@@ -1,0 +1,92 @@
+import { z } from 'zod';
+import prisma from '../config/prisma.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
+import { sendWhatsApp } from '../services/whatsapp.service.js';
+import { SUPPORT_TYPES } from '../utils/enums.js';
+import { nullifyEmpty, onlyDigits } from '../utils/helpers.js';
+
+// ============================================================
+//  Endpoints PÚBLICOS (sem autenticação) — usados pela Landing Page.
+//  Reaproveitam a regra antifraude do cadastro de apoiadores.
+// ============================================================
+
+const joinSchema = z.object({
+  name: z.string().min(2, 'Informe seu nome'),
+  phone: z.string().min(8, 'Informe um telefone válido'),
+  email: z.string().email().nullable().optional(),
+  neighborhood: z.string().nullable().optional(),
+  cityName: z.string().nullable().optional(),
+  supportType: z.enum(SUPPORT_TYPES).optional(),
+});
+
+export const join = asyncHandler(async (req, res) => {
+  const data = joinSchema.parse(nullifyEmpty(req.body));
+  const phone = onlyDigits(data.phone);
+
+  const [black, existing] = await Promise.all([
+    prisma.blacklist.findFirst({ where: { phone } }),
+    prisma.supporter.findFirst({ where: { phone } }),
+  ]);
+
+  let status = 'NOVO';
+  let flaggedReason = null;
+  let duplicateOfId = null;
+
+  if (black) {
+    status = 'BLACKLIST';
+    flaggedReason = `Telefone consta na blacklist: ${black.reason}`;
+  } else if (existing) {
+    status = 'SUSPEITO';
+    flaggedReason = `Telefone duplicado — já cadastrado para "${existing.name}".`;
+    duplicateOfId = existing.id;
+    await prisma.supporter.update({
+      where: { id: existing.id },
+      data: { status: 'SUSPEITO', flaggedReason: 'Telefone usado em mais de um cadastro.' },
+    });
+  }
+
+  const supporter = await prisma.supporter.create({
+    data: {
+      name: data.name,
+      phone,
+      whatsapp: phone,
+      email: data.email || null,
+      neighborhood: data.neighborhood || null,
+      cityName: data.cityName || 'Porto Alegre',
+      supportType: data.supportType || 'NOTICIAS',
+      status,
+      flaggedReason,
+      duplicateOfId,
+    },
+  });
+
+  if (supporter.supportType === 'VOLUNTARIO' && status !== 'BLACKLIST') {
+    await prisma.volunteer.create({ data: { supporterId: supporter.id } });
+    const body = `Olá ${supporter.name}! 👋 Recebemos seu cadastro na campanha do Márcio Bins Ely. Responda *SIM* para confirmar sua participação. 💪`;
+    const r = await sendWhatsApp({ to: phone, body });
+    await prisma.conversation.create({
+      data: {
+        channel: 'WHATSAPP', status: 'AGUARDANDO', contactName: supporter.name, contactPhone: phone,
+        supporterId: supporter.id, lastMessageAt: new Date(),
+        messages: { create: { direction: 'OUTBOUND', body, channel: 'WHATSAPP', externalId: r.id } },
+      },
+    });
+  }
+
+  res.status(201).json({ ok: true, message: 'Cadastro recebido! Em breve entraremos em contato. 💪' });
+});
+
+export const stats = asyncHandler(async (req, res) => {
+  const [supporters, volunteers, actions, banners] = await Promise.all([
+    prisma.supporter.count(),
+    prisma.volunteer.count(),
+    prisma.streetAction.count({ where: { status: 'REALIZADA' } }),
+    prisma.bannerLocation.count({ where: { status: { in: ['AUTORIZADO', 'INSTALADO'] } } }),
+  ]);
+  res.json({ supporters, volunteers, actions, banners });
+});
+
+export const campaign = asyncHandler(async (req, res) => {
+  const row = await prisma.setting.findUnique({ where: { key: 'campaign' } });
+  res.json(row?.value || {});
+});
