@@ -1,13 +1,8 @@
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './routes/ProtectedRoute.jsx';
 
-import Access from './pages/Access.jsx';
 import Login from './pages/Login.jsx';
 import Landing from './pages/Landing.jsx';
-
-const hasAccess = () => {
-  try { return localStorage.getItem('vai_access') === '1'; } catch { return false; }
-};
 import Dashboard from './pages/Dashboard.jsx';
 import Supporters from './pages/Supporters.jsx';
 import Volunteers from './pages/Volunteers.jsx';
@@ -33,12 +28,6 @@ import TVPanel from './pages/TVPanel.jsx';
 const P = (roles, element) => <ProtectedRoute roles={roles}>{element}</ProtectedRoute>;
 
 export default function App() {
-  const { pathname } = useLocation();
-
-  // Porta de acesso (gate VAI): protege todo o site antes do login do sistema.
-  if (pathname === '/acesso') return <Access />;
-  if (!hasAccess()) return <Navigate to="/acesso" replace />;
-
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
