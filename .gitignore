@@ -31,3 +31,4 @@ backend/prisma/*.db
 .vscode/
 .idea/
 .vercel
+.env*
