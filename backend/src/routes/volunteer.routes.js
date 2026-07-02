@@ -4,9 +4,9 @@ import { authorize } from '../middlewares/rbac.js';
 
 const r = Router();
 
-r.get('/ranking', volunteer.ranking);
-r.get('/', volunteer.list);
-r.get('/:id', volunteer.get);
-r.put('/:id', authorize('LIDER', 'MEMBRO', 'MEMBRO'), volunteer.update);
+r.get('/ranking', authorize('LIDER', 'MEMBRO', 'PARCEIRO'), volunteer.ranking);
+r.get('/', authorize('LIDER', 'MEMBRO'), volunteer.list);
+r.get('/:id', authorize('LIDER', 'MEMBRO'), volunteer.get);
+r.put('/:id', authorize('LIDER', 'MEMBRO'), volunteer.update);
 
 export default r;

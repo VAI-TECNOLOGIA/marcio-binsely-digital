@@ -4,13 +4,13 @@ import { authorize } from '../middlewares/rbac.js';
 
 const r = Router();
 
-r.get('/suspects', supporter.listSuspects);
-r.get('/', supporter.list);
-r.get('/:id', supporter.get);
-r.post('/', supporter.create);
-r.post('/:id/confirm', supporter.confirmVolunteer);
+r.get('/suspects', authorize('LIDER'), supporter.listSuspects);
+r.get('/', authorize('LIDER', 'MEMBRO'), supporter.list);
+r.get('/:id', authorize('LIDER', 'MEMBRO'), supporter.get);
+r.post('/', authorize('LIDER', 'MEMBRO'), supporter.create);
+r.post('/:id/confirm', authorize('LIDER', 'MEMBRO'), supporter.confirmVolunteer);
 r.post('/:id/blacklist', authorize('LIDER', 'MEMBRO'), supporter.toBlacklist);
-r.put('/:id', supporter.update);
-r.delete('/:id', authorize('LIDER', 'MEMBRO'), supporter.remove);
+r.put('/:id', authorize('LIDER', 'MEMBRO'), supporter.update);
+r.delete('/:id', authorize('LIDER'), supporter.remove);
 
 export default r;

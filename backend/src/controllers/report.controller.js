@@ -34,7 +34,13 @@ export const summary = asyncHandler(async (req, res) => {
 
 /** Crescimento da base ao longo do tempo (série acumulada por dia). */
 export const growth = asyncHandler(async (req, res) => {
-  const supporters = await prisma.supporter.findMany({ select: { createdAt: true }, orderBy: { createdAt: 'asc' } });
+  // Cap defensivo: 100k linhas é ~4MB — não trava memoria da lambda.
+  // Se o banco crescer além disso, migrar pra agregação SQL (DATE_TRUNC).
+  const supporters = await prisma.supporter.findMany({
+    select: { createdAt: true },
+    orderBy: { createdAt: 'asc' },
+    take: 100_000,
+  });
   const byDay = {};
   for (const s of supporters) {
     const day = s.createdAt.toISOString().slice(0, 10);

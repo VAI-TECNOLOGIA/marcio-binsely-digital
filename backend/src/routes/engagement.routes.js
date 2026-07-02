@@ -4,8 +4,8 @@ import { authorize } from '../middlewares/rbac.js';
 
 const r = Router();
 
-r.get('/', engagement.list);
-r.post('/', engagement.create);
-r.post('/:id/validate', authorize('LIDER', 'MEMBRO', 'MEMBRO'), engagement.validate);
+r.get('/', authorize('LIDER', 'MEMBRO', 'PARCEIRO'), engagement.list);
+r.post('/', authorize('LIDER', 'MEMBRO', 'PARCEIRO'), engagement.create);
+r.post('/:id/validate', authorize('LIDER', 'MEMBRO'), engagement.validate);
 
 export default r;

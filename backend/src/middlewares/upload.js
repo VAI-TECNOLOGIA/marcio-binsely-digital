@@ -14,9 +14,14 @@ if (!USE_BLOB) {
   uploadRoot = path.resolve(process.cwd(), env.uploadDir);
   try {
     if (!fs.existsSync(uploadRoot)) fs.mkdirSync(uploadRoot, { recursive: true });
-  } catch {
+  } catch (e) {
+    console.warn('[upload] uploadDir principal indisponível, tentando /tmp:', e.message);
     uploadRoot = path.join('/tmp', 'uploads');
-    try { fs.mkdirSync(uploadRoot, { recursive: true }); } catch {}
+    try {
+      fs.mkdirSync(uploadRoot, { recursive: true });
+    } catch (e2) {
+      console.error('[upload] /tmp tambem falhou — uploads locais quebrarão:', e2.message);
+    }
   }
 }
 

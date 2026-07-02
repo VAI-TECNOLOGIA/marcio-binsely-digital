@@ -4,12 +4,12 @@ import { authorize } from '../middlewares/rbac.js';
 
 const r = Router();
 
-r.get('/', bc.list);
-r.get('/:id', bc.get);
-r.post('/', authorize('LIDER', 'MEMBRO', 'MEMBRO', 'MEMBRO'), bc.create);
-r.post('/:id/contacts', bc.importContacts);
-r.post('/:id/send', bc.send);
-r.post('/:id/pause', bc.pause);
-r.delete('/:id', bc.remove);
+r.get('/', authorize('LIDER', 'MEMBRO'), bc.list);
+r.get('/:id', authorize('LIDER', 'MEMBRO'), bc.get);
+r.post('/', authorize('LIDER', 'MEMBRO'), bc.create);
+r.post('/:id/contacts', authorize('LIDER', 'MEMBRO'), bc.importContacts);
+r.post('/:id/send', authorize('LIDER'), bc.send);
+r.post('/:id/pause', authorize('LIDER', 'MEMBRO'), bc.pause);
+r.delete('/:id', authorize('LIDER'), bc.remove);
 
 export default r;
