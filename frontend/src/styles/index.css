@@ -661,6 +661,35 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 }
 
 /* ============================================================
+   AUTH — páginas simples (esqueci/redefinir senha)
+   ============================================================ */
+.auth-simple {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--bg);
+}
+.auth-simple .auth-card { width: 100%; max-width: 420px; }
+.auth-sent-icon {
+  width: 62px; height: 62px;
+  border-radius: 16px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  display: grid; place-items: center;
+  margin-bottom: 16px;
+}
+.auth-links {
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.auth-links .auth-back { display: inline-flex; }
+
+/* ============================================================
    MAPA PROFISSIONAL — sidebar + tile CartoDB Voyager + ao vivo
    ============================================================ */
 .map-shell {

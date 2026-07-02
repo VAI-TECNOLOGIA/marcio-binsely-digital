@@ -81,9 +81,12 @@ export default function Login() {
             {submitting ? 'Entrando...' : 'Entrar'}
           </button>
 
-          <Link to="/lp" className="auth-back" style={{ marginTop: 16, display: 'inline-flex' }}>
-            <ArrowLeft size={14} /> Conhecer a campanha
-          </Link>
+          <div className="auth-links">
+            <Link to="/esqueci-senha" className="auth-back">Esqueci minha senha</Link>
+            <Link to="/lp" className="auth-back">
+              <ArrowLeft size={14} /> Conhecer a campanha
+            </Link>
+          </div>
         </form>
       </div>
     </div>

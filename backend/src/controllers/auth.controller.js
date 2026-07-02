@@ -7,6 +7,8 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { audit } from '../utils/audit.js';
 import { USER_ROLES } from '../utils/enums.js';
 import { nullifyEmpty } from '../utils/helpers.js';
+import { sendEmail, resetPasswordEmail } from '../services/email.service.js';
+import env from '../config/env.js';
 
 const loginSchema = z.object({
   email: z.string().email('E-mail inválido'),
@@ -80,6 +82,18 @@ export const forgotPassword = asyncHandler(async (req, res) => {
       where: { id: user.id },
       data: { resetToken: token, resetTokenExpires: new Date(Date.now() + 3600_000) },
     });
+
+    // Link aponta pro próprio front (mesma origem do deploy). Fallback: PUBLIC_URL.
+    const base = req.headers.origin || env.publicUrl;
+    const resetUrl = `${base}/redefinir-senha?token=${encodeURIComponent(token)}`;
+    try {
+      const { subject, html } = resetPasswordEmail({ name: user.name, resetUrl });
+      await sendEmail({ to: user.email, subject, html });
+    } catch (e) {
+      // Não vaza a falha pro solicitante (evita enumeração); loga pra operação.
+      console.error('[forgot-password] falha ao enviar e-mail:', e.message);
+    }
+
     return res.json({
       message,
       resetToken: process.env.NODE_ENV === 'development' ? token : undefined,
