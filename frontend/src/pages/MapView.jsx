@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup, ZoomControl } from 'react-leaflet';
+import { GoogleMap, Marker, InfoWindow, useJsApiLoader } from '@react-google-maps/api';
 import {
   AlertTriangle, RotateCw, Users, MapPin, Activity,
   Radio, Pause, Layers,
@@ -11,9 +12,34 @@ import { formatPhone } from '../lib/format.js';
 import 'leaflet/dist/leaflet.css';
 
 const RS_CENTER = [-29.6, -53.2];
+const RS_CENTER_LATLNG = { lat: -29.6, lng: -53.2 };
 const REFRESH_MS = 30_000;
 
-// Tile CartoDB Voyager — aparência clean tipo Google Maps, gratuito, sem key.
+// Google Maps — usado quando VITE_GOOGLE_MAPS_API_KEY estiver setada em build/env.
+// Se não estiver, usa fallback CartoDB Voyager (Leaflet).
+const GOOGLE_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
+const USE_GOOGLE = GOOGLE_KEY.length > 20;
+
+// Estilo minimalista pra Google Maps (remove POIs comerciais e transit,
+// deixa o mapa clean pra dashboard política).
+const GMAP_STYLES = [
+  { featureType: 'poi.business',  stylers: [{ visibility: 'off' }] },
+  { featureType: 'poi.attraction', elementType: 'labels', stylers: [{ visibility: 'off' }] },
+  { featureType: 'transit',        elementType: 'labels', stylers: [{ visibility: 'off' }] },
+  { featureType: 'road.highway',   elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+];
+const GMAP_OPTIONS = {
+  disableDefaultUI: false,
+  streetViewControl: false,
+  mapTypeControl: false,
+  fullscreenControl: false,
+  zoomControl: true,
+  clickableIcons: false,
+  gestureHandling: 'greedy',
+  styles: GMAP_STYLES,
+};
+
+// Tile CartoDB Voyager — fallback quando não há chave Google (gratuito, sem key).
 // Retina-ready via {r}.
 const TILE_URL =
   'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
@@ -183,59 +209,10 @@ export default function MapView() {
               <span className="muted">Carregando camadas do mapa…</span>
             </div>
           </div>
+        ) : USE_GOOGLE ? (
+          <GoogleCanvas data={data} visible={visible} refreshing={refreshing} hasContent={anyContent} />
         ) : (
-          <div className="map-wrap map-container-wrap">
-            <MapContainer
-              center={RS_CENTER}
-              zoom={7}
-              scrollWheelZoom
-              zoomControl={false}
-              style={{ height: '100%', background: '#eaf1f7' }}
-            >
-              <TileLayer attribution={TILE_ATTR} url={TILE_URL} />
-              <ZoomControl position="topright" />
-              {LAYERS.map(
-                (l) =>
-                  visible[l.key] &&
-                  (data[l.key] || []).map((p) => (
-                    <CircleMarker
-                      key={`${l.key}-${p.id}`}
-                      center={[p.lat, p.lng]}
-                      radius={l.key === 'supporters' ? 6 : 8}
-                      pathOptions={{
-                        color: '#ffffff',
-                        fillColor: l.color,
-                        fillOpacity: 0.92,
-                        weight: 2,
-                      }}
-                    >
-                      <Popup>
-                        <Detail layer={l.key} p={p} />
-                      </Popup>
-                    </CircleMarker>
-                  ))
-              )}
-            </MapContainer>
-
-            {refreshing && (
-              <div className="map-refresh-indicator">
-                <RotateCw size={11} className="spin" />
-                Atualizando
-              </div>
-            )}
-
-            {!anyContent && (
-              <div className="map-empty-overlay">
-                <div className="map-empty-card">
-                  <div className="empty-icon"><MapPin size={26} /></div>
-                  <h4>Nenhum ponto ainda no mapa</h4>
-                  <p className="muted">
-                    Cadastros de apoiadores, faixas e ações vão aparecer aqui automaticamente.
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
+          <LeafletCanvas data={data} visible={visible} refreshing={refreshing} hasContent={anyContent} />
         )}
       </div>
     </Layout>
@@ -277,6 +254,147 @@ function Detail({ layer, p }) {
         {label('StreetActionType', p.type)}
       </div>
       <div className="map-popup-sub">{p.neighborhood}</div>
+    </div>
+  );
+}
+
+/* Overlay comum: indicador de refresh + empty state — mesmo visual em ambos os canvas. */
+function CanvasOverlay({ refreshing, hasContent }) {
+  return (
+    <>
+      {refreshing && (
+        <div className="map-refresh-indicator">
+          <RotateCw size={11} className="spin" />
+          Atualizando
+        </div>
+      )}
+      {!hasContent && (
+        <div className="map-empty-overlay">
+          <div className="map-empty-card">
+            <div className="empty-icon"><MapPin size={26} /></div>
+            <h4>Nenhum ponto ainda no mapa</h4>
+            <p className="muted">
+              Cadastros de apoiadores, faixas e ações vão aparecer aqui automaticamente.
+            </p>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/* Canvas Leaflet (fallback, sempre disponível — sem key). */
+function LeafletCanvas({ data, visible, refreshing, hasContent }) {
+  return (
+    <div className="map-wrap map-container-wrap">
+      <MapContainer
+        center={RS_CENTER}
+        zoom={7}
+        scrollWheelZoom
+        zoomControl={false}
+        style={{ height: '100%', background: '#eaf1f7' }}
+      >
+        <TileLayer attribution={TILE_ATTR} url={TILE_URL} />
+        <ZoomControl position="topright" />
+        {LAYERS.map(
+          (l) =>
+            visible[l.key] &&
+            (data[l.key] || []).map((p) => (
+              <CircleMarker
+                key={`${l.key}-${p.id}`}
+                center={[p.lat, p.lng]}
+                radius={l.key === 'supporters' ? 6 : 8}
+                pathOptions={{
+                  color: '#ffffff',
+                  fillColor: l.color,
+                  fillOpacity: 0.92,
+                  weight: 2,
+                }}
+              >
+                <Popup>
+                  <Detail layer={l.key} p={p} />
+                </Popup>
+              </CircleMarker>
+            ))
+        )}
+      </MapContainer>
+      <CanvasOverlay refreshing={refreshing} hasContent={hasContent} />
+    </div>
+  );
+}
+
+/* Canvas Google Maps — ativa quando VITE_GOOGLE_MAPS_API_KEY está setada. */
+function GoogleCanvas({ data, visible, refreshing, hasContent }) {
+  const { isLoaded, loadError } = useJsApiLoader({
+    id: 'mbd-google-map',
+    googleMapsApiKey: GOOGLE_KEY,
+  });
+  const [selected, setSelected] = useState(null);
+
+  if (loadError) {
+    return (
+      <div className="map-wrap map-center">
+        <div className="empty">
+          <div className="empty-icon"><AlertTriangle size={26} /></div>
+          <h4>Não foi possível carregar o Google Maps</h4>
+          <p className="muted">
+            Verifique se a chave <code>VITE_GOOGLE_MAPS_API_KEY</code> é válida,
+            está ativa e tem a API “Maps JavaScript” habilitada.
+          </p>
+        </div>
+      </div>
+    );
+  }
+  if (!isLoaded) {
+    return (
+      <div className="map-wrap map-center">
+        <div className="center-box">
+          <div className="spinner" />
+          <span className="muted">Carregando Google Maps…</span>
+        </div>
+      </div>
+    );
+  }
+
+  const iconFor = (color, scale) => ({
+    path: window.google.maps.SymbolPath.CIRCLE,
+    fillColor: color,
+    fillOpacity: 0.92,
+    strokeColor: '#ffffff',
+    strokeWeight: 2,
+    scale,
+  });
+
+  return (
+    <div className="map-wrap map-container-wrap">
+      <GoogleMap
+        mapContainerStyle={{ width: '100%', height: '100%' }}
+        center={RS_CENTER_LATLNG}
+        zoom={7}
+        options={GMAP_OPTIONS}
+      >
+        {LAYERS.map(
+          (l) =>
+            visible[l.key] &&
+            (data[l.key] || []).map((p) => (
+              <Marker
+                key={`${l.key}-${p.id}`}
+                position={{ lat: p.lat, lng: p.lng }}
+                icon={iconFor(l.color, l.key === 'supporters' ? 6 : 8)}
+                onClick={() => setSelected({ layer: l.key, p })}
+              />
+            ))
+        )}
+        {selected && (
+          <InfoWindow
+            position={{ lat: selected.p.lat, lng: selected.p.lng }}
+            onCloseClick={() => setSelected(null)}
+          >
+            <Detail layer={selected.layer} p={selected.p} />
+          </InfoWindow>
+        )}
+      </GoogleMap>
+      <CanvasOverlay refreshing={refreshing} hasContent={hasContent} />
     </div>
   );
 }
