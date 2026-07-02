@@ -9,8 +9,8 @@ export default function Login() {
   const { login, user, loading } = useAuth();
   const nav = useNavigate();
   const toast = useToast();
-  const [email, setEmail] = useState('admin@marciobinsely.com');
-  const [password, setPassword] = useState('Admin@123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   if (!loading && user) return <Navigate to="/" replace />;
@@ -84,14 +84,6 @@ export default function Login() {
           <Link to="/lp" className="auth-back" style={{ marginTop: 16, display: 'inline-flex' }}>
             <ArrowLeft size={14} /> Conhecer a campanha
           </Link>
-
-          <div className="auth-hint">
-            <strong>Acesso de demonstração</strong>
-            <br />
-            admin@marciobinsely.com · Admin@123
-            <br />
-            (também: norte@, sul@, marketing@, materiais@, atendimento@ · mesma senha)
-          </div>
         </form>
       </div>
     </div>
