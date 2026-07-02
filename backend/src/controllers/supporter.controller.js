@@ -8,6 +8,7 @@ import { supporterScope } from '../utils/scope.js';
 import { sendWhatsApp } from '../services/whatsapp.service.js';
 import { SUPPORT_TYPES, SUPPORTER_STATUS } from '../utils/enums.js';
 import { nullifyEmpty, onlyDigits } from '../utils/helpers.js';
+import { fallbackLatLng, linkCityByName } from '../utils/geo.js';
 
 const include = {
   region: { select: { id: true, name: true } },
@@ -75,6 +76,21 @@ export const create = asyncHandler(async (req, res) => {
       where: { id: existing.id },
       data: { status: 'SUSPEITO', flaggedReason: 'Telefone usado em mais de um cadastro.' },
     });
+  }
+
+  // Conexão com o mapa: sem lat/lng manual, usa centroide da cidade + jitter.
+  // Sem cityId, tenta vincular pela cidade digitada (habilita filtro por região).
+  if (!data.cityId && data.cityName) {
+    const city = await linkCityByName(prisma, data.cityName);
+    if (city) {
+      data.cityId = city.id;
+      if (!data.regionId) data.regionId = city.regionId;
+    }
+  }
+  if (data.lat == null || data.lng == null) {
+    const geo = fallbackLatLng({ cityName: data.cityName, neighborhood: data.neighborhood, seed: phone });
+    data.lat = geo.lat;
+    data.lng = geo.lng;
   }
 
   const supporter = await prisma.supporter.create({

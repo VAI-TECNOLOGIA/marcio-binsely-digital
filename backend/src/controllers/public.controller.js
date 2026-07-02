@@ -4,6 +4,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { sendWhatsApp } from '../services/whatsapp.service.js';
 import { SUPPORT_TYPES } from '../utils/enums.js';
 import { nullifyEmpty, onlyDigits } from '../utils/helpers.js';
+import { fallbackLatLng, linkCityByName } from '../utils/geo.js';
 
 // ============================================================
 //  Endpoints PÚBLICOS (sem autenticação) — usados pela Landing Page.
@@ -45,6 +46,12 @@ export const join = asyncHandler(async (req, res) => {
     });
   }
 
+  // Conexão com o mapa/filtros: vincula cidade→região e garante lat/lng
+  // aproximado (centroide da cidade + jitter) quando não há coordenada.
+  const cityName = data.cityName || 'Porto Alegre';
+  const city = await linkCityByName(prisma, cityName);
+  const geo = fallbackLatLng({ cityName, neighborhood: data.neighborhood, seed: phone });
+
   const supporter = await prisma.supporter.create({
     data: {
       name: data.name,
@@ -52,7 +59,11 @@ export const join = asyncHandler(async (req, res) => {
       whatsapp: phone,
       email: data.email || null,
       neighborhood: data.neighborhood || null,
-      cityName: data.cityName || 'Porto Alegre',
+      cityName,
+      cityId: city?.id || null,
+      regionId: city?.regionId || null,
+      lat: geo.lat,
+      lng: geo.lng,
       supportType: data.supportType || 'NOTICIAS',
       status,
       flaggedReason,
