@@ -154,6 +154,7 @@ exports.Prisma.RegionScalarFieldEnum = {
   name: 'name',
   uf: 'uf',
   color: 'color',
+  coordinatorId: 'coordinatorId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

@@ -22,6 +22,7 @@ export default function ResourcePage({ config }) {
   const [search, setSearch] = useState('');
   const [filterValues, setFilterValues] = useState({});
   const [lookups, setLookups] = useState({});
+  const [lookupRaw, setLookupRaw] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({});
@@ -56,25 +57,40 @@ export default function ResourcePage({ config }) {
   useEffect(() => {
     (async () => {
       const map = {};
+      const raw = {};
       for (const lk of config.lookups || []) {
         try {
           const { data } = await api.get(lk.endpoint, { params: lk.params });
           const items = data.data || data;
+          raw[lk.key] = items;
           map[lk.key] = items.map((it) => ({
             value: it[lk.valueKey || 'id'],
             label: lk.labelFn ? lk.labelFn(it) : it[lk.labelKey || 'name'],
           }));
         } catch {
           map[lk.key] = [];
+          raw[lk.key] = [];
         }
       }
       setLookups(map);
+      setLookupRaw(raw);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function resolveField(f) {
-    if (f.optionsFrom) return { ...f, type: 'select', options: lookups[f.optionsFrom] || [] };
+    if (f.optionsFrom) {
+      const resolved = { ...f, type: 'select', options: lookups[f.optionsFrom] || [] };
+      // Ao escolher a região, mostra o coordenador responsável (vem no lookup).
+      if (f.optionsFrom === 'regions' && form[f.name]) {
+        const region = (lookupRaw.regions || []).find((r) => r.id === form[f.name]);
+        const c = region?.coordinator;
+        resolved.hint = c
+          ? `Coordenador responsável: ${c.name}${c.phone ? ' · ' + c.phone : ''}`
+          : 'Sem coordenador definido para esta região (defina em Configurações → Regiões).';
+      }
+      return resolved;
+    }
     if (f.enumGroup) return { ...f, type: 'select', options: options(f.enumGroup) };
     return f;
   }

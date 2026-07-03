@@ -130,9 +130,12 @@ export const automations = resourceRouter(
 export const regions = resourceRouter(
   crudFactory('region', {
     searchFields: ['name'],
-    include: { _count: { select: { cities: true, supporters: true } } },
+    include: {
+      _count: { select: { cities: true, supporters: true } },
+      coordinator: { select: { id: true, name: true, phone: true, email: true, role: true } },
+    },
     orderBy: { name: 'asc' },
-    writableFields: ['name', 'uf', 'color'],
+    writableFields: ['name', 'uf', 'color', 'coordinatorId'],
   }),
   { writeRoles: [A] }
 );

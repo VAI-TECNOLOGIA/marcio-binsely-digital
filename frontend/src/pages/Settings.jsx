@@ -29,9 +29,12 @@ const regionsConfig = {
   titleField: 'name',
   writeRoles: ['LIDER'],
   searchable: false,
+  lookups: [
+    { key: 'coordinators', endpoint: '/users', labelFn: (u) => `${u.name}${u.phone ? ' · ' + u.phone : ''}` },
+  ],
   columns: [
     { key: 'name', label: 'Região', render: (r) => <div className="cell-strong">{r.name}</div> },
-    { key: 'uf', label: 'UF', render: (r) => r.uf },
+    { key: 'coordinator', label: 'Coordenador responsável', render: (r) => r.coordinator?.name || <span className="muted">—</span> },
     { key: 'color', label: 'Cor', render: (r) => <span className="legend-dot" style={{ background: r.color || '#cbd5e1', display: 'inline-block' }} /> },
     { key: 'count', label: 'Apoiadores', render: (r) => r._count?.supporters ?? 0 },
   ],
@@ -39,6 +42,7 @@ const regionsConfig = {
     { name: 'name', label: 'Nome', required: true },
     { name: 'uf', label: 'UF', placeholder: 'RS' },
     { name: 'color', label: 'Cor (hex)', placeholder: '#C8102E' },
+    { name: 'coordinatorId', label: 'Coordenador responsável', optionsFrom: 'coordinators', full: true, hint: 'Aparece automaticamente ao selecionar esta região nos formulários. Cadastre a pessoa em Usuários primeiro.' },
   ],
 };
 

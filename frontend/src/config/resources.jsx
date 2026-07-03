@@ -60,6 +60,7 @@ export const supporters = {
     { name: 'status', label: 'Status', enumGroup: 'SupporterStatus' },
     { name: 'instagram', label: 'Instagram' },
     { name: 'facebook', label: 'Facebook' },
+    { name: 'photoUrl', label: 'Foto do apoiador (opcional)', type: 'upload', accept: 'image/*', full: true },
     { name: 'lat', label: 'Latitude (mapa)', type: 'number' },
     { name: 'lng', label: 'Longitude (mapa)', type: 'number' },
     { name: 'notes', label: 'Observações', type: 'textarea', full: true },
@@ -104,7 +105,8 @@ export const notices = {
     { name: 'priority', label: 'Prioridade', enumGroup: 'Priority' },
     { name: 'regionId', label: 'Região (vazio = todas)', optionsFrom: 'regions' },
     { name: 'status', label: 'Status', enumGroup: 'PublishStatus' },
-    { name: 'externalLink', label: 'Link externo', full: true },
+    { name: 'attachmentUrl', label: 'Anexo (imagem, vídeo, áudio ou PDF)', type: 'upload', full: true },
+    { name: 'externalLink', label: 'Link externo (opcional)', full: true },
     { name: 'publishDate', label: 'Data de publicação', type: 'date' },
   ],
 };
@@ -133,6 +135,8 @@ export const banners = {
     { name: 'lng', label: 'Longitude', type: 'number' },
     { name: 'status', label: 'Status', enumGroup: 'BannerStatus' },
     { name: 'authorized', label: 'Autorização registrada', type: 'checkbox' },
+    { name: 'bannerPhotoUrl', label: 'Foto da faixa instalada', type: 'upload', accept: 'image/*', full: true },
+    { name: 'housePhotoUrl', label: 'Foto da casa / local (opcional)', type: 'upload', accept: 'image/*', full: true },
     { name: 'notes', label: 'Observações', type: 'textarea', full: true },
   ],
 };

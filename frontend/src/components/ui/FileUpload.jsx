@@ -13,7 +13,7 @@ const MAX_MB = 25;
 export default function FileUpload({
   value,
   onChange,
-  accept = 'image/*,video/*,audio/*',
+  accept = 'image/*,video/*,audio/*,application/pdf',
   maxSizeMB = MAX_MB,
   previewImages = true,
 }) {
@@ -93,7 +93,7 @@ export default function FileUpload({
             <>
               <UploadCloud size={22} />
               <span><strong>Anexar arquivo</strong> ou arraste aqui</span>
-              <small>Imagem, vídeo ou áudio · até {maxSizeMB} MB</small>
+              <small>Imagem, vídeo, áudio ou PDF · até {maxSizeMB} MB</small>
             </>
           )}
           <input ref={inputRef} type="file" accept={accept} hidden onChange={onInput} />

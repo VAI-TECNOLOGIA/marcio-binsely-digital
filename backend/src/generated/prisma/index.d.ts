@@ -4059,6 +4059,7 @@ export namespace Prisma {
    */
 
   export type UserCountOutputType = {
+    coordinatedRegions: number
     team: number
     coordinatedSupporters: number
     supervisedVolunteers: number
@@ -4081,6 +4082,7 @@ export namespace Prisma {
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    coordinatedRegions?: boolean | UserCountOutputTypeCountCoordinatedRegionsArgs
     team?: boolean | UserCountOutputTypeCountTeamArgs
     coordinatedSupporters?: boolean | UserCountOutputTypeCountCoordinatedSupportersArgs
     supervisedVolunteers?: boolean | UserCountOutputTypeCountSupervisedVolunteersArgs
@@ -4111,6 +4113,13 @@ export namespace Prisma {
      * Select specific fields to fetch from the UserCountOutputType
      */
     select?: UserCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountCoordinatedRegionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RegionWhereInput
   }
 
   /**
@@ -6007,6 +6016,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     region?: boolean | User$regionArgs<ExtArgs>
+    coordinatedRegions?: boolean | User$coordinatedRegionsArgs<ExtArgs>
     manager?: boolean | User$managerArgs<ExtArgs>
     team?: boolean | User$teamArgs<ExtArgs>
     coordinatedSupporters?: boolean | User$coordinatedSupportersArgs<ExtArgs>
@@ -6091,6 +6101,7 @@ export namespace Prisma {
   export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "phone" | "role" | "avatarUrl" | "active" | "code" | "regionId" | "managerId" | "resetToken" | "resetTokenExpires" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     region?: boolean | User$regionArgs<ExtArgs>
+    coordinatedRegions?: boolean | User$coordinatedRegionsArgs<ExtArgs>
     manager?: boolean | User$managerArgs<ExtArgs>
     team?: boolean | User$teamArgs<ExtArgs>
     coordinatedSupporters?: boolean | User$coordinatedSupportersArgs<ExtArgs>
@@ -6126,6 +6137,7 @@ export namespace Prisma {
     name: "User"
     objects: {
       region: Prisma.$RegionPayload<ExtArgs> | null
+      coordinatedRegions: Prisma.$RegionPayload<ExtArgs>[]
       manager: Prisma.$UserPayload<ExtArgs> | null
       team: Prisma.$UserPayload<ExtArgs>[]
       coordinatedSupporters: Prisma.$SupporterPayload<ExtArgs>[]
@@ -6558,6 +6570,7 @@ export namespace Prisma {
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     region<T extends User$regionArgs<ExtArgs> = {}>(args?: Subset<T, User$regionArgs<ExtArgs>>): Prisma__RegionClient<$Result.GetResult<Prisma.$RegionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    coordinatedRegions<T extends User$coordinatedRegionsArgs<ExtArgs> = {}>(args?: Subset<T, User$coordinatedRegionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RegionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     manager<T extends User$managerArgs<ExtArgs> = {}>(args?: Subset<T, User$managerArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     team<T extends User$teamArgs<ExtArgs> = {}>(args?: Subset<T, User$teamArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     coordinatedSupporters<T extends User$coordinatedSupportersArgs<ExtArgs> = {}>(args?: Subset<T, User$coordinatedSupportersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SupporterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -7034,6 +7047,30 @@ export namespace Prisma {
      */
     include?: RegionInclude<ExtArgs> | null
     where?: RegionWhereInput
+  }
+
+  /**
+   * User.coordinatedRegions
+   */
+  export type User$coordinatedRegionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Region
+     */
+    select?: RegionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Region
+     */
+    omit?: RegionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RegionInclude<ExtArgs> | null
+    where?: RegionWhereInput
+    orderBy?: RegionOrderByWithRelationInput | RegionOrderByWithRelationInput[]
+    cursor?: RegionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: RegionScalarFieldEnum | RegionScalarFieldEnum[]
   }
 
   /**
@@ -7545,6 +7582,7 @@ export namespace Prisma {
     name: string | null
     uf: string | null
     color: string | null
+    coordinatorId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -7554,6 +7592,7 @@ export namespace Prisma {
     name: string | null
     uf: string | null
     color: string | null
+    coordinatorId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -7563,6 +7602,7 @@ export namespace Prisma {
     name: number
     uf: number
     color: number
+    coordinatorId: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -7574,6 +7614,7 @@ export namespace Prisma {
     name?: true
     uf?: true
     color?: true
+    coordinatorId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -7583,6 +7624,7 @@ export namespace Prisma {
     name?: true
     uf?: true
     color?: true
+    coordinatorId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -7592,6 +7634,7 @@ export namespace Prisma {
     name?: true
     uf?: true
     color?: true
+    coordinatorId?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -7674,6 +7717,7 @@ export namespace Prisma {
     name: string
     uf: string
     color: string | null
+    coordinatorId: string | null
     createdAt: Date
     updatedAt: Date
     _count: RegionCountAggregateOutputType | null
@@ -7700,8 +7744,10 @@ export namespace Prisma {
     name?: boolean
     uf?: boolean
     color?: boolean
+    coordinatorId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    coordinator?: boolean | Region$coordinatorArgs<ExtArgs>
     cities?: boolean | Region$citiesArgs<ExtArgs>
     users?: boolean | Region$usersArgs<ExtArgs>
     supporters?: boolean | Region$supportersArgs<ExtArgs>
@@ -7717,8 +7763,10 @@ export namespace Prisma {
     name?: boolean
     uf?: boolean
     color?: boolean
+    coordinatorId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    coordinator?: boolean | Region$coordinatorArgs<ExtArgs>
   }, ExtArgs["result"]["region"]>
 
   export type RegionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -7726,8 +7774,10 @@ export namespace Prisma {
     name?: boolean
     uf?: boolean
     color?: boolean
+    coordinatorId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    coordinator?: boolean | Region$coordinatorArgs<ExtArgs>
   }, ExtArgs["result"]["region"]>
 
   export type RegionSelectScalar = {
@@ -7735,12 +7785,14 @@ export namespace Prisma {
     name?: boolean
     uf?: boolean
     color?: boolean
+    coordinatorId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type RegionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "uf" | "color" | "createdAt" | "updatedAt", ExtArgs["result"]["region"]>
+  export type RegionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "uf" | "color" | "coordinatorId" | "createdAt" | "updatedAt", ExtArgs["result"]["region"]>
   export type RegionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    coordinator?: boolean | Region$coordinatorArgs<ExtArgs>
     cities?: boolean | Region$citiesArgs<ExtArgs>
     users?: boolean | Region$usersArgs<ExtArgs>
     supporters?: boolean | Region$supportersArgs<ExtArgs>
@@ -7750,12 +7802,17 @@ export namespace Prisma {
     events?: boolean | Region$eventsArgs<ExtArgs>
     _count?: boolean | RegionCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type RegionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
-  export type RegionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type RegionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    coordinator?: boolean | Region$coordinatorArgs<ExtArgs>
+  }
+  export type RegionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    coordinator?: boolean | Region$coordinatorArgs<ExtArgs>
+  }
 
   export type $RegionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Region"
     objects: {
+      coordinator: Prisma.$UserPayload<ExtArgs> | null
       cities: Prisma.$CityPayload<ExtArgs>[]
       users: Prisma.$UserPayload<ExtArgs>[]
       supporters: Prisma.$SupporterPayload<ExtArgs>[]
@@ -7769,6 +7826,7 @@ export namespace Prisma {
       name: string
       uf: string
       color: string | null
+      coordinatorId: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["region"]>
@@ -8165,6 +8223,7 @@ export namespace Prisma {
    */
   export interface Prisma__RegionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    coordinator<T extends Region$coordinatorArgs<ExtArgs> = {}>(args?: Subset<T, Region$coordinatorArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     cities<T extends Region$citiesArgs<ExtArgs> = {}>(args?: Subset<T, Region$citiesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     users<T extends Region$usersArgs<ExtArgs> = {}>(args?: Subset<T, Region$usersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     supporters<T extends Region$supportersArgs<ExtArgs> = {}>(args?: Subset<T, Region$supportersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SupporterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -8205,6 +8264,7 @@ export namespace Prisma {
     readonly name: FieldRef<"Region", 'String'>
     readonly uf: FieldRef<"Region", 'String'>
     readonly color: FieldRef<"Region", 'String'>
+    readonly coordinatorId: FieldRef<"Region", 'String'>
     readonly createdAt: FieldRef<"Region", 'DateTime'>
     readonly updatedAt: FieldRef<"Region", 'DateTime'>
   }
@@ -8456,6 +8516,10 @@ export namespace Prisma {
      */
     data: RegionCreateManyInput | RegionCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RegionIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -8526,6 +8590,10 @@ export namespace Prisma {
      * Limit how many Regions to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RegionIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -8592,6 +8660,25 @@ export namespace Prisma {
      * Limit how many Regions to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Region.coordinator
+   */
+  export type Region$coordinatorArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
   }
 
   /**
@@ -43182,6 +43269,7 @@ export namespace Prisma {
     name: 'name',
     uf: 'uf',
     color: 'color',
+    coordinatorId: 'coordinatorId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -44221,6 +44309,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     region?: XOR<RegionNullableScalarRelationFilter, RegionWhereInput> | null
+    coordinatedRegions?: RegionListRelationFilter
     manager?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     team?: UserListRelationFilter
     coordinatedSupporters?: SupporterListRelationFilter
@@ -44260,6 +44349,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     region?: RegionOrderByWithRelationInput
+    coordinatedRegions?: RegionOrderByRelationAggregateInput
     manager?: UserOrderByWithRelationInput
     team?: UserOrderByRelationAggregateInput
     coordinatedSupporters?: SupporterOrderByRelationAggregateInput
@@ -44302,6 +44392,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     region?: XOR<RegionNullableScalarRelationFilter, RegionWhereInput> | null
+    coordinatedRegions?: RegionListRelationFilter
     manager?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     team?: UserListRelationFilter
     coordinatedSupporters?: SupporterListRelationFilter
@@ -44374,8 +44465,10 @@ export namespace Prisma {
     name?: StringFilter<"Region"> | string
     uf?: StringFilter<"Region"> | string
     color?: StringNullableFilter<"Region"> | string | null
+    coordinatorId?: StringNullableFilter<"Region"> | string | null
     createdAt?: DateTimeFilter<"Region"> | Date | string
     updatedAt?: DateTimeFilter<"Region"> | Date | string
+    coordinator?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     cities?: CityListRelationFilter
     users?: UserListRelationFilter
     supporters?: SupporterListRelationFilter
@@ -44390,8 +44483,10 @@ export namespace Prisma {
     name?: SortOrder
     uf?: SortOrder
     color?: SortOrderInput | SortOrder
+    coordinatorId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    coordinator?: UserOrderByWithRelationInput
     cities?: CityOrderByRelationAggregateInput
     users?: UserOrderByRelationAggregateInput
     supporters?: SupporterOrderByRelationAggregateInput
@@ -44409,8 +44504,10 @@ export namespace Prisma {
     NOT?: RegionWhereInput | RegionWhereInput[]
     uf?: StringFilter<"Region"> | string
     color?: StringNullableFilter<"Region"> | string | null
+    coordinatorId?: StringNullableFilter<"Region"> | string | null
     createdAt?: DateTimeFilter<"Region"> | Date | string
     updatedAt?: DateTimeFilter<"Region"> | Date | string
+    coordinator?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     cities?: CityListRelationFilter
     users?: UserListRelationFilter
     supporters?: SupporterListRelationFilter
@@ -44425,6 +44522,7 @@ export namespace Prisma {
     name?: SortOrder
     uf?: SortOrder
     color?: SortOrderInput | SortOrder
+    coordinatorId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: RegionCountOrderByAggregateInput
@@ -44440,6 +44538,7 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"Region"> | string
     uf?: StringWithAggregatesFilter<"Region"> | string
     color?: StringNullableWithAggregatesFilter<"Region"> | string | null
+    coordinatorId?: StringNullableWithAggregatesFilter<"Region"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Region"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Region"> | Date | string
   }
@@ -47073,6 +47172,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     team?: UserCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
@@ -47111,6 +47211,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
@@ -47147,6 +47248,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
@@ -47185,6 +47287,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
@@ -47265,6 +47368,7 @@ export namespace Prisma {
     color?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinator?: UserCreateNestedOneWithoutCoordinatedRegionsInput
     cities?: CityCreateNestedManyWithoutRegionInput
     users?: UserCreateNestedManyWithoutRegionInput
     supporters?: SupporterCreateNestedManyWithoutRegionInput
@@ -47279,6 +47383,7 @@ export namespace Prisma {
     name: string
     uf?: string
     color?: string | null
+    coordinatorId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     cities?: CityUncheckedCreateNestedManyWithoutRegionInput
@@ -47297,6 +47402,7 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinator?: UserUpdateOneWithoutCoordinatedRegionsNestedInput
     cities?: CityUpdateManyWithoutRegionNestedInput
     users?: UserUpdateManyWithoutRegionNestedInput
     supporters?: SupporterUpdateManyWithoutRegionNestedInput
@@ -47311,6 +47417,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     uf?: StringFieldUpdateOperationsInput | string
     color?: NullableStringFieldUpdateOperationsInput | string | null
+    coordinatorId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cities?: CityUncheckedUpdateManyWithoutRegionNestedInput
@@ -47327,6 +47434,7 @@ export namespace Prisma {
     name: string
     uf?: string
     color?: string | null
+    coordinatorId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -47345,6 +47453,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     uf?: StringFieldUpdateOperationsInput | string
     color?: NullableStringFieldUpdateOperationsInput | string | null
+    coordinatorId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -50360,6 +50469,12 @@ export namespace Prisma {
     isNot?: RegionWhereInput | null
   }
 
+  export type RegionListRelationFilter = {
+    every?: RegionWhereInput
+    some?: RegionWhereInput
+    none?: RegionWhereInput
+  }
+
   export type UserNullableScalarRelationFilter = {
     is?: UserWhereInput | null
     isNot?: UserWhereInput | null
@@ -50471,6 +50586,10 @@ export namespace Prisma {
     every?: InternalMessageWhereInput
     some?: InternalMessageWhereInput
     none?: InternalMessageWhereInput
+  }
+
+  export type RegionOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type UserOrderByRelationAggregateInput = {
@@ -50636,6 +50755,7 @@ export namespace Prisma {
     name?: SortOrder
     uf?: SortOrder
     color?: SortOrder
+    coordinatorId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -50645,6 +50765,7 @@ export namespace Prisma {
     name?: SortOrder
     uf?: SortOrder
     color?: SortOrder
+    coordinatorId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -50654,6 +50775,7 @@ export namespace Prisma {
     name?: SortOrder
     uf?: SortOrder
     color?: SortOrder
+    coordinatorId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -52629,6 +52751,13 @@ export namespace Prisma {
     connect?: RegionWhereUniqueInput
   }
 
+  export type RegionCreateNestedManyWithoutCoordinatorInput = {
+    create?: XOR<RegionCreateWithoutCoordinatorInput, RegionUncheckedCreateWithoutCoordinatorInput> | RegionCreateWithoutCoordinatorInput[] | RegionUncheckedCreateWithoutCoordinatorInput[]
+    connectOrCreate?: RegionCreateOrConnectWithoutCoordinatorInput | RegionCreateOrConnectWithoutCoordinatorInput[]
+    createMany?: RegionCreateManyCoordinatorInputEnvelope
+    connect?: RegionWhereUniqueInput | RegionWhereUniqueInput[]
+  }
+
   export type UserCreateNestedOneWithoutTeamInput = {
     create?: XOR<UserCreateWithoutTeamInput, UserUncheckedCreateWithoutTeamInput>
     connectOrCreate?: UserCreateOrConnectWithoutTeamInput
@@ -52766,6 +52895,13 @@ export namespace Prisma {
     connectOrCreate?: InternalMessageCreateOrConnectWithoutSenderInput | InternalMessageCreateOrConnectWithoutSenderInput[]
     createMany?: InternalMessageCreateManySenderInputEnvelope
     connect?: InternalMessageWhereUniqueInput | InternalMessageWhereUniqueInput[]
+  }
+
+  export type RegionUncheckedCreateNestedManyWithoutCoordinatorInput = {
+    create?: XOR<RegionCreateWithoutCoordinatorInput, RegionUncheckedCreateWithoutCoordinatorInput> | RegionCreateWithoutCoordinatorInput[] | RegionUncheckedCreateWithoutCoordinatorInput[]
+    connectOrCreate?: RegionCreateOrConnectWithoutCoordinatorInput | RegionCreateOrConnectWithoutCoordinatorInput[]
+    createMany?: RegionCreateManyCoordinatorInputEnvelope
+    connect?: RegionWhereUniqueInput | RegionWhereUniqueInput[]
   }
 
   export type UserUncheckedCreateNestedManyWithoutManagerInput = {
@@ -52917,6 +53053,20 @@ export namespace Prisma {
     delete?: RegionWhereInput | boolean
     connect?: RegionWhereUniqueInput
     update?: XOR<XOR<RegionUpdateToOneWithWhereWithoutUsersInput, RegionUpdateWithoutUsersInput>, RegionUncheckedUpdateWithoutUsersInput>
+  }
+
+  export type RegionUpdateManyWithoutCoordinatorNestedInput = {
+    create?: XOR<RegionCreateWithoutCoordinatorInput, RegionUncheckedCreateWithoutCoordinatorInput> | RegionCreateWithoutCoordinatorInput[] | RegionUncheckedCreateWithoutCoordinatorInput[]
+    connectOrCreate?: RegionCreateOrConnectWithoutCoordinatorInput | RegionCreateOrConnectWithoutCoordinatorInput[]
+    upsert?: RegionUpsertWithWhereUniqueWithoutCoordinatorInput | RegionUpsertWithWhereUniqueWithoutCoordinatorInput[]
+    createMany?: RegionCreateManyCoordinatorInputEnvelope
+    set?: RegionWhereUniqueInput | RegionWhereUniqueInput[]
+    disconnect?: RegionWhereUniqueInput | RegionWhereUniqueInput[]
+    delete?: RegionWhereUniqueInput | RegionWhereUniqueInput[]
+    connect?: RegionWhereUniqueInput | RegionWhereUniqueInput[]
+    update?: RegionUpdateWithWhereUniqueWithoutCoordinatorInput | RegionUpdateWithWhereUniqueWithoutCoordinatorInput[]
+    updateMany?: RegionUpdateManyWithWhereWithoutCoordinatorInput | RegionUpdateManyWithWhereWithoutCoordinatorInput[]
+    deleteMany?: RegionScalarWhereInput | RegionScalarWhereInput[]
   }
 
   export type UserUpdateOneWithoutTeamNestedInput = {
@@ -53195,6 +53345,20 @@ export namespace Prisma {
     deleteMany?: InternalMessageScalarWhereInput | InternalMessageScalarWhereInput[]
   }
 
+  export type RegionUncheckedUpdateManyWithoutCoordinatorNestedInput = {
+    create?: XOR<RegionCreateWithoutCoordinatorInput, RegionUncheckedCreateWithoutCoordinatorInput> | RegionCreateWithoutCoordinatorInput[] | RegionUncheckedCreateWithoutCoordinatorInput[]
+    connectOrCreate?: RegionCreateOrConnectWithoutCoordinatorInput | RegionCreateOrConnectWithoutCoordinatorInput[]
+    upsert?: RegionUpsertWithWhereUniqueWithoutCoordinatorInput | RegionUpsertWithWhereUniqueWithoutCoordinatorInput[]
+    createMany?: RegionCreateManyCoordinatorInputEnvelope
+    set?: RegionWhereUniqueInput | RegionWhereUniqueInput[]
+    disconnect?: RegionWhereUniqueInput | RegionWhereUniqueInput[]
+    delete?: RegionWhereUniqueInput | RegionWhereUniqueInput[]
+    connect?: RegionWhereUniqueInput | RegionWhereUniqueInput[]
+    update?: RegionUpdateWithWhereUniqueWithoutCoordinatorInput | RegionUpdateWithWhereUniqueWithoutCoordinatorInput[]
+    updateMany?: RegionUpdateManyWithWhereWithoutCoordinatorInput | RegionUpdateManyWithWhereWithoutCoordinatorInput[]
+    deleteMany?: RegionScalarWhereInput | RegionScalarWhereInput[]
+  }
+
   export type UserUncheckedUpdateManyWithoutManagerNestedInput = {
     create?: XOR<UserCreateWithoutManagerInput, UserUncheckedCreateWithoutManagerInput> | UserCreateWithoutManagerInput[] | UserUncheckedCreateWithoutManagerInput[]
     connectOrCreate?: UserCreateOrConnectWithoutManagerInput | UserCreateOrConnectWithoutManagerInput[]
@@ -53461,6 +53625,12 @@ export namespace Prisma {
     deleteMany?: InternalMessageScalarWhereInput | InternalMessageScalarWhereInput[]
   }
 
+  export type UserCreateNestedOneWithoutCoordinatedRegionsInput = {
+    create?: XOR<UserCreateWithoutCoordinatedRegionsInput, UserUncheckedCreateWithoutCoordinatedRegionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCoordinatedRegionsInput
+    connect?: UserWhereUniqueInput
+  }
+
   export type CityCreateNestedManyWithoutRegionInput = {
     create?: XOR<CityCreateWithoutRegionInput, CityUncheckedCreateWithoutRegionInput> | CityCreateWithoutRegionInput[] | CityUncheckedCreateWithoutRegionInput[]
     connectOrCreate?: CityCreateOrConnectWithoutRegionInput | CityCreateOrConnectWithoutRegionInput[]
@@ -53557,6 +53727,16 @@ export namespace Prisma {
     connectOrCreate?: EventCreateOrConnectWithoutRegionInput | EventCreateOrConnectWithoutRegionInput[]
     createMany?: EventCreateManyRegionInputEnvelope
     connect?: EventWhereUniqueInput | EventWhereUniqueInput[]
+  }
+
+  export type UserUpdateOneWithoutCoordinatedRegionsNestedInput = {
+    create?: XOR<UserCreateWithoutCoordinatedRegionsInput, UserUncheckedCreateWithoutCoordinatedRegionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCoordinatedRegionsInput
+    upsert?: UserUpsertWithoutCoordinatedRegionsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutCoordinatedRegionsInput, UserUpdateWithoutCoordinatedRegionsInput>, UserUncheckedUpdateWithoutCoordinatedRegionsInput>
   }
 
   export type CityUpdateManyWithoutRegionNestedInput = {
@@ -56208,6 +56388,7 @@ export namespace Prisma {
     color?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinator?: UserCreateNestedOneWithoutCoordinatedRegionsInput
     cities?: CityCreateNestedManyWithoutRegionInput
     supporters?: SupporterCreateNestedManyWithoutRegionInput
     notices?: NoticeCreateNestedManyWithoutRegionInput
@@ -56221,6 +56402,7 @@ export namespace Prisma {
     name: string
     uf?: string
     color?: string | null
+    coordinatorId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     cities?: CityUncheckedCreateNestedManyWithoutRegionInput
@@ -56234,6 +56416,48 @@ export namespace Prisma {
   export type RegionCreateOrConnectWithoutUsersInput = {
     where: RegionWhereUniqueInput
     create: XOR<RegionCreateWithoutUsersInput, RegionUncheckedCreateWithoutUsersInput>
+  }
+
+  export type RegionCreateWithoutCoordinatorInput = {
+    id?: string
+    name: string
+    uf?: string
+    color?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    cities?: CityCreateNestedManyWithoutRegionInput
+    users?: UserCreateNestedManyWithoutRegionInput
+    supporters?: SupporterCreateNestedManyWithoutRegionInput
+    notices?: NoticeCreateNestedManyWithoutRegionInput
+    mediaKits?: MediaKitCreateNestedManyWithoutRegionInput
+    streetActions?: StreetActionCreateNestedManyWithoutRegionInput
+    events?: EventCreateNestedManyWithoutRegionInput
+  }
+
+  export type RegionUncheckedCreateWithoutCoordinatorInput = {
+    id?: string
+    name: string
+    uf?: string
+    color?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    cities?: CityUncheckedCreateNestedManyWithoutRegionInput
+    users?: UserUncheckedCreateNestedManyWithoutRegionInput
+    supporters?: SupporterUncheckedCreateNestedManyWithoutRegionInput
+    notices?: NoticeUncheckedCreateNestedManyWithoutRegionInput
+    mediaKits?: MediaKitUncheckedCreateNestedManyWithoutRegionInput
+    streetActions?: StreetActionUncheckedCreateNestedManyWithoutRegionInput
+    events?: EventUncheckedCreateNestedManyWithoutRegionInput
+  }
+
+  export type RegionCreateOrConnectWithoutCoordinatorInput = {
+    where: RegionWhereUniqueInput
+    create: XOR<RegionCreateWithoutCoordinatorInput, RegionUncheckedCreateWithoutCoordinatorInput>
+  }
+
+  export type RegionCreateManyCoordinatorInputEnvelope = {
+    data: RegionCreateManyCoordinatorInput | RegionCreateManyCoordinatorInput[]
+    skipDuplicates?: boolean
   }
 
   export type UserCreateWithoutTeamInput = {
@@ -56251,6 +56475,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerCreateNestedManyWithoutSupervisorInput
@@ -56288,6 +56513,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
     assignedConversations?: ConversationUncheckedCreateNestedManyWithoutAgentInput
@@ -56328,6 +56554,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     team?: UserCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerCreateNestedManyWithoutSupervisorInput
@@ -56364,6 +56591,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
@@ -57141,6 +57369,7 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinator?: UserUpdateOneWithoutCoordinatedRegionsNestedInput
     cities?: CityUpdateManyWithoutRegionNestedInput
     supporters?: SupporterUpdateManyWithoutRegionNestedInput
     notices?: NoticeUpdateManyWithoutRegionNestedInput
@@ -57154,6 +57383,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     uf?: StringFieldUpdateOperationsInput | string
     color?: NullableStringFieldUpdateOperationsInput | string | null
+    coordinatorId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cities?: CityUncheckedUpdateManyWithoutRegionNestedInput
@@ -57162,6 +57392,35 @@ export namespace Prisma {
     mediaKits?: MediaKitUncheckedUpdateManyWithoutRegionNestedInput
     streetActions?: StreetActionUncheckedUpdateManyWithoutRegionNestedInput
     events?: EventUncheckedUpdateManyWithoutRegionNestedInput
+  }
+
+  export type RegionUpsertWithWhereUniqueWithoutCoordinatorInput = {
+    where: RegionWhereUniqueInput
+    update: XOR<RegionUpdateWithoutCoordinatorInput, RegionUncheckedUpdateWithoutCoordinatorInput>
+    create: XOR<RegionCreateWithoutCoordinatorInput, RegionUncheckedCreateWithoutCoordinatorInput>
+  }
+
+  export type RegionUpdateWithWhereUniqueWithoutCoordinatorInput = {
+    where: RegionWhereUniqueInput
+    data: XOR<RegionUpdateWithoutCoordinatorInput, RegionUncheckedUpdateWithoutCoordinatorInput>
+  }
+
+  export type RegionUpdateManyWithWhereWithoutCoordinatorInput = {
+    where: RegionScalarWhereInput
+    data: XOR<RegionUpdateManyMutationInput, RegionUncheckedUpdateManyWithoutCoordinatorInput>
+  }
+
+  export type RegionScalarWhereInput = {
+    AND?: RegionScalarWhereInput | RegionScalarWhereInput[]
+    OR?: RegionScalarWhereInput[]
+    NOT?: RegionScalarWhereInput | RegionScalarWhereInput[]
+    id?: StringFilter<"Region"> | string
+    name?: StringFilter<"Region"> | string
+    uf?: StringFilter<"Region"> | string
+    color?: StringNullableFilter<"Region"> | string | null
+    coordinatorId?: StringNullableFilter<"Region"> | string | null
+    createdAt?: DateTimeFilter<"Region"> | Date | string
+    updatedAt?: DateTimeFilter<"Region"> | Date | string
   }
 
   export type UserUpsertWithoutTeamInput = {
@@ -57190,6 +57449,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUpdateManyWithoutSupervisorNestedInput
@@ -57227,6 +57487,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
     assignedConversations?: ConversationUncheckedUpdateManyWithoutAgentNestedInput
@@ -57882,6 +58143,85 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"InternalMessage"> | Date | string
   }
 
+  export type UserCreateWithoutCoordinatedRegionsInput = {
+    id?: string
+    name: string
+    email: string
+    password: string
+    phone?: string | null
+    role?: $Enums.UserRole
+    avatarUrl?: string | null
+    active?: boolean
+    code?: string | null
+    resetToken?: string | null
+    resetTokenExpires?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    region?: RegionCreateNestedOneWithoutUsersInput
+    manager?: UserCreateNestedOneWithoutTeamInput
+    team?: UserCreateNestedManyWithoutManagerInput
+    coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
+    supervisedVolunteers?: VolunteerCreateNestedManyWithoutSupervisorInput
+    assignedConversations?: ConversationCreateNestedManyWithoutAgentInput
+    authoredNotices?: NoticeCreateNestedManyWithoutAuthorInput
+    uploadedMedia?: MediaKitCreateNestedManyWithoutAuthorInput
+    mediaDownloads?: MediaDownloadCreateNestedManyWithoutUserInput
+    publicationProofs?: MediaPublicationProofCreateNestedManyWithoutUserInput
+    engagements?: EngagementCreateNestedManyWithoutValidatedByInput
+    requestedMaterials?: MaterialRequestCreateNestedManyWithoutRequesterInput
+    approvedMaterials?: MaterialRequestCreateNestedManyWithoutApproverInput
+    coordinatedActions?: StreetActionCreateNestedManyWithoutCoordinatorInput
+    responsibleEvents?: EventCreateNestedManyWithoutResponsibleInput
+    responsibleDemands?: DemandCreateNestedManyWithoutResponsibleInput
+    broadcasts?: BroadcastCampaignCreateNestedManyWithoutOwnerInput
+    auditLogs?: AuditLogCreateNestedManyWithoutUserInput
+    messages?: MessageCreateNestedManyWithoutSenderInput
+    internalMemberships?: InternalMemberCreateNestedManyWithoutUserInput
+    internalMessages?: InternalMessageCreateNestedManyWithoutSenderInput
+  }
+
+  export type UserUncheckedCreateWithoutCoordinatedRegionsInput = {
+    id?: string
+    name: string
+    email: string
+    password: string
+    phone?: string | null
+    role?: $Enums.UserRole
+    avatarUrl?: string | null
+    active?: boolean
+    code?: string | null
+    regionId?: string | null
+    managerId?: string | null
+    resetToken?: string | null
+    resetTokenExpires?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    team?: UserUncheckedCreateNestedManyWithoutManagerInput
+    coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
+    supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
+    assignedConversations?: ConversationUncheckedCreateNestedManyWithoutAgentInput
+    authoredNotices?: NoticeUncheckedCreateNestedManyWithoutAuthorInput
+    uploadedMedia?: MediaKitUncheckedCreateNestedManyWithoutAuthorInput
+    mediaDownloads?: MediaDownloadUncheckedCreateNestedManyWithoutUserInput
+    publicationProofs?: MediaPublicationProofUncheckedCreateNestedManyWithoutUserInput
+    engagements?: EngagementUncheckedCreateNestedManyWithoutValidatedByInput
+    requestedMaterials?: MaterialRequestUncheckedCreateNestedManyWithoutRequesterInput
+    approvedMaterials?: MaterialRequestUncheckedCreateNestedManyWithoutApproverInput
+    coordinatedActions?: StreetActionUncheckedCreateNestedManyWithoutCoordinatorInput
+    responsibleEvents?: EventUncheckedCreateNestedManyWithoutResponsibleInput
+    responsibleDemands?: DemandUncheckedCreateNestedManyWithoutResponsibleInput
+    broadcasts?: BroadcastCampaignUncheckedCreateNestedManyWithoutOwnerInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    internalMemberships?: InternalMemberUncheckedCreateNestedManyWithoutUserInput
+    internalMessages?: InternalMessageUncheckedCreateNestedManyWithoutSenderInput
+  }
+
+  export type UserCreateOrConnectWithoutCoordinatedRegionsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutCoordinatedRegionsInput, UserUncheckedCreateWithoutCoordinatedRegionsInput>
+  }
+
   export type CityCreateWithoutRegionInput = {
     id?: string
     name: string
@@ -57930,6 +58270,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     team?: UserCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
@@ -57967,6 +58308,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
@@ -58268,6 +58610,91 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type UserUpsertWithoutCoordinatedRegionsInput = {
+    update: XOR<UserUpdateWithoutCoordinatedRegionsInput, UserUncheckedUpdateWithoutCoordinatedRegionsInput>
+    create: XOR<UserCreateWithoutCoordinatedRegionsInput, UserUncheckedCreateWithoutCoordinatedRegionsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutCoordinatedRegionsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutCoordinatedRegionsInput, UserUncheckedUpdateWithoutCoordinatedRegionsInput>
+  }
+
+  export type UserUpdateWithoutCoordinatedRegionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    active?: BoolFieldUpdateOperationsInput | boolean
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    region?: RegionUpdateOneWithoutUsersNestedInput
+    manager?: UserUpdateOneWithoutTeamNestedInput
+    team?: UserUpdateManyWithoutManagerNestedInput
+    coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
+    supervisedVolunteers?: VolunteerUpdateManyWithoutSupervisorNestedInput
+    assignedConversations?: ConversationUpdateManyWithoutAgentNestedInput
+    authoredNotices?: NoticeUpdateManyWithoutAuthorNestedInput
+    uploadedMedia?: MediaKitUpdateManyWithoutAuthorNestedInput
+    mediaDownloads?: MediaDownloadUpdateManyWithoutUserNestedInput
+    publicationProofs?: MediaPublicationProofUpdateManyWithoutUserNestedInput
+    engagements?: EngagementUpdateManyWithoutValidatedByNestedInput
+    requestedMaterials?: MaterialRequestUpdateManyWithoutRequesterNestedInput
+    approvedMaterials?: MaterialRequestUpdateManyWithoutApproverNestedInput
+    coordinatedActions?: StreetActionUpdateManyWithoutCoordinatorNestedInput
+    responsibleEvents?: EventUpdateManyWithoutResponsibleNestedInput
+    responsibleDemands?: DemandUpdateManyWithoutResponsibleNestedInput
+    broadcasts?: BroadcastCampaignUpdateManyWithoutOwnerNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutUserNestedInput
+    messages?: MessageUpdateManyWithoutSenderNestedInput
+    internalMemberships?: InternalMemberUpdateManyWithoutUserNestedInput
+    internalMessages?: InternalMessageUpdateManyWithoutSenderNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutCoordinatedRegionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    active?: BoolFieldUpdateOperationsInput | boolean
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    regionId?: NullableStringFieldUpdateOperationsInput | string | null
+    managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    team?: UserUncheckedUpdateManyWithoutManagerNestedInput
+    coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
+    supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
+    assignedConversations?: ConversationUncheckedUpdateManyWithoutAgentNestedInput
+    authoredNotices?: NoticeUncheckedUpdateManyWithoutAuthorNestedInput
+    uploadedMedia?: MediaKitUncheckedUpdateManyWithoutAuthorNestedInput
+    mediaDownloads?: MediaDownloadUncheckedUpdateManyWithoutUserNestedInput
+    publicationProofs?: MediaPublicationProofUncheckedUpdateManyWithoutUserNestedInput
+    engagements?: EngagementUncheckedUpdateManyWithoutValidatedByNestedInput
+    requestedMaterials?: MaterialRequestUncheckedUpdateManyWithoutRequesterNestedInput
+    approvedMaterials?: MaterialRequestUncheckedUpdateManyWithoutApproverNestedInput
+    coordinatedActions?: StreetActionUncheckedUpdateManyWithoutCoordinatorNestedInput
+    responsibleEvents?: EventUncheckedUpdateManyWithoutResponsibleNestedInput
+    responsibleDemands?: DemandUncheckedUpdateManyWithoutResponsibleNestedInput
+    broadcasts?: BroadcastCampaignUncheckedUpdateManyWithoutOwnerNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    internalMemberships?: InternalMemberUncheckedUpdateManyWithoutUserNestedInput
+    internalMessages?: InternalMessageUncheckedUpdateManyWithoutSenderNestedInput
+  }
+
   export type CityUpsertWithWhereUniqueWithoutRegionInput = {
     where: CityWhereUniqueInput
     update: XOR<CityUpdateWithoutRegionInput, CityUncheckedUpdateWithoutRegionInput>
@@ -58399,6 +58826,7 @@ export namespace Prisma {
     color?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinator?: UserCreateNestedOneWithoutCoordinatedRegionsInput
     users?: UserCreateNestedManyWithoutRegionInput
     supporters?: SupporterCreateNestedManyWithoutRegionInput
     notices?: NoticeCreateNestedManyWithoutRegionInput
@@ -58412,6 +58840,7 @@ export namespace Prisma {
     name: string
     uf?: string
     color?: string | null
+    coordinatorId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     users?: UserUncheckedCreateNestedManyWithoutRegionInput
@@ -58665,6 +59094,7 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinator?: UserUpdateOneWithoutCoordinatedRegionsNestedInput
     users?: UserUpdateManyWithoutRegionNestedInput
     supporters?: SupporterUpdateManyWithoutRegionNestedInput
     notices?: NoticeUpdateManyWithoutRegionNestedInput
@@ -58678,6 +59108,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     uf?: StringFieldUpdateOperationsInput | string
     color?: NullableStringFieldUpdateOperationsInput | string | null
+    coordinatorId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     users?: UserUncheckedUpdateManyWithoutRegionNestedInput
@@ -58788,6 +59219,7 @@ export namespace Prisma {
     color?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinator?: UserCreateNestedOneWithoutCoordinatedRegionsInput
     cities?: CityCreateNestedManyWithoutRegionInput
     users?: UserCreateNestedManyWithoutRegionInput
     notices?: NoticeCreateNestedManyWithoutRegionInput
@@ -58801,6 +59233,7 @@ export namespace Prisma {
     name: string
     uf?: string
     color?: string | null
+    coordinatorId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     cities?: CityUncheckedCreateNestedManyWithoutRegionInput
@@ -58986,6 +59419,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     team?: UserCreateNestedManyWithoutManagerInput
     supervisedVolunteers?: VolunteerCreateNestedManyWithoutSupervisorInput
@@ -59023,6 +59457,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
     assignedConversations?: ConversationUncheckedCreateNestedManyWithoutAgentInput
@@ -59266,6 +59701,7 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinator?: UserUpdateOneWithoutCoordinatedRegionsNestedInput
     cities?: CityUpdateManyWithoutRegionNestedInput
     users?: UserUpdateManyWithoutRegionNestedInput
     notices?: NoticeUpdateManyWithoutRegionNestedInput
@@ -59279,6 +59715,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     uf?: StringFieldUpdateOperationsInput | string
     color?: NullableStringFieldUpdateOperationsInput | string | null
+    coordinatorId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cities?: CityUncheckedUpdateManyWithoutRegionNestedInput
@@ -59412,6 +59849,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     supervisedVolunteers?: VolunteerUpdateManyWithoutSupervisorNestedInput
@@ -59449,6 +59887,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
     assignedConversations?: ConversationUncheckedUpdateManyWithoutAgentNestedInput
@@ -59693,6 +60132,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     team?: UserCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
@@ -59730,6 +60170,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     assignedConversations?: ConversationUncheckedCreateNestedManyWithoutAgentInput
@@ -59984,6 +60425,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
@@ -60021,6 +60463,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     assignedConversations?: ConversationUncheckedUpdateManyWithoutAgentNestedInput
@@ -60236,6 +60679,7 @@ export namespace Prisma {
     color?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinator?: UserCreateNestedOneWithoutCoordinatedRegionsInput
     cities?: CityCreateNestedManyWithoutRegionInput
     users?: UserCreateNestedManyWithoutRegionInput
     supporters?: SupporterCreateNestedManyWithoutRegionInput
@@ -60249,6 +60693,7 @@ export namespace Prisma {
     name: string
     uf?: string
     color?: string | null
+    coordinatorId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     cities?: CityUncheckedCreateNestedManyWithoutRegionInput
@@ -60279,6 +60724,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     team?: UserCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
@@ -60316,6 +60762,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
@@ -60409,6 +60856,7 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinator?: UserUpdateOneWithoutCoordinatedRegionsNestedInput
     cities?: CityUpdateManyWithoutRegionNestedInput
     users?: UserUpdateManyWithoutRegionNestedInput
     supporters?: SupporterUpdateManyWithoutRegionNestedInput
@@ -60422,6 +60870,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     uf?: StringFieldUpdateOperationsInput | string
     color?: NullableStringFieldUpdateOperationsInput | string | null
+    coordinatorId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cities?: CityUncheckedUpdateManyWithoutRegionNestedInput
@@ -60458,6 +60907,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
@@ -60495,6 +60945,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
@@ -60609,6 +61060,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     team?: UserCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
@@ -60646,6 +61098,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
@@ -60750,6 +61203,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
@@ -60787,6 +61241,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
@@ -60869,6 +61324,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     team?: UserCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
@@ -60906,6 +61362,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
@@ -61010,6 +61467,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
@@ -61047,6 +61505,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
@@ -61074,6 +61533,7 @@ export namespace Prisma {
     color?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinator?: UserCreateNestedOneWithoutCoordinatedRegionsInput
     cities?: CityCreateNestedManyWithoutRegionInput
     users?: UserCreateNestedManyWithoutRegionInput
     supporters?: SupporterCreateNestedManyWithoutRegionInput
@@ -61087,6 +61547,7 @@ export namespace Prisma {
     name: string
     uf?: string
     color?: string | null
+    coordinatorId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     cities?: CityUncheckedCreateNestedManyWithoutRegionInput
@@ -61117,6 +61578,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     team?: UserCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
@@ -61154,6 +61616,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
@@ -61197,6 +61660,7 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinator?: UserUpdateOneWithoutCoordinatedRegionsNestedInput
     cities?: CityUpdateManyWithoutRegionNestedInput
     users?: UserUpdateManyWithoutRegionNestedInput
     supporters?: SupporterUpdateManyWithoutRegionNestedInput
@@ -61210,6 +61674,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     uf?: StringFieldUpdateOperationsInput | string
     color?: NullableStringFieldUpdateOperationsInput | string | null
+    coordinatorId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cities?: CityUncheckedUpdateManyWithoutRegionNestedInput
@@ -61246,6 +61711,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
@@ -61283,6 +61749,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
@@ -61520,6 +61987,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     team?: UserCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
@@ -61557,6 +62025,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
@@ -61688,6 +62157,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
@@ -61725,6 +62195,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
@@ -61851,6 +62322,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     team?: UserCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
@@ -61888,6 +62360,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
@@ -61928,6 +62401,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     team?: UserCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
@@ -61965,6 +62439,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
@@ -62049,6 +62524,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
@@ -62086,6 +62562,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
@@ -62132,6 +62609,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
@@ -62169,6 +62647,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
@@ -62381,6 +62860,7 @@ export namespace Prisma {
     color?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinator?: UserCreateNestedOneWithoutCoordinatedRegionsInput
     cities?: CityCreateNestedManyWithoutRegionInput
     users?: UserCreateNestedManyWithoutRegionInput
     supporters?: SupporterCreateNestedManyWithoutRegionInput
@@ -62394,6 +62874,7 @@ export namespace Prisma {
     name: string
     uf?: string
     color?: string | null
+    coordinatorId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     cities?: CityUncheckedCreateNestedManyWithoutRegionInput
@@ -62424,6 +62905,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     team?: UserCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
@@ -62461,6 +62943,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
@@ -62539,6 +63022,7 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinator?: UserUpdateOneWithoutCoordinatedRegionsNestedInput
     cities?: CityUpdateManyWithoutRegionNestedInput
     users?: UserUpdateManyWithoutRegionNestedInput
     supporters?: SupporterUpdateManyWithoutRegionNestedInput
@@ -62552,6 +63036,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     uf?: StringFieldUpdateOperationsInput | string
     color?: NullableStringFieldUpdateOperationsInput | string | null
+    coordinatorId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cities?: CityUncheckedUpdateManyWithoutRegionNestedInput
@@ -62588,6 +63073,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
@@ -62625,6 +63111,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
@@ -62681,6 +63168,7 @@ export namespace Prisma {
     color?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinator?: UserCreateNestedOneWithoutCoordinatedRegionsInput
     cities?: CityCreateNestedManyWithoutRegionInput
     users?: UserCreateNestedManyWithoutRegionInput
     supporters?: SupporterCreateNestedManyWithoutRegionInput
@@ -62694,6 +63182,7 @@ export namespace Prisma {
     name: string
     uf?: string
     color?: string | null
+    coordinatorId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     cities?: CityUncheckedCreateNestedManyWithoutRegionInput
@@ -62724,6 +63213,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     team?: UserCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
@@ -62761,6 +63251,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
@@ -62839,6 +63330,7 @@ export namespace Prisma {
     color?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinator?: UserUpdateOneWithoutCoordinatedRegionsNestedInput
     cities?: CityUpdateManyWithoutRegionNestedInput
     users?: UserUpdateManyWithoutRegionNestedInput
     supporters?: SupporterUpdateManyWithoutRegionNestedInput
@@ -62852,6 +63344,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     uf?: StringFieldUpdateOperationsInput | string
     color?: NullableStringFieldUpdateOperationsInput | string | null
+    coordinatorId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cities?: CityUncheckedUpdateManyWithoutRegionNestedInput
@@ -62888,6 +63381,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
@@ -62925,6 +63419,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
@@ -63035,6 +63530,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     team?: UserCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
@@ -63072,6 +63568,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
@@ -63234,6 +63731,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
@@ -63271,6 +63769,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
@@ -63357,6 +63856,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     team?: UserCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
@@ -63394,6 +63894,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
@@ -63486,6 +63987,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
@@ -63523,6 +64025,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
@@ -63587,6 +64090,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     team?: UserCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
@@ -63624,6 +64128,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
@@ -63710,6 +64215,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
@@ -63747,6 +64253,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
@@ -63782,6 +64289,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     team?: UserCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
@@ -63819,6 +64327,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
@@ -63908,6 +64417,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
@@ -63945,6 +64455,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
@@ -64441,6 +64952,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     team?: UserCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
@@ -64478,6 +64990,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
@@ -64529,6 +65042,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
@@ -64566,6 +65080,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
@@ -64708,6 +65223,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     team?: UserCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
@@ -64745,6 +65261,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
@@ -64829,6 +65346,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
@@ -64866,6 +65384,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
@@ -64928,6 +65447,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     region?: RegionCreateNestedOneWithoutUsersInput
+    coordinatedRegions?: RegionCreateNestedManyWithoutCoordinatorInput
     manager?: UserCreateNestedOneWithoutTeamInput
     team?: UserCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterCreateNestedManyWithoutCoordinatorInput
@@ -64965,6 +65485,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    coordinatedRegions?: RegionUncheckedCreateNestedManyWithoutCoordinatorInput
     team?: UserUncheckedCreateNestedManyWithoutManagerInput
     coordinatedSupporters?: SupporterUncheckedCreateNestedManyWithoutCoordinatorInput
     supervisedVolunteers?: VolunteerUncheckedCreateNestedManyWithoutSupervisorInput
@@ -65049,6 +65570,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
@@ -65086,6 +65608,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
@@ -65104,6 +65627,15 @@ export namespace Prisma {
     auditLogs?: AuditLogUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     internalMemberships?: InternalMemberUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type RegionCreateManyCoordinatorInput = {
+    id?: string
+    name: string
+    uf?: string
+    color?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type UserCreateManyManagerInput = {
@@ -65384,6 +65916,47 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type RegionUpdateWithoutCoordinatorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    uf?: StringFieldUpdateOperationsInput | string
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cities?: CityUpdateManyWithoutRegionNestedInput
+    users?: UserUpdateManyWithoutRegionNestedInput
+    supporters?: SupporterUpdateManyWithoutRegionNestedInput
+    notices?: NoticeUpdateManyWithoutRegionNestedInput
+    mediaKits?: MediaKitUpdateManyWithoutRegionNestedInput
+    streetActions?: StreetActionUpdateManyWithoutRegionNestedInput
+    events?: EventUpdateManyWithoutRegionNestedInput
+  }
+
+  export type RegionUncheckedUpdateWithoutCoordinatorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    uf?: StringFieldUpdateOperationsInput | string
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cities?: CityUncheckedUpdateManyWithoutRegionNestedInput
+    users?: UserUncheckedUpdateManyWithoutRegionNestedInput
+    supporters?: SupporterUncheckedUpdateManyWithoutRegionNestedInput
+    notices?: NoticeUncheckedUpdateManyWithoutRegionNestedInput
+    mediaKits?: MediaKitUncheckedUpdateManyWithoutRegionNestedInput
+    streetActions?: StreetActionUncheckedUpdateManyWithoutRegionNestedInput
+    events?: EventUncheckedUpdateManyWithoutRegionNestedInput
+  }
+
+  export type RegionUncheckedUpdateManyWithoutCoordinatorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    uf?: StringFieldUpdateOperationsInput | string
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type UserUpdateWithoutManagerInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
@@ -65399,6 +65972,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     region?: RegionUpdateOneWithoutUsersNestedInput
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUpdateManyWithoutSupervisorNestedInput
@@ -65435,6 +66009,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput
@@ -66456,6 +67031,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUpdateManyWithoutCoordinatorNestedInput
     manager?: UserUpdateOneWithoutTeamNestedInput
     team?: UserUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUpdateManyWithoutCoordinatorNestedInput
@@ -66493,6 +67069,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coordinatedRegions?: RegionUncheckedUpdateManyWithoutCoordinatorNestedInput
     team?: UserUncheckedUpdateManyWithoutManagerNestedInput
     coordinatedSupporters?: SupporterUncheckedUpdateManyWithoutCoordinatorNestedInput
     supervisedVolunteers?: VolunteerUncheckedUpdateManyWithoutSupervisorNestedInput

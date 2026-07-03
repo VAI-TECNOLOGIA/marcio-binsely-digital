@@ -242,11 +242,12 @@ model User {
   active    Boolean  @default(true)
   code      String?  @unique // código único do membro (chat interno)
 
-  regionId  String?
-  region    Region? @relation(fields: [regionId], references: [id], onDelete: SetNull)
-  managerId String?
-  manager   User?   @relation("UserHierarchy", fields: [managerId], references: [id], onDelete: SetNull)
-  team      User[]  @relation("UserHierarchy")
+  regionId           String?
+  region             Region?  @relation(fields: [regionId], references: [id], onDelete: SetNull)
+  coordinatedRegions Region[] @relation("RegionCoordinator")
+  managerId          String?
+  manager            User?    @relation("UserHierarchy", fields: [managerId], references: [id], onDelete: SetNull)
+  team               User[]   @relation("UserHierarchy")
 
   resetToken        String?
   resetTokenExpires DateTime?
@@ -279,12 +280,14 @@ model User {
 }
 
 model Region {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  uf        String   @default("RS")
-  color     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid())
+  name          String   @unique
+  uf            String   @default("RS")
+  color         String?
+  coordinatorId String?
+  coordinator   User?    @relation("RegionCoordinator", fields: [coordinatorId], references: [id], onDelete: SetNull)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   cities        City[]
   users         User[]

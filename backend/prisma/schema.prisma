@@ -244,6 +244,7 @@ model User {
 
   regionId  String?
   region    Region? @relation(fields: [regionId], references: [id], onDelete: SetNull)
+  coordinatedRegions Region[] @relation("RegionCoordinator")
   managerId String?
   manager   User?   @relation("UserHierarchy", fields: [managerId], references: [id], onDelete: SetNull)
   team      User[]  @relation("UserHierarchy")
@@ -283,6 +284,8 @@ model Region {
   name      String   @unique
   uf        String   @default("RS")
   color     String?
+  coordinatorId String?
+  coordinator   User?   @relation("RegionCoordinator", fields: [coordinatorId], references: [id], onDelete: SetNull)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
