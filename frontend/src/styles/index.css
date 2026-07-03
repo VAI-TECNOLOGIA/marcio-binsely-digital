@@ -690,6 +690,66 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .auth-links .auth-back { display: inline-flex; }
 
 /* ============================================================
+   UPLOAD / ANEXO DE ARQUIVO (Mídia Kit, faixas, etc.)
+   ============================================================ */
+.upload { display: flex; flex-direction: column; gap: 6px; }
+.upload-drop {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 5px;
+  min-height: 108px;
+  padding: 16px;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.upload-drop:hover { border-color: var(--brand); color: var(--ink-700); background: var(--brand-soft); }
+.upload-drop.busy { cursor: progress; opacity: .8; }
+.upload-drop span { font-size: 13px; }
+.upload-drop strong { color: var(--brand); font-weight: 700; }
+.upload-drop small { font-size: 11px; color: var(--muted-2); }
+
+.upload-done {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+.upload-preview {
+  width: 52px; height: 52px; border-radius: 8px; object-fit: cover;
+  flex-shrink: 0; background: var(--surface-2);
+  display: grid; place-items: center; color: var(--green-rs);
+}
+.upload-preview.file { border: 1px solid var(--border); }
+.upload-done-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.upload-done-name { font-size: 13px; font-weight: 600; color: var(--green-rs); }
+.upload-done-link {
+  font-size: 11.5px; color: var(--muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.upload-remove {
+  flex-shrink: 0;
+  width: 30px; height: 30px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--muted); cursor: pointer;
+  display: grid; place-items: center;
+  transition: all .12s;
+}
+.upload-remove:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-soft); }
+
+.upload-url-toggle {
+  align-self: flex-start;
+  border: none; background: none; padding: 2px 0;
+  font-size: 11.5px; color: var(--muted); cursor: pointer;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.upload-url-toggle:hover { color: var(--brand); text-decoration: underline; }
+
+/* ============================================================
    MAPA PROFISSIONAL — sidebar + tile CartoDB Voyager + ao vivo
    ============================================================ */
 .map-shell {

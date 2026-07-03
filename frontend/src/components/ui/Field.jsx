@@ -1,3 +1,5 @@
+import FileUpload from './FileUpload.jsx';
+
 /** Renderiza um campo de formulário a partir de uma especificação (field spec). */
 export default function Field({ field, value, onChange, error }) {
   const { name, label, type = 'text', required, placeholder, options = [], hint, rows, full } = field;
@@ -35,6 +37,14 @@ export default function Field({ field, value, onChange, error }) {
           <input type="checkbox" checked={!!value} onChange={(e) => set(e.target.checked)} />
           {label}
         </label>
+      ) : type === 'upload' ? (
+        <FileUpload
+          value={value}
+          onChange={set}
+          accept={field.accept}
+          maxSizeMB={field.maxSizeMB}
+          previewImages={field.previewImages !== false}
+        />
       ) : (
         <input
           className="input"
