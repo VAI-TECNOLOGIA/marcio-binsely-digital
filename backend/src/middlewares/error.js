@@ -1,4 +1,7 @@
-import { Prisma } from '@prisma/client';
+// IMPORTANTE: o client é gerado em src/generated/prisma (não em @prisma/client).
+// Importar do pacote errado deixa Prisma.* indefinido e o instanceof explode
+// DENTRO do errorHandler — derrubando pro handler HTML default do Express.
+import { Prisma } from '../generated/prisma/index.js';
 import { ZodError } from 'zod';
 import { AppError } from '../utils/AppError.js';
 
@@ -30,6 +33,14 @@ export function errorHandler(err, req, res, next) {
       return res.status(400).json({ error: 'Referência inválida (chave estrangeira)' });
     }
     return res.status(400).json({ error: 'Erro de banco de dados', code: err.code });
+  }
+
+  // Payload que não bate com o schema (ex.: enum inválido via API direta).
+  if (err instanceof Prisma.PrismaClientValidationError) {
+    return res.status(400).json({
+      error: 'Dados inválidos para o banco',
+      hint: 'Verifique os valores enviados (enums, tipos e campos obrigatórios).',
+    });
   }
 
   console.error('[ERRO]', err);

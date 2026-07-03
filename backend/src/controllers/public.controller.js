@@ -24,6 +24,17 @@ export const join = asyncHandler(async (req, res) => {
   const data = joinSchema.parse(nullifyEmpty(req.body));
   const phone = onlyDigits(data.phone);
 
+  // Trava global de velocidade (anti-bot em serverless): o rate limit por
+  // instância não vale entre lambdas, então limitamos o TOTAL de cadastros
+  // por minuto no banco. 60/min = pico legítimo de comício passa; enxurrada
+  // de bot degrada por 1 minuto e volta.
+  const recentJoins = await prisma.supporter.count({
+    where: { createdAt: { gte: new Date(Date.now() - 60_000) } },
+  });
+  if (recentJoins >= 60) {
+    return res.status(429).json({ error: 'Estamos recebendo muitos cadastros agora. Tente novamente em instantes.' });
+  }
+
   const [black, existing] = await Promise.all([
     prisma.blacklist.findFirst({ where: { phone } }),
     prisma.supporter.findFirst({ where: { phone } }),

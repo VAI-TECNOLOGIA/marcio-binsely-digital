@@ -1,17 +1,15 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './routes/ProtectedRoute.jsx';
 
 import Login from './pages/Login.jsx';
 import ForgotPassword from './pages/ForgotPassword.jsx';
 import ResetPassword from './pages/ResetPassword.jsx';
-import Landing from './pages/Landing.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Supporters from './pages/Supporters.jsx';
 import Volunteers from './pages/Volunteers.jsx';
 import Suspects from './pages/Suspects.jsx';
 import Blacklist from './pages/Blacklist.jsx';
-import MapView from './pages/MapView.jsx';
-import Reports from './pages/Reports.jsx';
 import Notices from './pages/Notices.jsx';
 import MediaKit from './pages/MediaKit.jsx';
 import Engagement from './pages/Engagement.jsx';
@@ -25,12 +23,25 @@ import Broadcasts from './pages/Broadcasts.jsx';
 import Automations from './pages/Automations.jsx';
 import Users from './pages/Users.jsx';
 import Settings from './pages/Settings.jsx';
-import TVPanel from './pages/TVPanel.jsx';
+
+// Páginas pesadas saem do bundle principal (Leaflet/Google Maps, Recharts,
+// landing com CSS próprio) e carregam sob demanda na primeira visita.
+const Landing = lazy(() => import('./pages/Landing.jsx'));
+const MapView = lazy(() => import('./pages/MapView.jsx'));
+const Reports = lazy(() => import('./pages/Reports.jsx'));
+const TVPanel = lazy(() => import('./pages/TVPanel.jsx'));
 
 const P = (roles, element) => <ProtectedRoute roles={roles}>{element}</ProtectedRoute>;
 
+const lazyFallback = (
+  <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center' }}>
+    <div className="spinner" />
+  </div>
+);
+
 export default function App() {
   return (
+    <Suspense fallback={lazyFallback}>
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/esqueci-senha" element={<ForgotPassword />} />
@@ -66,5 +77,6 @@ export default function App() {
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </Suspense>
   );
 }

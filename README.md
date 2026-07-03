@@ -99,3 +99,47 @@ Autenticação · Dashboard · Apoiadores & Voluntários (antifraude) · Confirm
 WhatsApp Cloud API (oficial), Instagram Direct, Messenger e SMS passam pelo roteador `services/messaging.service.js` (provider pattern). Tudo **simulado** por padrão — basta preencher credenciais no `.env` e trocar `WHATSAPP_PROVIDER=meta_cloud`. Detalhes em **[ARQUITETURA.md](ARQUITETURA.md)**.
 
 > ⚖️ Conectar apenas APIs **oficiais/autorizadas**, em conformidade com a legislação eleitoral e a LGPD.
+
+---
+
+## 🛰️ Operação em produção (runbook)
+
+**Infra:** Vercel (frontend estático + API Express serverless via `api/index.mjs`) · Postgres Neon (integração `marcelopolitico`) · Vercel Blob (`marcio-binsely-uploads`) para uploads.
+
+### Deploy
+
+```bash
+vercel --prod            # deploy manual (raiz do repo, projeto vai-campanha)
+```
+
+> Recomendado: conectar o repo GitHub ao projeto Vercel (`vercel git connect`) para deploy automático a cada push na `main`.
+
+### Variáveis de ambiente (produção)
+
+| Var | Função | Estado |
+|---|---|---|
+| `APP_DATABASE_URL` / `APP_DIRECT_URL` | Postgres Neon (pooled / direto) | ✅ via integração Neon |
+| `JWT_SECRET` | Assinatura dos tokens | ✅ |
+| `UPLOAD_DRIVER` | `blob` em produção (Vercel Blob) | ✅ |
+| `BLOB_READ_WRITE_TOKEN` | Token do Blob store | ✅ via integração |
+| `CRON_SECRET` | Protege `/api/cron/*` (Vercel envia como Bearer) | ✅ |
+| `RESEND_API_KEY` / `EMAIL_FROM` | E-mail transacional (reset de senha) | 🔶 pendente chave |
+| `WHATSAPP_PROVIDER` + `WHATSAPP_TOKEN` + `WHATSAPP_PHONE_NUMBER_ID` | WhatsApp real (Meta Cloud API) | 🔶 modo `simulado` |
+| `VITE_GOOGLE_MAPS_API_KEY` | Google Maps no /mapa (fallback: CartoDB) | 🔶 opcional |
+
+### Cron de automações
+
+`vercel.json` agenda `GET /api/cron/automations` **diariamente às 09:00 BRT** (12:00 UTC). O endpoint exige `Authorization: Bearer ${CRON_SECRET}`.
+
+- `ANIVERSARIO`: roda todo dia para aniversariantes do dia.
+- Demais tipos: disparam quando `triggerDate` = hoje.
+- Idempotente (não repete destinatário no mesmo dia) · máx. 100 envios/execução.
+- Execução manual: `curl -H "Authorization: Bearer $CRON_SECRET" https://<prod>/api/cron/automations`
+
+### Bootstrap de dados de referência
+
+O banco de produção já contém: 3 perfis, 6 regiões de POA, 12 cidades RS, 8 tarefas, 6 materiais e settings da campanha. Para recriar num ambiente novo, usar o padrão de rota one-shot documentado em `docs/PLANO-GO-LIVE-100.md` (nunca rodar `prisma/seed.js` em produção — ele TRUNCATE e cria dados fake).
+
+### Geolocalização de apoiadores
+
+Todo cadastro (landing pública e manual) recebe automaticamente `cityId`/`regionId` (lookup pelo nome da cidade) e `lat/lng` aproximado (centroide da cidade + dispersão ~2km determinística — `backend/src/utils/geo.js`). Coordenada manual no formulário tem precedência.
