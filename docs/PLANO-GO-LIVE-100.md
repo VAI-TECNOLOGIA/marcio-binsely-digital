@@ -65,7 +65,7 @@
 |---|---|---|---|---|
 | 2.1 | **Conta Meta Business + WhatsApp Cloud API** | Criar app na Meta, verificar empresa, registrar número comercial da campanha | **Cliente** (com guia do Dev) | burocracia 3-14 dias |
 | 2.2 | Ativar WhatsApp real | Setar `WHATSAPP_PROVIDER=meta_cloud` + `WHATSAPP_TOKEN` + `WHATSAPP_PHONE_NUMBER_ID` na Vercel + configurar webhook na Meta + teste E2E | Dev | 2-3 h |
-| 2.3 | **Automações (aniversário, boas-vindas, reativação)** | Hoje o CRUD existe mas nada dispara. Criar endpoint worker + **Vercel Cron** (grátis: 2 crons/dia no Hobby) varrendo automações ativas | Dev | 1 dia |
+| 2.3 | **Automações** | ✅ FEITO 02/07 (`1048789`): motor completo (`automation.service.js`) + Vercel Cron diário 09:00 BRT + rota protegida por CRON_SECRET. ANIVERSARIO diário; demais tipos por triggerDate; idempotente; cap 100/execução | Dev ✅ | — |
 | 2.4 | **Treinamento da equipe** | 2 sessões remotas de 2h (contratuais) usando o deck `Treinamento-Equipe.pdf` já pronto | Dev + equipe | 2×2 h |
 | 2.5 | Google Maps com chave real (opcional) | Cliente ativa "Maps JavaScript API" no Google Cloud → `VITE_GOOGLE_MAPS_API_KEY` → mapa upgrada sozinho (PR #1) | Cliente + Dev | 30 min |
 
@@ -77,8 +77,8 @@
 |---|---|---|---|---|
 | 3.1 | SMS real (opcional — decidir se a campanha usará) | Implementar `services/sms.service.js` (Twilio/Zenvia) — hoje é stub | Dev | 1-2 dias |
 | 3.2 | Teste E2E completo com dados reais + equipe usando | Roteiro de aceite por módulo, com Julian | Dev + Cliente | ½ dia |
-| 3.3 | Hardening final | Revisar rate-limit do cadastro público, headers (helmet), logs de erro | Dev | ½ dia |
-| 3.4 | Documentação de uso + handoff | Guia rápido por perfil (Líder/Membro/Parceiro) + runbook de operação (deploy, env vars, backup Neon) | Dev | ½ dia |
+| 3.3 | Hardening final | ✅ FEITO 02/07 (`1048789`): rate-limit por instância + trava global 60 cadastros/min no /join; headers de segurança globais (nosniff, X-Frame DENY, Referrer-Policy, Permissions-Policy); errorHandler corrigido (import do client gerado + 400 p/ validação Prisma). Bônus perf: code splitting (bundle -19%, landing ~25KB) | Dev ✅ | — |
+| 3.4 | Documentação de uso + handoff | 🟡 PARCIAL: runbook de operação no README (deploy, envs, cron, bootstrap, geo). Falta: guia rápido por perfil p/ equipe | Dev | 2 h |
 | 3.5 | **Assinatura de aceite da V Final** | Formaliza entrega → saldo em 20/08 | Cliente | — |
 
 ---
