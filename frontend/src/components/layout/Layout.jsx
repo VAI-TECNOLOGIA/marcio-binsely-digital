@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Sidebar from './Sidebar.jsx';
 import Header from './Header.jsx';
+import AiAssistant from '../ai/AiAssistant.jsx';
 
 export default function Layout({ title, subtitle, children }) {
   const [open, setOpen] = useState(false);
@@ -12,6 +13,7 @@ export default function Layout({ title, subtitle, children }) {
         <Header title={title} subtitle={subtitle} onMenu={() => setOpen(true)} />
         <div className="content">{children}</div>
       </div>
+      <AiAssistant />
     </div>
   );
 }

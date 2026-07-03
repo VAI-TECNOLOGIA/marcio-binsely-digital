@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Save, Settings as Cog, Target, Trophy, Package, MapPinned, ShieldCheck } from 'lucide-react';
+import { Save, Settings as Cog, Target, Trophy, Package, MapPinned, ShieldCheck, Sparkles } from 'lucide-react';
 import Layout from '../components/layout/Layout.jsx';
 import { Card } from '../components/ui/Card.jsx';
 import Field from '../components/ui/Field.jsx';
@@ -51,6 +51,8 @@ export default function Settings() {
   const [campaign, setCampaign] = useState(null);
   const [goals, setGoals] = useState({});
   const [roles, setRoles] = useState([]);
+  const [ai, setAi] = useState({ enabled: false, provider: 'openai', model: '', hasToken: false });
+  const [aiToken, setAiToken] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -58,6 +60,7 @@ export default function Settings() {
         const [s, r] = await Promise.all([api.get('/settings'), api.get('/settings/roles')]);
         setCampaign(s.data?.campaign || {});
         setGoals(s.data?.goals || {});
+        setAi(s.data?.ai || { enabled: false, provider: 'openai', model: '', hasToken: false });
         setRoles(r.data.data);
       } catch (e) {
         toast.error(apiError(e));
@@ -66,6 +69,19 @@ export default function Settings() {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  async function saveAi() {
+    try {
+      const value = { enabled: !!ai.enabled, provider: ai.provider || 'openai', model: (ai.model || '').trim() };
+      if (aiToken.trim()) value.token = aiToken.trim(); // só envia se digitou novo
+      await api.put('/settings/ai', { value });
+      setAiToken('');
+      setAi((a) => ({ ...a, hasToken: a.hasToken || !!aiToken.trim() }));
+      toast.success('Assistente de IA salvo!');
+    } catch (e) {
+      toast.error(apiError(e));
+    }
+  }
 
   async function save(key, value, msg) {
     try {
@@ -104,6 +120,49 @@ export default function Settings() {
           </div>
         </Card>
       </div>
+
+      <h3 style={{ margin: '26px 0 14px' }}><Sparkles size={18} style={{ verticalAlign: '-3px' }} /> Assistente de IA</h3>
+      <Card
+        title="Assistente de IA"
+        icon={Sparkles}
+        actions={<button className="btn btn-primary btn-sm" onClick={saveAi}><Save size={15} /> Salvar</button>}
+      >
+        <div className="card-body">
+          <p className="muted" style={{ marginBottom: 14, fontSize: 13.5 }}>
+            Cole a chave (token) do provedor de IA para ativar o assistente que aparece no canto de todas as telas.
+            Ele responde a cada usuário respeitando o que o perfil dele pode ver. O token fica guardado com segurança
+            e nunca é exibido novamente.
+          </p>
+          <div className="form-grid">
+            <Field
+              field={{ name: 'enabled', label: 'Ativar assistente de IA', type: 'checkbox' }}
+              value={ai.enabled}
+              onChange={(n, v) => setAi((s) => ({ ...s, enabled: v }))}
+            />
+            <div />
+            <Field
+              field={{ name: 'provider', label: 'Provedor', type: 'select', options: [
+                { value: 'openai', label: 'OpenAI (ChatGPT)' },
+                { value: 'anthropic', label: 'Anthropic (Claude)' },
+              ] }}
+              value={ai.provider}
+              onChange={(n, v) => setAi((s) => ({ ...s, provider: v }))}
+            />
+            <Field
+              field={{ name: 'model', label: 'Modelo', placeholder: ai.provider === 'anthropic' ? 'claude-3-5-haiku-20241022' : 'gpt-4o-mini', hint: 'Deixe em branco para usar o padrão do provedor.' }}
+              value={ai.model}
+              onChange={(n, v) => setAi((s) => ({ ...s, model: v }))}
+            />
+            <Field
+              field={{ name: 'token', label: 'Token / Chave de API', type: 'password', full: true,
+                placeholder: ai.hasToken ? '•••••••••• (já configurado — preencha só para trocar)' : 'Cole aqui a chave do provedor',
+                hint: ai.hasToken ? 'Uma chave já está salva. Deixe em branco para mantê-la.' : 'A chave é secreta e não será exibida depois de salva.' }}
+              value={aiToken}
+              onChange={(n, v) => setAiToken(v)}
+            />
+          </div>
+        </div>
+      </Card>
 
       <h3 style={{ margin: '26px 0 14px' }}><Trophy size={18} style={{ verticalAlign: '-3px' }} /> Catálogo de pontuação (tarefas)</h3>
       <ResourcePage config={tasks} />

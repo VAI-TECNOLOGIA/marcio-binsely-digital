@@ -17,6 +17,7 @@ import broadcastRoutes from './broadcast.routes.js';
 import reportRoutes from './report.routes.js';
 import settingsRoutes from './settings.routes.js';
 import uploadRoutes from './upload.routes.js';
+import aiRoutes from './ai.routes.js';
 import * as crud from './crud.js';
 
 const router = Router();
@@ -41,6 +42,7 @@ router.use('/internal', internalRoutes);
 router.use('/broadcasts', broadcastRoutes);
 router.use('/reports', reportRoutes);
 router.use('/settings', settingsRoutes);
+router.use('/ai', aiRoutes);
 router.use('/upload', uploadRoutes);
 
 // CRUDs genéricos
