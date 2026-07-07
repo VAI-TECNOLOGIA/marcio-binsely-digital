@@ -34,9 +34,9 @@ const CIDADES = [
   'Charqueadas','Eldorado do Sul','Nova Santa Rita','Estância Velha','Ivoti','Taquari','Bom Princípio','Feliz',
   'Triunfo','Portão','Arroio do Meio',
 ];
-const VERBOS = ['virou apoiador!','entrou na campanha!','agora apoia o 12345!','se juntou ao movimento!','virou voluntário!'];
+const VERBOS = ['virou apoiador!','entrou na campanha!','agora apoia o Márcio!','se juntou ao movimento!','virou voluntário!'];
 const TEMPOS = ['agora mesmo','há poucos segundos','há instantes'];
-const CORES = [['#1f6feb','#0a2540'],['#d62828','#9e1818'],['#1a9e54','#0d6b39'],['#7b2ff7','#3a1d8a'],['#f59e0b','#b45309'],['#0ea5e9','#075985']];
+const CORES = [['#003e9d','#062248'],['#f3083e','#a8062a'],['#2bb153','#1a7d3a'],['#7b2ff7','#3a1d8a'],['#fec330','#d99e06'],['#0ea5e9','#075985']];
 
 function gerarPool() {
   const pool = [];
@@ -162,8 +162,8 @@ export default function Landing() {
       <header className={'mlp-header' + (scrolled ? ' scrolled' : '')}>
         <div className="mlp-wrap mlp-bar">
           <a href="#topo" className="mlp-brand">
-            <span className="num">12</span>
-            <span className="wm"><b>Márcio Bins Ely</b><small>Vereador · PDT 12345</small></span>
+            <span className="num">MB</span>
+            <span className="wm"><b>Márcio Bins Ely</b><small>Vereador · PDT</small></span>
           </a>
           <nav className="mlp-menu">
             <a className="mlp-navlink" href="#bandeiras">Bandeiras</a>
@@ -180,7 +180,7 @@ export default function Landing() {
       <section className="mlp-hero" id="topo">
         <div className="mlp-wrap mlp-hero-grid">
           <div>
-            <span className="mlp-eyebrow"><Flag size={13} /> Vereador de Porto Alegre · PDT 12345</span>
+            <span className="mlp-eyebrow"><Flag size={13} /> Vereador de Porto Alegre · PDT</span>
             <h1>Juntos por ti,<br /><span className="accent">juntos por Porto&nbsp;Alegre.</span></h1>
             <p className="mlp-lead">
               18 anos de vida pública, trabalho e idealismo por uma cidade mais justa. Política de proximidade,
@@ -206,7 +206,7 @@ export default function Landing() {
             </div>
             <div className="mlp-chip c2">
               <div className="ic"><Check size={20} /></div>
-              <div><small>Vote</small><b>12345</b></div>
+              <div><small>Partido</small><b>PDT</b></div>
             </div>
           </div>
         </div>
@@ -476,7 +476,7 @@ export default function Landing() {
             </div>
           </div>
           <div className="mlp-foot-bottom">
-            © {new Date().getFullYear()} Márcio Bins Ely · Vereador · Porto Alegre/RS · PDT 12345 — Dados públicos; conteúdo de campanha ilustrativo.
+            © {new Date().getFullYear()} Márcio Bins Ely · Vereador · Porto Alegre/RS · PDT — Dados públicos; conteúdo de campanha ilustrativo.
           </div>
         </div>
       </footer>

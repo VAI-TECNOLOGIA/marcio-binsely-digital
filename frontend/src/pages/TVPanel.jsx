@@ -110,7 +110,7 @@ export default function TVPanel() {
         <div className="flex items-center gap-12">
           <RSFlag size={64} />
           <div>
-            <h1>{campaign.name || 'Márcio Bins Ely · 12345'}</h1>
+            <h1>{campaign.name || 'Márcio Bins Ely'}</h1>
             <div style={{ color: '#f2b705', fontWeight: 600 }}>{campaign.slogan || 'Juntos por ti, juntos por Porto Alegre'}</div>
           </div>
         </div>

@@ -45,7 +45,7 @@ export default function Login() {
         <div className="auth-slash" />
         <div className="auth-content">
           <div className="auth-top">
-            <div className="auth-number">12345</div>
+            <div className="auth-party">PDT</div>
           </div>
           <div>
             <div className="auth-name">Márcio Bins Ely · Vereador · PDT</div>

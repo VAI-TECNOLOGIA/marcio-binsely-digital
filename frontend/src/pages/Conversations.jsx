@@ -37,7 +37,7 @@ const QUICK_REPLIES = [
   'Que ótimo ter você com a gente! 💪',
 ];
 const TEMPLATES = [
-  { name: 'Boas-vindas voluntário', body: 'Olá! 👋 Que bom ter você na campanha do Márcio Bins Ely (12345)! Para confirmar sua participação como voluntário, responda *SIM*. Juntos por Porto Alegre! 💪' },
+  { name: 'Boas-vindas voluntário', body: 'Olá! 👋 Que bom ter você na campanha do Márcio Bins Ely! Para confirmar sua participação como voluntário, responda *SIM*. Juntos por Porto Alegre! 💪' },
   { name: 'Convite para evento', body: '📅 Você está convidado(a) para nossa próxima ação de rua! Confira a agenda e participe — sua presença faz a diferença!' },
   { name: 'Material digital', body: '📎 Aqui está nosso material digital para você compartilhar. Espalhe nas suas redes e ajude a campanha a crescer! 🚀' },
   { name: 'Faixa na sua casa', body: '🏠 Quer uma faixa na sua casa? Responda com seu endereço que organizamos a instalação. Obrigado pelo apoio!' },

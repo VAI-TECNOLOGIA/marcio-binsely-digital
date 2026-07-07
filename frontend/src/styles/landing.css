@@ -5,8 +5,8 @@
    ============================================================ */
 
 .mlp{
-  --navy:#0a2540; --navy-2:#0d3a6b; --blue:#1f6feb; --blue-soft:#eaf2ff;
-  --red:#d62828; --gold:#f6c453; --ink:#0e1726; --muted:#5b6b82;
+  --navy:#0a326b; --navy-2:#062248; --blue:#003e9d; --blue-soft:#e5edfb;
+  --red:#f3083e; --gold:#fec330; --ink:#0e1726; --muted:#5b6b82;
   --line:#e6ebf2; --paper:#fff; --paper-soft:#f7f9fc; --rad:18px;
   --sh-sm:0 4px 14px rgba(14,23,38,.06);
   --sh:0 18px 50px rgba(10,37,64,.12);
