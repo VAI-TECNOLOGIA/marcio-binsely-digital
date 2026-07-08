@@ -420,9 +420,11 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 /* ---------------- Login (trabalhismo gaúcho) ---------------- */
 .auth { min-height: 100vh; display: grid; grid-template-columns: 1.15fr 0.85fr; background: var(--brand-900); }
 .auth-visual { position: relative; overflow: hidden; background: var(--brand-900); }
-.auth-photo { position: absolute; inset: 0; background-image: var(--candidate-photo); background-size: cover; background-position: center top; filter: grayscale(100%) contrast(1.05); }
-.auth-duo { position: absolute; inset: 0; background: linear-gradient(160deg, var(--brand) 0%, var(--brand-900) 100%); mix-blend-mode: multiply; opacity: 0.9; }
-.auth-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(6,34,72,0.12) 0%, rgba(6,34,72,0.4) 45%, rgba(6,34,72,0.96) 100%); }
+.auth-photo { position: absolute; inset: 0; background-image: var(--candidate-photo); background-size: cover; background-position: center top; filter: saturate(1.05) brightness(1.04); }
+/* Véu azul da marca SUTIL — mantém a identidade sem escurecer o rosto */
+.auth-duo { position: absolute; inset: 0; background: linear-gradient(160deg, rgba(0,62,157,0.26) 0%, rgba(6,34,72,0.14) 55%, rgba(0,62,157,0.10) 100%); }
+/* Escurece só a base, para o texto branco ficar legível sobre a foto */
+.auth-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(6,34,72,0) 0%, rgba(6,34,72,0) 42%, rgba(6,34,72,0.55) 74%, rgba(6,34,72,0.9) 100%); }
 .auth-grain { position: absolute; inset: 0; background: repeating-linear-gradient(135deg, rgba(255,255,255,0.025) 0 2px, transparent 2px 8px); }
 .auth-flag { position: absolute; top: 34px; right: -70px; width: 320px; height: 50px; transform: rotate(38deg); display: flex; box-shadow: 0 14px 40px rgba(0,0,0,0.4); }
 .auth-flag i { flex: 1; }
