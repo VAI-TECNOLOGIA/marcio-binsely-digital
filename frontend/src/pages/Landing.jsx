@@ -182,7 +182,7 @@ export default function Landing() {
             </p>
             <div className="mlp-cta mlp-reveal">
               <a href="#apoie" className="mlp-btn mlp-btn--primary mlp-btn--lg">Quero apoiar a campanha <ArrowRight size={19} /></a>
-              <a href="#realizacoes" className="mlp-btn mlp-btn--glass mlp-btn--lg">Ver realizações</a>
+              <a href="#realizacoes" className="mlp-btn mlp-btn--outline mlp-btn--lg">Ver realizações</a>
             </div>
             <div className="mlp-hero-trust mlp-reveal">
               <div><b>833</b><span>projetos apresentados</span></div>
@@ -241,6 +241,35 @@ export default function Landing() {
             <Pillar icon={<Droplets size={24} />} t="Guaíba despoluído" d="À frente da Frente Parlamentar pela despoluição das águas do Guaíba — recuperar nosso cartão-postal." />
             <Pillar icon={<Home size={24} />} t="Moradia digna" d="Apoio à moradia popular e à regularização fundiária, com segurança jurídica e dignidade para as famílias." />
             <Pillar icon={<Users size={24} />} t="Trabalho e cooperação" d="Fortalecimento do cooperativismo, do pequeno empreendedor e do jovem aprendiz como motor de emprego e renda." />
+          </div>
+        </div>
+      </section>
+
+      {/* ================= RAIZ GAÚCHA (foto real, história humana) ================= */}
+      <section className="mlp-block mlp-raiz" id="raiz">
+        <div className="mlp-wrap mlp-raiz-grid">
+          <div className="mlp-raiz-photo mlp-reveal">
+            <img src="/tradicao.jpg" alt="Márcio Bins Ely pilchado, a cavalo, empunhando a bandeira do Rio Grande do Sul" loading="lazy" />
+            <div className="mlp-raiz-tag"><Flag size={14} /> Desfile Farroupilha</div>
+          </div>
+          <div className="mlp-raiz-copy">
+            <span className="mlp-eyebrow mlp-reveal">Raiz gaúcha</span>
+            <h2 className="mlp-reveal">Gaúcho de verdade,<br />porto-alegrense de coração</h2>
+            <p className="mlp-reveal">
+              Nascido e criado em Porto Alegre, Márcio começou cedo: movimento estudantil no DCE,
+              vice-presidência da UEE-RS e diretoria da UNE. Antes dos gabinetes, o trabalho voluntário —
+              Irmão da Santa Casa, conselheiro do Lar Santo Antônio dos Excepcionais, Rotary.
+            </p>
+            <p className="mlp-reveal">
+              A tradição não é figurino de campanha: é a pilcha no Desfile Farroupilha, o lenço no
+              pescoço e a bandeira do Rio Grande na mão. É dessa raiz que vem o jeito de fazer
+              política — <strong>perto das pessoas, com orgulho da nossa terra</strong>.
+            </p>
+            <div className="mlp-raiz-marks mlp-reveal">
+              <span><Check size={16} /> Movimento estudantil</span>
+              <span><Check size={16} /> Voluntário da Santa Casa</span>
+              <span><Check size={16} /> Tradicionalista</span>
+            </div>
           </div>
         </div>
       </section>
