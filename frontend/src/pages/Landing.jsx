@@ -173,11 +173,12 @@ export default function Landing() {
           <div className="mlp-hero-copy">
             <span className="mlp-eyebrow mlp-reveal"><Flag size={13} /> Vereador de Porto Alegre · PDT</span>
             <h1 className="mlp-reveal">
-              Juntos por ti,<br /><span className="accent">juntos por Porto&nbsp;Alegre.</span>
+              O Rio Grande<br /><span className="accent">pode mais.</span>
             </h1>
             <p className="mlp-lead mlp-reveal">
-              Presidente da Câmara de Porto Alegre e uma vida dedicada à cidade. Política de proximidade,
-              com trabalho, ética e resultado — construída <strong>com a comunidade</strong>, para a comunidade.
+              E nós vamos provar isso juntos. Mais de 20 anos de trabalho por Porto Alegre — ex-presidente
+              da Câmara, presidente do PDT da capital e uma política de proximidade feita
+              <strong> com a comunidade</strong>, para a comunidade.
             </p>
             <div className="mlp-cta mlp-reveal">
               <a href="#apoie" className="mlp-btn mlp-btn--primary mlp-btn--lg">Quero apoiar a campanha <ArrowRight size={19} /></a>
@@ -186,9 +187,9 @@ export default function Landing() {
             <div className="mlp-hero-trust mlp-reveal">
               <div><b>833</b><span>projetos apresentados</span></div>
               <div className="sep" />
-              <div><b>5</b><span>frentes que preside</span></div>
+              <div><b>6</b><span>frentes parlamentares</span></div>
               <div className="sep" />
-              <div><b>Presidente</b><span>da Câmara de POA</span></div>
+              <div><b>6º</b><span>mandato de vereador</span></div>
             </div>
           </div>
 
@@ -196,8 +197,8 @@ export default function Landing() {
             <div className="mlp-portrait">
               <div className="glow" />
               <img src="/foto.png" alt="Márcio Bins Ely" />
-              <div className="mlp-badge b-top"><BadgeCheck size={18} /><div><small>Cargo atual</small><b>Presidente da Câmara</b></div></div>
-              <div className="mlp-badge b-bot"><Landmark size={18} /><div><small>Partido</small><b>PDT · Porto Alegre</b></div></div>
+              <div className="mlp-badge b-top"><BadgeCheck size={18} /><div><small>Trajetória</small><b>Ex-Presidente da Câmara</b></div></div>
+              <div className="mlp-badge b-bot"><Landmark size={18} /><div><small>Hoje</small><b>Presidente do PDT · POA</b></div></div>
             </div>
           </div>
         </div>
@@ -274,7 +275,8 @@ export default function Landing() {
             <Frente n="02" t="Apoio à Moradia Popular e Regularização Fundiária" d="Segurança jurídica e dignidade para as famílias." />
             <Frente n="03" t="Apoio ao Cooperativismo — FRENCOOP" d="Fortalecimento da economia cooperativa local." />
             <Frente n="04" t="Práticas Integrativas em Saúde" d="Ampliação do cuidado e do bem-estar no SUS municipal." />
-            <Frente n="05" t="Desenvolvimento do Mercado Imobiliário" d="Cidade que cresce com responsabilidade e gera emprego." />
+            <Frente n="05" t="Incentivo à Doação de Órgãos e Sangue" d="Conscientização e política pública que salvam vidas." />
+            <Frente n="06" t="Desenvolvimento do Mercado Imobiliário" d="Cidade que cresce com responsabilidade e gera emprego." />
           </div>
         </div>
       </section>
@@ -344,7 +346,7 @@ export default function Landing() {
             <Tl yr="2006" t="Secretário de Esportes, Recreação e Lazer" d="Primeira grande gestão pública na Prefeitura de Porto Alegre." />
             <Tl yr="2009–2012" t="Secretário de Planejamento" d="À frente do planejamento estratégico da capital gaúcha." />
             <Tl yr="2021" t="Presidente da Câmara Municipal" d="Eleito para presidir o Legislativo, chegando a assumir interinamente a Prefeitura." />
-            <Tl yr="Hoje" t="Presidente da Câmara e do PDT-POA" d="833 projetos apresentados e a liderança de 5 frentes parlamentares estruturantes." />
+            <Tl yr="Hoje" t="6º mandato · Presidente do PDT-POA" d="833 projetos apresentados e a liderança de 6 frentes parlamentares estruturantes." />
           </div>
         </div>
       </section>
@@ -431,7 +433,7 @@ export default function Landing() {
           <div className="mlp-foot-grid">
             <div>
               <div className="mlp-foot-brand"><span className="num">MB</span><b>Márcio Bins Ely</b></div>
-              <p style={{ maxWidth: 340 }}>Juntos por ti, juntos por Porto Alegre. Trabalho e idealismo, com ética e coerência — uma campanha construída com a comunidade.</p>
+              <p style={{ maxWidth: 340 }}>O Rio Grande pode mais — e nós vamos provar isso juntos. Mais de 20 anos de trabalho e idealismo, com ética e coerência, ao lado da comunidade.</p>
               <div className="mlp-socials">
                 <a href="https://instagram.com/marciobinsely" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><IgIcon /></a>
                 <a href="https://facebook.com/marciobinsely12345" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><FbIcon /></a>
