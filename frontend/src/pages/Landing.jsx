@@ -149,7 +149,7 @@ export default function Landing() {
       <header className={'mlp-header' + (scrolled ? ' scrolled' : '')}>
         <div className="mlp-wrap mlp-bar">
           <a href="#topo" className="mlp-brand">
-            <span className="num">MB</span>
+            <span className="num num-rs" aria-label="Bandeira do Rio Grande do Sul"><RsFlag /></span>
             <span className="wm"><b>Márcio Bins Ely</b><small>Vereador · PDT</small></span>
           </a>
           <nav className="mlp-menu">
@@ -461,7 +461,7 @@ export default function Landing() {
         <div className="mlp-wrap">
           <div className="mlp-foot-grid">
             <div>
-              <div className="mlp-foot-brand"><span className="num">MB</span><b>Márcio Bins Ely</b></div>
+              <div className="mlp-foot-brand"><span className="num num-rs" aria-label="Bandeira do Rio Grande do Sul"><RsFlag /></span><b>Márcio Bins Ely</b></div>
               <p style={{ maxWidth: 340 }}>O Rio Grande pode mais — e nós vamos provar isso juntos. Mais de 20 anos de trabalho e idealismo, com ética e coerência, ao lado da comunidade.</p>
               <div className="mlp-socials">
                 <a href="https://instagram.com/marciobinsely" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><IgIcon /></a>
@@ -526,6 +526,22 @@ function Frente({ n, t, d }) {
 }
 function Tl({ yr, t, d }) {
   return (<div className="mlp-tl mlp-reveal"><div className="yr">{yr}</div><h3>{t}</h3><p>{d}</p></div>);
+}
+
+/* Bandeira do RS estilizada (faixas diagonais verde/vermelho/amarelo). */
+function RsFlag() {
+  return (
+    <svg viewBox="0 0 48 48" aria-hidden="true">
+      <defs>
+        <clipPath id="rsclip"><rect x="0" y="0" width="48" height="48" rx="13" /></clipPath>
+      </defs>
+      <g clipPath="url(#rsclip)">
+        <polygon points="0,0 48,0 48,10 0,28" fill="#2bb153" />
+        <polygon points="0,28 48,10 48,30 0,48" fill="#f3083e" />
+        <polygon points="0,48 48,30 48,48" fill="#fec330" />
+      </g>
+    </svg>
+  );
 }
 
 /* ===== Ícones de marca (SVG inline) ===== */

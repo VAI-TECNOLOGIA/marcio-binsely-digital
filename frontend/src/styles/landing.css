@@ -37,6 +37,12 @@
 .mlp-btn--glass:hover{background:rgba(255,255,255,.2);transform:translateY(-3px)}
 .mlp-btn--outline{background:#fff;color:var(--blue);border:1.5px solid #c9d8f0;box-shadow:0 6px 18px rgba(10,50,107,.08)}
 .mlp-btn--outline:hover{border-color:var(--blue);transform:translateY(-3px);box-shadow:0 12px 28px rgba(10,50,107,.14)}
+/* Botões usados como <a>: `.mlp a{color:inherit}` vence .mlp-btn--* por
+   especificidade — reforço explícito pra nunca ficar azul-sobre-azul. */
+.mlp a.mlp-btn--primary{color:#fff}
+.mlp a.mlp-btn--glass{color:#fff}
+.mlp a.mlp-btn--outline{color:var(--blue)}
+.mlp a.mlp-enter{color:var(--blue)}
 
 /* ---------- Header ---------- */
 .mlp-header{position:fixed;top:0;left:0;right:0;z-index:100;transition:.35s}
@@ -45,6 +51,9 @@
 .mlp-header.scrolled .mlp-bar{height:66px}
 .mlp-brand{display:flex;align-items:center;gap:12px}
 .mlp-brand .num{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;font-family:'Inter';font-weight:900;font-size:17px;letter-spacing:.02em;background:linear-gradient(135deg,var(--blue),var(--navy));color:#fff;box-shadow:0 8px 20px rgba(0,62,157,.42)}
+/* Chip com a bandeira do RS (substitui as iniciais) */
+.num.num-rs{background:#fff;padding:0;overflow:hidden;border:1px solid #dfe7f2;box-shadow:0 8px 20px rgba(10,50,107,.16)}
+.num.num-rs svg{width:100%;height:100%;display:block}
 .mlp-brand .wm b{font-weight:800;font-size:18px;display:block;line-height:1.05;color:var(--ink);letter-spacing:-.01em}
 .mlp-brand .wm small{font-weight:700;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--blue)}
 .mlp-menu{display:flex;align-items:center;gap:28px}
