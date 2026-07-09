@@ -146,7 +146,7 @@ export default function ResourcePage({ config }) {
         toast.success('Registro atualizado!');
       } else {
         const { data } = await api.post(config.endpoint, payload);
-        config.onCreated?.(data, toast);
+        config.onCreated?.(data, toast, payload);
         toast.success('Registro criado com sucesso!');
       }
       setModalOpen(false);

@@ -749,6 +749,20 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .auth-links .auth-back { display: inline-flex; }
 
 /* ============================================================
+   ENVIO DE ACESSO (modal "Copiar acesso" — Usuários)
+   ============================================================ */
+.access-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.access-ic { width: 42px; height: 42px; border-radius: 12px; background: var(--brand-soft); color: var(--brand); display: grid; place-items: center; flex-shrink: 0; }
+.access-head strong { display: block; font-size: 15px; color: var(--ink); }
+.access-head span { font-size: 13px; color: var(--muted); }
+.access-note { font-size: 13px; color: var(--muted); line-height: 1.55; margin-bottom: 18px; padding: 11px 13px; background: var(--surface-2); border-radius: 10px; }
+.access-note b { color: var(--ink-700); }
+.access-pwd { display: flex; align-items: center; gap: 8px; }
+.access-pwd .input { font-family: ui-monospace, 'SF Mono', Menlo, monospace; letter-spacing: 0.02em; }
+.access-pwd .icon-btn { width: 40px; height: 40px; flex-shrink: 0; }
+.access-box { white-space: pre-wrap; font-size: 13px; line-height: 1.6; color: var(--ink-700); background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 13px 15px; font-family: ui-monospace, 'SF Mono', Menlo, monospace; }
+
+/* ============================================================
    ASSISTENTE DE IA — botão flutuante + painel lateral direito
    ============================================================ */
 .ai-fab {
