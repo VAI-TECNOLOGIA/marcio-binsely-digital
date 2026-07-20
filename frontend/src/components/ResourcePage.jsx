@@ -205,7 +205,12 @@ export default function ResourcePage({ config }) {
           </div>
         )}
         {(config.filters || []).map((f) => {
-          const opts = f.enumGroup ? options(f.enumGroup) : f.options || [];
+          // optionsFrom = lista dinâmica vinda de lookup (ex.: tags da base)
+          const opts = f.optionsFrom
+            ? lookups[f.optionsFrom] || []
+            : f.enumGroup
+              ? options(f.enumGroup)
+              : f.options || [];
           return (
             <select
               key={f.name}

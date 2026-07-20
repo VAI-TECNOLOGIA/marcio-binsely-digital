@@ -319,8 +319,13 @@ model City {
 model Supporter {
   id          String          @id @default(uuid())
   name        String
-  phone       String
+  // Opcional: bases importadas de gabinete trazem contatos sem telefone
+  // (nome + endereço + histórico). O cadastro manual continua exigindo.
+  phone       String?
   whatsapp    String?
+  // Segmentação livre (ex.: "MULTIPLICADORES 2026", "FAIXAS 2024").
+  // Filtrar com: where: { tags: { has: 'X' } }
+  tags        String[]        @default([])
   email       String?
   cpf         String?
   birthDate   DateTime?

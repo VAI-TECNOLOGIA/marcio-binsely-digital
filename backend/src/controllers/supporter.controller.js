@@ -22,13 +22,27 @@ const factory = crudFactory('supporter', {
   scope: supporterScope,
   searchFields: ['name', 'phone', 'email', 'cityName', 'neighborhood'],
   allowedFilters: ['status', 'supportType', 'regionId', 'cityId', 'coordinatorId'],
+  arrayFilters: ['tags'],
 });
 
 export const { list, get } = factory;
 
+/** Tags distintas da base (grupos do gabinete), com contagem — alimenta o filtro. */
+export const listTags = asyncHandler(async (_req, res) => {
+  const rows = await prisma.$queryRaw`
+    SELECT t AS tag, count(DISTINCT "Supporter".id)::int AS total
+    FROM "Supporter", unnest(tags) t
+    GROUP BY t
+    ORDER BY count(*) DESC, t ASC
+  `;
+  res.json({ data: rows });
+});
+
 const createSchema = z.object({
   name: z.string().min(2, 'Nome obrigatório'),
-  phone: z.string().min(8, 'Telefone obrigatório'),
+  // Opcional: a base importada do gabinete tem contatos só com nome/endereço.
+  // O cadastro público (/public/join) continua exigindo telefone.
+  phone: z.string().min(8, 'Telefone muito curto').nullable().optional(),
   whatsapp: z.string().nullable().optional(),
   email: z.string().email().nullable().optional(),
   cpf: z.string().nullable().optional(),

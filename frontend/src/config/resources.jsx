@@ -17,10 +17,13 @@ export const supporters = {
   filters: [
     { name: 'status', label: 'Status', enumGroup: 'SupporterStatus' },
     { name: 'supportType', label: 'Tipo de apoio', enumGroup: 'SupportType' },
+    { name: 'tags', label: 'Grupo', optionsFrom: 'tags' },
   ],
   lookups: [
     { key: 'regions', endpoint: '/regions' },
     { key: 'coordinators', endpoint: '/users', params: { role: 'MEMBRO' } },
+    // Grupos importados do gabinete (ex.: "MULTIPLICADORES 2026") com contagem.
+    { key: 'tags', endpoint: '/supporters/tags', valueKey: 'tag', labelFn: (t) => `${t.tag} (${t.total})` },
   ],
   columns: [
     {
@@ -31,19 +34,33 @@ export const supporters = {
           <Avatar name={r.name} src={r.photoUrl} size="avatar-sm" />
           <div>
             <div className="cell-strong">{r.name}</div>
-            <div className="cell-muted text-sm">{formatPhone(r.phone)}</div>
+            <div className="cell-muted text-sm">{r.phone ? formatPhone(r.phone) : 'sem telefone'}</div>
           </div>
         </div>
       ),
     },
     { key: 'supportType', label: 'Apoio', render: (r) => <Badge>{label('SupportType', r.supportType)}</Badge> },
     { key: 'local', label: 'Local', render: (r) => [r.neighborhood, r.cityName].filter(Boolean).join(', ') || '—' },
-    { key: 'region', label: 'Região', render: (r) => r.region?.name || '—' },
+    {
+      key: 'tags',
+      label: 'Grupos',
+      render: (r) =>
+        r.tags?.length ? (
+          <div className="cell-tags">
+            {r.tags.slice(0, 2).map((t) => (
+              <Badge key={t}>{t}</Badge>
+            ))}
+            {r.tags.length > 2 && <span className="cell-muted text-sm">+{r.tags.length - 2}</span>}
+          </div>
+        ) : (
+          '—'
+        ),
+    },
     { key: 'status', label: 'Status', render: (r) => <StatusBadge group="SupporterStatus" value={r.status} /> },
   ],
   fields: [
     { name: 'name', label: 'Nome completo', required: true, full: true },
-    { name: 'phone', label: 'Telefone', type: 'tel', required: true },
+    { name: 'phone', label: 'Telefone', type: 'tel' },
     { name: 'whatsapp', label: 'WhatsApp', type: 'tel' },
     { name: 'email', label: 'E-mail', type: 'email' },
     { name: 'cpf', label: 'CPF (opcional)' },

@@ -18,6 +18,8 @@ export function crudFactory(modelKey, options = {}) {
     orderBy = { createdAt: 'desc' },
     scope,
     allowedFilters = [],
+    // Filtros sobre colunas de array (ex.: tags) — usam `has` em vez de igualdade.
+    arrayFilters = [],
     writableFields,
     dateFields = [],
     numberFields = [],
@@ -56,6 +58,10 @@ export function crudFactory(modelKey, options = {}) {
     for (const key of allowedFilters) {
       const v = req.query[key];
       if (v !== undefined && v !== '') and.push({ [key]: v });
+    }
+    for (const key of arrayFilters) {
+      const v = req.query[key];
+      if (v !== undefined && v !== '') and.push({ [key]: { has: v } });
     }
     const { search } = req.query;
     if (search && searchFields.length) {
