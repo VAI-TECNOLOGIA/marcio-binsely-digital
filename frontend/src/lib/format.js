@@ -32,6 +32,25 @@ export function formatPhone(phone = '') {
   return phone || '—';
 }
 
+/**
+ * Monta o link do WhatsApp (wa.me) a partir do telefone salvo.
+ * A base guarda só DDD + número (ex.: 51999647944); o wa.me exige o país (55).
+ * Devolve null quando não há número válido — aí o botão não deve aparecer.
+ */
+export function waLink(phone, message) {
+  let d = String(phone || '').replace(/\D/g, '');
+  if (!d) return null;
+  if (d.startsWith('55') && (d.length === 12 || d.length === 13)) {
+    // já veio com o país
+  } else if (d.length === 10 || d.length === 11) {
+    d = `55${d}`;
+  } else {
+    return null; // número incompleto: melhor não oferecer o atalho
+  }
+  const texto = message ? `?text=${encodeURIComponent(message)}` : '';
+  return `https://wa.me/${d}${texto}`;
+}
+
 export function toInputDate(value) {
   if (!value) return '';
   const d = new Date(value);

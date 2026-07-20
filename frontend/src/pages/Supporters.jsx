@@ -1,6 +1,7 @@
 import { UserCheck, Ban } from 'lucide-react';
 import Layout from '../components/layout/Layout.jsx';
 import ResourcePage from '../components/ResourcePage.jsx';
+import WhatsAppButton from '../components/WhatsAppButton.jsx';
 import { supporters } from '../config/resources.jsx';
 import api, { apiError } from '../api/client.js';
 
@@ -9,6 +10,7 @@ export default function Supporters() {
     ...supporters,
     rowActionsExtra: (row, reload, toast) => (
       <>
+        {row.status !== 'BLACKLIST' && <WhatsAppButton person={row} />}
         {row.supportType === 'VOLUNTARIO' && row.status !== 'CONFIRMADO' && row.status !== 'BLACKLIST' && (
           <button
             className="btn btn-ghost btn-sm"

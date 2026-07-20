@@ -281,6 +281,12 @@ input, select, textarea { font-family: inherit; }
 .btn-gold:hover { filter: brightness(1.04); }
 .btn-green { background: var(--green-rs); color: #fff; border-color: var(--green-rs-700); }
 .btn-green:hover { filter: brightness(1.06); }
+/* Telefone clicável na listagem: parece texto comum até o mouse chegar. */
+.cell-phone-wa { color: var(--muted); text-decoration: none; }
+.cell-phone-wa:hover { color: #128C7E; text-decoration: underline; }
+/* Atalho do WhatsApp na listagem: discreto, mas verde ao passar o mouse. */
+.btn-wa { color: #25D366; }
+.btn-wa:hover { background: rgba(37, 211, 102, 0.12); color: #128C7E; border-color: rgba(37, 211, 102, 0.35); }
 .btn-outline { background: transparent; border-color: var(--ink-600); color: var(--ink); }
 .btn-outline:hover { background: var(--surface-2); }
 .btn-dark { background: var(--ink); color: #fff; border-color: var(--ink); }

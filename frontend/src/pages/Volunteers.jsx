@@ -5,6 +5,7 @@ import { Card } from '../components/ui/Card.jsx';
 import DataTable from '../components/ui/DataTable.jsx';
 import { LoadingBox } from '../components/ui/Spinner.jsx';
 import EmptyState from '../components/ui/EmptyState.jsx';
+import WhatsAppButton from '../components/WhatsAppButton.jsx';
 import { StatusBadge } from '../components/ui/Badge.jsx';
 import Avatar from '../components/ui/Avatar.jsx';
 import api, { apiError } from '../api/client.js';
@@ -89,9 +90,12 @@ export default function Volunteers() {
             rows={rows}
             empty={<EmptyState icon={Trophy} title="Nenhum voluntário" message="Cadastros do tipo 'Quero ser voluntário' aparecem aqui." />}
             actions={(row) => (
-              <button className="btn btn-ghost btn-sm" title={row.active ? 'Desativar' : 'Ativar'} onClick={() => toggle(row)}>
-                <Power size={15} />
-              </button>
+              <>
+                <WhatsAppButton person={row.supporter} />
+                <button className="btn btn-ghost btn-sm" title={row.active ? 'Desativar' : 'Ativar'} onClick={() => toggle(row)}>
+                  <Power size={15} />
+                </button>
+              </>
             )}
           />
         )}
