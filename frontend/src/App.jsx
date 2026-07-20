@@ -33,6 +33,10 @@ const TVPanel = lazy(() => import('./pages/TVPanel.jsx'));
 
 const P = (roles, element) => <ProtectedRoute roles={roles}>{element}</ProtectedRoute>;
 
+// No domínio da landing (lp.*) a raiz mostra o site público, não o sistema.
+const isLandingHost =
+  typeof window !== 'undefined' && window.location.hostname.startsWith('lp.');
+
 const lazyFallback = (
   <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center' }}>
     <div className="spinner" />
@@ -49,7 +53,7 @@ export default function App() {
       <Route path="/lp" element={<Landing />} />
       <Route path="/painel-tv" element={P(['LIDER', 'MEMBRO'], <TVPanel />)} />
 
-      <Route path="/" element={P(null, <Dashboard />)} />
+      <Route path="/" element={isLandingHost ? <Landing /> : P(null, <Dashboard />)} />
       <Route path="/mapa" element={P(['LIDER', 'MEMBRO'], <MapView />)} />
       <Route path="/relatorios" element={P(['LIDER', 'MEMBRO'], <Reports />)} />
 
