@@ -32,6 +32,28 @@ export function formatPhone(phone = '') {
   return phone || '—';
 }
 
+// Partículas que ficam em minúscula no meio do nome.
+const PARTICULAS = new Set(['de', 'da', 'do', 'das', 'dos', 'e', 'di', 'du', 'del', 'la']);
+
+/**
+ * Normaliza nome próprio para exibição.
+ * A base do gabinete veio em CAIXA ALTA ("ROBERTO PERES"), que grita na tela.
+ * CSS não resolve: `text-transform: capitalize` não rebaixa maiúsculas.
+ */
+export function nomeProprio(nome) {
+  if (!nome) return '';
+  return String(nome)
+    .trim()
+    .toLocaleLowerCase('pt-BR')
+    .split(/\s+/)
+    .map((p, i) => {
+      if (i > 0 && PARTICULAS.has(p)) return p;
+      // Mantém iniciais como "J." em maiúscula e trata hífen (Ana-Maria).
+      return p.replace(/(^|-)(\p{L})/gu, (_, sep, letra) => sep + letra.toLocaleUpperCase('pt-BR'));
+    })
+    .join(' ');
+}
+
 /**
  * Monta o link do WhatsApp (wa.me) a partir do telefone salvo.
  * A base guarda só DDD + número (ex.: 51999647944); o wa.me exige o país (55).

@@ -1,7 +1,7 @@
 import { StatusBadge, Badge } from '../components/ui/Badge.jsx';
 import Avatar from '../components/ui/Avatar.jsx';
 import { label } from './enums.js';
-import { formatDate, formatPhone, waLink } from '../lib/format.js';
+import { formatDate, formatPhone, waLink, nomeProprio } from '../lib/format.js';
 
 const cut = (s, n = 56) => (s && s.length > n ? `${s.slice(0, n)}…` : s || '');
 
@@ -32,12 +32,12 @@ export const supporters = {
       render: (r) => (
         <div className="cell-person">
           <Avatar name={r.name} src={r.photoUrl} size="avatar-sm" />
-          <div>
-            <div className="cell-strong">{r.name}</div>
+          <div className="cell-person-txt">
+            <div className="cell-strong">{nomeProprio(r.name)}</div>
             {waLink(r.whatsapp || r.phone) ? (
               <a
                 className="cell-phone-wa text-sm"
-                href={waLink(r.whatsapp || r.phone, `Olá, ${(r.name || '').split(' ')[0]}! Aqui é da campanha do Márcio Bins Ely.`)}
+                href={waLink(r.whatsapp || r.phone, `Olá, ${nomeProprio(r.name).split(' ')[0]}! Aqui é da campanha do Márcio Bins Ely.`)}
                 target="_blank"
                 rel="noopener noreferrer"
                 title="Abrir conversa no WhatsApp"

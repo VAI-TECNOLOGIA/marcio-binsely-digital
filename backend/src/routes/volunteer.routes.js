@@ -7,6 +7,7 @@ const r = Router();
 r.get('/ranking', authorize('LIDER', 'MEMBRO', 'PARCEIRO'), volunteer.ranking);
 r.get('/', authorize('LIDER', 'MEMBRO'), volunteer.list);
 r.get('/:id', authorize('LIDER', 'MEMBRO'), volunteer.get);
+r.patch('/:id/confirmation', authorize('LIDER', 'MEMBRO'), volunteer.setConfirmation);
 r.put('/:id', authorize('LIDER', 'MEMBRO'), volunteer.update);
 
 export default r;

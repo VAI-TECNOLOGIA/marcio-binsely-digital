@@ -27,6 +27,12 @@ enum UserRole {
   PARCEIRO
 }
 
+enum VolunteerConfirmation {
+  A_CONFIRMAR // cadastrou-se / veio de importação — ainda não falou com a campanha
+  CONFIRMADO  // confirmou que quer participar
+  CANCELADO   // desistiu ou recusou
+}
+
 enum SupportType {
   VOLUNTARIO
   FAIXA_CASA
@@ -376,6 +382,9 @@ model Volunteer {
 
   active       Boolean  @default(false)
   totalScore   Int      @default(0)
+  // Situação da confirmação. `confirmed` continua espelhando
+  // (confirmationStatus == CONFIRMADO) para não quebrar o fluxo do WhatsApp.
+  confirmationStatus VolunteerConfirmation @default(A_CONFIRMAR)
   confirmed         Boolean   @default(false)
   confirmedAt       DateTime?
   confirmationChannel Channel?

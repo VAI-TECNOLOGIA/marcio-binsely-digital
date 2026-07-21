@@ -284,9 +284,6 @@ input, select, textarea { font-family: inherit; }
 /* Telefone clicável na listagem: parece texto comum até o mouse chegar. */
 .cell-phone-wa { color: var(--muted); text-decoration: none; }
 .cell-phone-wa:hover { color: #128C7E; text-decoration: underline; }
-/* Atalho do WhatsApp na listagem: discreto, mas verde ao passar o mouse. */
-.btn-wa { color: #25D366; }
-.btn-wa:hover { background: rgba(37, 211, 102, 0.12); color: #128C7E; border-color: rgba(37, 211, 102, 0.35); }
 .btn-outline { background: transparent; border-color: var(--ink-600); color: var(--ink); }
 .btn-outline:hover { background: var(--surface-2); }
 .btn-dark { background: var(--ink); color: #fff; border-color: var(--ink); }
@@ -384,7 +381,44 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .table tbody tr { transition: background 0.12s; }
 .table tbody tr:hover { background: var(--surface-2); }
 .table tbody tr:last-child td { border-bottom: none; }
-.table-actions { display: flex; gap: 6px; justify-content: flex-end; }
+.table-actions { display: flex; gap: 6px; justify-content: flex-end; align-items: center; }
+
+/* --- Densidade da tabela ---------------------------------------------
+   O conteúdo importado (textos longos de formulário) inflava a linha para
+   ~130px e espremia o nome em 3 linhas. Teto de altura + nome com espaço
+   garantido devolvem a leitura em varredura vertical. */
+.table td { max-width: 340px; }
+.table tbody tr { height: 56px; }
+.cell-person-txt { min-width: 0; }
+.cell-person-txt .cell-strong,
+.cell-person-txt .cell-muted {
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 210px;
+}
+
+/* Confirmação: estado + ação no mesmo lugar, sem abrir modal. */
+.conf-cell { display: flex; align-items: center; gap: 6px; }
+/* O rótulo não pode quebrar em duas linhas — era o que inflava a altura da linha. */
+.conf-cell .badge { white-space: nowrap; flex: none; }
+.btn-conf {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 7px; font-size: 11px; font-weight: 600;
+  border: 1px solid transparent; cursor: pointer; background: transparent;
+  transition: background 0.12s, border-color 0.12s; white-space: nowrap;
+}
+.btn-conf:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-conf--ok { color: var(--green-rs); border-color: rgba(43,177,83,0.35); }
+.btn-conf--ok:hover:not(:disabled) { background: var(--green-soft); }
+.btn-conf--no { color: var(--muted); border-color: transparent; padding: 3px 6px; }
+.btn-conf--no:hover:not(:disabled) { background: var(--red-soft); color: #b91c1c; }
+
+/* WhatsApp: pastilha verde sólida — a marca precisa ser reconhecida de relance. */
+.btn-wa {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 8px; flex: none;
+  background: rgba(37, 211, 102, 0.12); color: #128C7E;
+  transition: background 0.12s, color 0.12s, transform 0.12s;
+}
+.btn-wa:hover { background: #25D366; color: #fff; transform: translateY(-1px); }
 .cell-strong { font-weight: 600; }
 .cell-muted { color: var(--muted); }
 .cell-person { display: flex; align-items: center; gap: 10px; }
