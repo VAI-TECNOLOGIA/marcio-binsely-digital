@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   ArrowRight, Check, MapPin, Flag, ShieldCheck, GraduationCap, HeartPulse,
   Droplets, Home, Users, Trophy, BadgeCheck, Landmark, Sparkles, ChevronDown,
+  HeartHandshake,
 } from 'lucide-react';
 import api, { apiError } from '../api/client.js';
 import { useToast } from '../context/ToastContext.jsx';
@@ -150,7 +151,7 @@ export default function Landing() {
         <div className="mlp-wrap mlp-bar">
           <a href="#topo" className="mlp-brand">
             <span className="num num-rs" aria-label="Bandeira do Rio Grande do Sul"><RsFlag /></span>
-            <span className="wm"><b>Márcio Bins Ely</b><small>Vereador · PDT</small></span>
+            <span className="wm"><b>Márcio Bins Ely</b><small>Pré-candidato · Dep. Federal</small></span>
           </a>
           <nav className="mlp-menu">
             <a className="mlp-navlink" href="#bandeiras">Bandeiras</a>
@@ -171,7 +172,7 @@ export default function Landing() {
         </div>
         <div className="mlp-wrap mlp-hero-grid">
           <div className="mlp-hero-copy">
-            <span className="mlp-eyebrow mlp-reveal"><Flag size={13} /> Vereador de Porto Alegre · PDT</span>
+            <span className="mlp-eyebrow mlp-reveal"><Flag size={13} /> Pré-candidato a Deputado Federal · PDT</span>
             <h1 className="mlp-reveal">
               O Rio Grande<br /><span className="accent">pode mais.</span>
             </h1>
@@ -196,8 +197,7 @@ export default function Landing() {
           <div className="mlp-hero-visual mlp-reveal">
             <div className="mlp-portrait">
               <div className="glow" />
-              <img src="/foto.png" alt="Márcio Bins Ely" />
-              <div className="mlp-badge b-top"><BadgeCheck size={18} /><div><small>Trajetória</small><b>Ex-Presidente da Câmara</b></div></div>
+              <img src="/foto-web.webp" alt="Márcio Bins Ely" />
               <div className="mlp-badge b-bot"><Landmark size={18} /><div><small>Hoje</small><b>Presidente do PDT · POA</b></div></div>
             </div>
           </div>
@@ -241,6 +241,7 @@ export default function Landing() {
             <Pillar icon={<Droplets size={24} />} t="Guaíba despoluído" d="À frente da Frente Parlamentar pela despoluição das águas do Guaíba — recuperar nosso cartão-postal." />
             <Pillar icon={<Home size={24} />} t="Moradia digna" d="Apoio à moradia popular e à regularização fundiária, com segurança jurídica e dignidade para as famílias." />
             <Pillar icon={<Users size={24} />} t="Trabalho e cooperação" d="Fortalecimento do cooperativismo, do pequeno empreendedor e do jovem aprendiz como motor de emprego e renda." />
+            <Pillar icon={<HeartHandshake size={24} />} t="Políticas em defesa das mulheres" d="Atuação em projetos de lei que defendem a vida e a integridade das mulheres diante dos números alarmantes de feminicídios no Estado." />
           </div>
         </div>
       </section>
@@ -249,27 +250,17 @@ export default function Landing() {
       <section className="mlp-block mlp-raiz" id="raiz">
         <div className="mlp-wrap mlp-raiz-grid">
           <div className="mlp-raiz-photo mlp-reveal">
-            <img src="/tradicao.jpg" alt="Márcio Bins Ely pilchado, a cavalo, empunhando a bandeira do Rio Grande do Sul" loading="lazy" />
+            <img src="/tradicao.webp" alt="Márcio Bins Ely de lenço vermelho, tomando chimarrão em acampamento farroupilha" loading="lazy" />
             <div className="mlp-raiz-tag"><Flag size={14} /> Desfile Farroupilha</div>
           </div>
           <div className="mlp-raiz-copy">
             <span className="mlp-eyebrow mlp-reveal">Raiz gaúcha</span>
             <h2 className="mlp-reveal">Gaúcho de verdade,<br />porto-alegrense de coração</h2>
             <p className="mlp-reveal">
-              Nascido e criado em Porto Alegre, Márcio começou cedo: movimento estudantil no DCE,
-              vice-presidência da UEE-RS e diretoria da UNE. Antes dos gabinetes, o trabalho voluntário —
-              Irmão da Santa Casa, conselheiro do Lar Santo Antônio dos Excepcionais, Rotary.
+              A tradição não é figurino de campanha, é a pilcha no Desfile Farroupilha, o lenço no
+              pescoço e a bandeira do Rio Grande na mão. Dessa raiz vem o jeito de fazer política:{' '}
+              <strong>perto das pessoas, com orgulho da nossa terra</strong>.
             </p>
-            <p className="mlp-reveal">
-              A tradição não é figurino de campanha: é a pilcha no Desfile Farroupilha, o lenço no
-              pescoço e a bandeira do Rio Grande na mão. É dessa raiz que vem o jeito de fazer
-              política — <strong>perto das pessoas, com orgulho da nossa terra</strong>.
-            </p>
-            <div className="mlp-raiz-marks mlp-reveal">
-              <span><Check size={16} /> Movimento estudantil</span>
-              <span><Check size={16} /> Voluntário da Santa Casa</span>
-              <span><Check size={16} /> Tradicionalista</span>
-            </div>
           </div>
         </div>
       </section>
@@ -358,7 +349,7 @@ export default function Landing() {
           <blockquote>Política se faz <span className="hl">com</span> as pessoas, não <span className="hl">pelas</span> pessoas. É caminhando junto, com trabalho e coerência, que Porto Alegre muda de verdade.</blockquote>
           <div className="mlp-by">
             <img src="/foto.png" alt="Márcio Bins Ely" />
-            <div><b>Márcio Bins Ely</b><span>Vereador de Porto Alegre · PDT</span></div>
+            <div><b>Márcio Bins Ely</b><span>Pré-candidato a Deputado Federal · PDT</span></div>
           </div>
         </div>
       </section>
