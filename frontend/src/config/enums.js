@@ -20,7 +20,9 @@ export const LABELS = {
     NOVO: 'Novo',
     CONFIRMADO: 'Confirmado',
     ATIVO: 'Ativo',
-    PENDENTE: 'Pendente',
+    // "A confirmar" = veio de formulário/importação, ninguém da campanha
+    // falou com a pessoa ainda. Mesmo vocabulário usado em Voluntários.
+    PENDENTE: 'A confirmar',
     SUSPEITO: 'Suspeito',
     INATIVO: 'Inativo',
     BLACKLIST: 'Blacklist',

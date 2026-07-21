@@ -70,6 +70,12 @@ export const supporters = {
         ),
     },
     { key: 'status', label: 'Status', render: (r) => <StatusBadge group="SupporterStatus" value={r.status} /> },
+    {
+      key: 'createdAt',
+      label: 'Cadastro',
+      thStyle: { width: 110 },
+      render: (r) => <span className="cell-muted text-sm">{formatDate(r.createdAt)}</span>,
+    },
   ],
   fields: [
     { name: 'name', label: 'Nome completo', required: true, full: true },

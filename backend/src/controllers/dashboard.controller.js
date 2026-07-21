@@ -79,6 +79,55 @@ export const getCharts = asyncHandler(async (req, res) => {
   });
 });
 
+/**
+ * Cadastros novos por dia — responde "quantos estão entrando por dia".
+ * Preenche os dias sem cadastro com zero para o gráfico não mentir
+ * (buraco no eixo daria impressão de continuidade).
+ */
+export const getDailySignups = asyncHandler(async (req, res) => {
+  const dias = Math.min(180, Math.max(7, Number(req.query.dias) || 30));
+  const desde = new Date();
+  desde.setHours(0, 0, 0, 0);
+  desde.setDate(desde.getDate() - (dias - 1));
+
+  // A base migrada tem createdAt = data da importação (não da inscrição real).
+  // Incluí-la geraria um pico de 33 mil que achataria os dias reais no gráfico.
+  const linhas = await prisma.$queryRaw`
+    SELECT to_char(date_trunc('day', "createdAt"), 'YYYY-MM-DD') AS dia,
+           count(*)::int AS total,
+           count(*) FILTER (WHERE 'SITE 2026' = ANY(tags))::int AS site
+    FROM "Supporter"
+    WHERE "createdAt" >= ${desde}
+      AND NOT ('BASE HISTÓRICA' = ANY(tags))
+    GROUP BY 1
+    ORDER BY 1
+  `;
+
+  const porDia = new Map(linhas.map((l) => [l.dia, l]));
+  const serie = [];
+  for (let i = 0; i < dias; i++) {
+    const d = new Date(desde);
+    d.setDate(desde.getDate() + i);
+    const chave = d.toISOString().slice(0, 10);
+    const achado = porDia.get(chave);
+    serie.push({ dia: chave, total: achado?.total || 0, site: achado?.site || 0 });
+  }
+
+  const hoje = serie.at(-1)?.total || 0;
+  const total = serie.reduce((s, d) => s + d.total, 0);
+  res.json({
+    serie,
+    resumo: {
+      hoje,
+      ontem: serie.at(-2)?.total || 0,
+      ultimos7: serie.slice(-7).reduce((s, d) => s + d.total, 0),
+      periodo: total,
+      mediaDia: Number((total / dias).toFixed(1)),
+      dias,
+    },
+  });
+});
+
 /** Camadas georreferenciadas do mapa político (fonte única e agregada). */
 export const getMap = asyncHandler(async (req, res) => {
   const geo = { lat: { not: null }, lng: { not: null } };

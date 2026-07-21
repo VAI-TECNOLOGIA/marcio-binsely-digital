@@ -19,8 +19,11 @@ export default function Dashboard() {
       api.get('/dashboard/charts'),
       api.get('/dashboard/rankings'),
       api.get('/reports/growth'),
+      api.get('/dashboard/cadastros-por-dia', { params: { dias: 30 } }),
     ])
-      .then(([s, c, r, g]) => setData({ stats: s.data, charts: c.data, rankings: r.data, growth: g.data.series }))
+      .then(([s, c, r, g, d]) =>
+        setData({ stats: s.data, charts: c.data, rankings: r.data, growth: g.data.series, diarios: d.data })
+      )
       .catch(() => setData({ error: true }));
   }, []);
 
@@ -32,7 +35,14 @@ export default function Dashboard() {
     );
   }
 
-  const { stats, charts, rankings, growth } = data;
+  const { stats, charts, rankings, growth, diarios } = data;
+  const res = diarios?.resumo;
+  // Série temporal usa LineChartCard (eixo `date`/`total`). Em barra, 30 dias
+  // viravam uma lista vertical ilegível.
+  const serieDiaria = (diarios?.serie || []).map((d) => ({
+    date: `${d.dia.slice(8, 10)}/${d.dia.slice(5, 7)}`,
+    total: d.total,
+  }));
   const statusData = (charts.byStatus || []).map((s) => ({ name: label('SupporterStatus', s.name), value: s.value }));
   const supportData = (charts.bySupportType || []).map((s) => ({ name: label('SupportType', s.name), value: s.value }));
 
@@ -55,6 +65,22 @@ export default function Dashboard() {
         <StatCard label="Demandas abertas" value={stats.openDemands} icon={Inbox} tone="blue" />
         <StatCard label="Conversas abertas" value={stats.openConversations} icon={MessageSquare} tone="ink" />
       </div>
+
+      {res && (
+        <>
+          <div className="grid stats-grid" style={{ marginTop: 18 }}>
+            <StatCard label="Cadastros hoje" value={res.hoje} icon={UserPlus} tone="green" hint={`ontem: ${res.ontem}`} />
+            <StatCard label="Últimos 7 dias" value={res.ultimos7} icon={TrendingUp} tone="blue" />
+            <StatCard label="Média por dia" value={res.mediaDia} icon={TrendingUp} tone="ink" hint={`em ${res.dias} dias`} />
+            <StatCard label={`Total em ${res.dias} dias`} value={res.periodo} icon={Users} tone="violet" />
+          </div>
+          <div style={{ marginTop: 18 }}>
+            <Card title="Cadastros por dia" icon={TrendingUp} subtitle={`Entradas diárias nos últimos ${res.dias} dias`}>
+              <LineChartCard data={serieDiaria} color="#2BB153" />
+            </Card>
+          </div>
+        </>
+      )}
 
       <div className="grid cols-2-1" style={{ marginTop: 18 }}>
         <Card title="Apoiadores por cidade/bairro" icon={MapPin}>

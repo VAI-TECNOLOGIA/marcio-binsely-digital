@@ -20,6 +20,106 @@ const joinSchema = z.object({
   supportType: z.enum(SUPPORT_TYPES).optional(),
 });
 
+// ============================================================
+//  Recebe o formulário do site WordPress (marciobinsely.site — Fluent Forms).
+//  Cai em Apoiadores como "A confirmar" (status PENDENTE): a pessoa
+//  preencheu um formulário, ainda não falou com a campanha.
+// ============================================================
+
+/** Lê um campo aceitando as variações que o Fluent Forms manda. */
+function campo(body, ...chaves) {
+  for (const k of chaves) {
+    const v = k.split('.').reduce((o, p) => (o == null ? o : o[p]), body);
+    if (v != null && String(v).trim() !== '') return String(v).trim();
+  }
+  return '';
+}
+
+export const siteJoin = asyncHandler(async (req, res) => {
+  const b = req.body || {};
+
+  // Fluent Forms manda names como objeto OU achatado em names[first_name].
+  const nome = [
+    campo(b, 'names.first_name', 'names[first_name]', 'first_name', 'name', 'nome'),
+    campo(b, 'names.last_name', 'names[last_name]', 'last_name'),
+  ].filter(Boolean).join(' ').trim();
+
+  const telefone = onlyDigits(campo(b, 'whatsApp', 'whatsapp', 'phone', 'telefone', 'input_whatsapp'));
+
+  if (nome.length < 2) return res.status(400).json({ error: 'Nome é obrigatório.' });
+  if (telefone.length < 8) return res.status(400).json({ error: 'WhatsApp é obrigatório.' });
+
+  // Mesma trava anti-enxurrada do /join.
+  const recentes = await prisma.supporter.count({
+    where: { createdAt: { gte: new Date(Date.now() - 60_000) } },
+  });
+  if (recentes >= 60) {
+    return res.status(429).json({ error: 'Muitos cadastros agora. Tente novamente em instantes.' });
+  }
+
+  const [black, existente] = await Promise.all([
+    prisma.blacklist.findFirst({ where: { phone: telefone } }),
+    prisma.supporter.findFirst({ where: { phone: telefone } }),
+  ]);
+
+  const indicacao = campo(b, 'input_indicacao', 'indicacao');
+  const tags = ['SITE 2026'];
+  if (indicacao) tags.push(`INDICAÇÃO: ${indicacao.toUpperCase().replace(/\s+/g, ' ').trim()}`);
+  if (campo(b, 'input_propaganda', 'propaganda')) tags.push('QUER PLACA/FAIXA');
+
+  const cidade = campo(b, 'input_cidade', 'cidade', 'cityName') || 'Porto Alegre';
+  const bairro = campo(b, 'input_bairro', 'bairro');
+  const notas = [
+    indicacao && `Indicado por: ${indicacao}`,
+    campo(b, 'input_propaganda') && `Propaganda: ${campo(b, 'input_propaganda')}`,
+    'Origem: formulário do site marciobinsely.site',
+  ].filter(Boolean).join('\n');
+
+  // Já existe? Não duplica: enriquece o cadastro e marca para conferência.
+  if (existente) {
+    const atualizado = await prisma.supporter.update({
+      where: { id: existente.id },
+      data: {
+        tags: Array.from(new Set([...(existente.tags || []), ...tags])),
+        email: existente.email || campo(b, 'email') || null,
+        neighborhood: existente.neighborhood || bairro || null,
+        notes: existente.notes ? `${existente.notes}\n--- site ---\n${notas}` : notas,
+        ...(existente.status === 'BLACKLIST' ? {} : { status: 'PENDENTE' }),
+      },
+    });
+    return res.status(200).json({ ok: true, duplicado: true, id: atualizado.id, message: 'Cadastro atualizado!' });
+  }
+
+  const city = await linkCityByName(prisma, cidade);
+  const geo = fallbackLatLng({ cityName: cidade, neighborhood: bairro, seed: telefone });
+
+  const apoiador = await prisma.supporter.create({
+    data: {
+      name: nome,
+      phone: telefone,
+      whatsapp: telefone,
+      email: campo(b, 'email') || null,
+      cep: onlyDigits(campo(b, 'input_cep', 'cep')) || null,
+      street: campo(b, 'input_endereco', 'endereco') || null,
+      neighborhood: bairro || null,
+      cityName: cidade,
+      cityId: city?.id || null,
+      regionId: city?.regionId || null,
+      lat: geo.lat,
+      lng: geo.lng,
+      instagram: campo(b, 'input_social', 'social', 'instagram') || null,
+      tags,
+      notes: notas,
+      supportType: 'NOTICIAS',
+      // "A confirmar": veio do site, ninguém da campanha falou com a pessoa ainda.
+      status: black ? 'BLACKLIST' : 'PENDENTE',
+      flaggedReason: black ? `Telefone consta na blacklist: ${black.reason}` : null,
+    },
+  });
+
+  res.status(201).json({ ok: true, id: apoiador.id, message: 'Cadastro recebido!' });
+});
+
 export const join = asyncHandler(async (req, res) => {
   const data = joinSchema.parse(nullifyEmpty(req.body));
   const phone = onlyDigits(data.phone);
