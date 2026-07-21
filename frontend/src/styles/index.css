@@ -86,7 +86,11 @@
   /* Tipografia — Inter em todo o sistema (fonte padrão de apps/sites) */
   --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-strong: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --candidate-photo: url('/foto.png'), url('/candidato.svg');
+  /* foto-web.webp (62 KB) no lugar de foto.png (3,3 MB): o PNG tinha canal
+     alfa 100% opaco, ou seja, peso sem uso. Em 4G o original deixava um
+     boneco cinza na tela por segundos. Camadas = a 1ª fica por cima;
+     o .jpg atende quem não suporta WebP e o .svg é o último recurso. */
+  --candidate-photo: url('/foto-web.webp'), url('/foto-web.jpg'), url('/candidato.svg');
 }
 
 /* ----------------------------------------------------------------

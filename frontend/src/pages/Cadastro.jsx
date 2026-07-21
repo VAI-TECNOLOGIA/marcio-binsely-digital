@@ -110,19 +110,48 @@ export default function Cadastro() {
     }
   }
 
+  // Lado visual: foto do candidato, bandeira do RS e números reais da campanha.
+  const painel = (
+    <aside className="cad-visual">
+      <div className="cad-foto" />
+      <div className="cad-tint" />
+      <div className="cad-sombra" />
+      <div className="cad-flag"><i className="g" /><i className="y" /><i className="r" /></div>
+
+      <div className="cad-visual-txt">
+        <span className="cad-visual-tag">Vereador de Porto Alegre · PDT</span>
+        <h2>
+          O Rio Grande<br /><em>pode mais.</em>
+        </h2>
+        <p>Mais de 20 anos de trabalho por Porto Alegre — uma política de proximidade,
+          feita com a comunidade.</p>
+        <ul className="cad-numeros">
+          <li><strong>833</strong><span>projetos apresentados</span></li>
+          <li><strong>6</strong><span>frentes parlamentares</span></li>
+          <li><strong>6º</strong><span>mandato de vereador</span></li>
+        </ul>
+      </div>
+    </aside>
+  );
+
   if (pronto) {
     return (
       <main className="cad">
-        <div className="cad-box cad-ok">
-          <div className="cad-ok-ic"><Check size={30} /></div>
-          <h1>Cadastro recebido!</h1>
-          <p>
-            Obrigado, <strong>{f.nome.trim().split(' ')[0]}</strong>. Sua inscrição chegou para a
-            equipe da campanha e em breve entraremos em contato pelo WhatsApp.
-          </p>
-          <button className="cad-btn cad-btn-sec" onClick={() => { setF(VAZIO); setPronto(false); }}>
-            Cadastrar outra pessoa
-          </button>
+        <div className="cad-split">
+          {painel}
+          <div className="cad-form-side">
+            <div className="cad-box cad-ok">
+              <div className="cad-ok-ic"><Check size={30} /></div>
+              <h1>Cadastro recebido!</h1>
+              <p>
+                Obrigado, <strong>{f.nome.trim().split(' ')[0]}</strong>. Sua inscrição chegou para a
+                equipe da campanha e em breve entraremos em contato pelo WhatsApp.
+              </p>
+              <button className="cad-btn cad-btn-sec" onClick={() => { setF(VAZIO); setPronto(false); }}>
+                Cadastrar outra pessoa
+              </button>
+            </div>
+          </div>
         </div>
       </main>
     );
@@ -130,11 +159,14 @@ export default function Cadastro() {
 
   return (
     <main className="cad">
+      <div className="cad-split">
+        {painel}
+        <div className="cad-form-side">
       <form className="cad-box" onSubmit={enviar} noValidate>
         <header className="cad-head">
           <span className="cad-tag">Márcio Bins Ely · Vereador · PDT</span>
           <h1>Faça parte da campanha</h1>
-          <p>O Rio Grande pode mais — e nós vamos provar isso juntos.</p>
+          <p>Preencha seus dados e some-se ao movimento.</p>
         </header>
 
         {erroGeral && <div className="cad-alerta">{erroGeral}</div>}
@@ -230,6 +262,8 @@ export default function Cadastro() {
           nem compartilhados com terceiros.
         </p>
       </form>
+        </div>
+      </div>
     </main>
   );
 }

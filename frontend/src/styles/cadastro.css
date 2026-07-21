@@ -6,23 +6,95 @@
 
 .cad {
   min-height: 100vh;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 28px 16px 56px;
   background:
     radial-gradient(1100px 520px at 50% -12%, rgba(0, 62, 157, 0.10), transparent 62%),
     linear-gradient(180deg, #fbfdff, #eef4fd 55%, #e8effc);
 }
 
+/* Foto à esquerda, formulário à direita. No celular vira uma faixa
+   compacta em cima — a foto não pode empurrar o formulário para fora da tela. */
+.cad-split { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+
+/* ---------- Lado visual (candidato) ---------- */
+/* Fixo em 100vh: sem isso o painel acompanha a altura do formulário (que é
+   maior que a tela) e o texto de baixo some da vista. */
+.cad-visual {
+  position: sticky; top: 0; align-self: start;
+  height: 100vh; overflow: hidden; background: #0A326B;
+}
+.cad-foto {
+  position: absolute; inset: 0;
+  background-image: var(--candidate-photo);
+  background-size: cover; background-position: center top;
+  filter: saturate(1.05) brightness(1.02);
+}
+.cad-tint {
+  position: absolute; inset: 0;
+  background: linear-gradient(160deg, rgba(0,62,157,0.30) 0%, rgba(6,34,72,0.16) 52%, rgba(0,62,157,0.12) 100%);
+}
+/* Escurece só a base, onde entra o texto — o rosto fica claro. */
+.cad-sombra {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(4,20,46,0.92) 0%, rgba(4,20,46,0.55) 34%, transparent 62%);
+}
+/* Faixa tricolor do RS no topo. */
+.cad-flag { position: absolute; top: 0; left: 0; right: 0; height: 5px; display: flex; z-index: 2; }
+.cad-flag i { flex: 1; }
+.cad-flag .g { background: #2BB153; }
+.cad-flag .y { background: #FEC330; }
+.cad-flag .r { background: #F3083E; }
+
+.cad-visual-txt {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+  padding: 38px 40px 40px; color: #fff;
+}
+.cad-visual-tag {
+  display: inline-block; font-size: 11px; font-weight: 800;
+  letter-spacing: 0.11em; text-transform: uppercase;
+  color: #FEC330; margin-bottom: 12px;
+}
+.cad-visual-txt h2 {
+  font-size: clamp(30px, 3.4vw, 46px); line-height: 1.06; font-weight: 800;
+  letter-spacing: -0.028em; margin: 0 0 14px; color: #fff;
+}
+.cad-visual-txt h2 em { font-style: normal; color: #FEC330; }
+.cad-visual-txt p {
+  font-size: 15px; line-height: 1.6; color: rgba(255,255,255,0.9);
+  margin: 0 0 24px; max-width: 40ch;
+}
+.cad-numeros { display: flex; gap: 30px; list-style: none; padding: 0; margin: 0; }
+.cad-numeros li { display: flex; flex-direction: column; gap: 2px; }
+.cad-numeros strong { font-size: 27px; font-weight: 800; color: #fff; line-height: 1; }
+.cad-numeros span { font-size: 11.5px; color: rgba(255,255,255,0.74); line-height: 1.3; max-width: 12ch; }
+
+/* ---------- Lado do formulário ---------- */
+.cad-form-side {
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 40px 28px 56px; overflow-y: auto;
+}
 .cad-box {
   width: 100%;
-  max-width: 620px;
+  max-width: 520px;
   background: #fff;
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 20px;
   padding: 30px 28px 26px;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 18px 46px rgba(0, 62, 157, 0.10);
+}
+
+@media (max-width: 900px) {
+  .cad-split { grid-template-columns: 1fr; min-height: 0; }
+  /* SEM sticky: o formulário precisa aparecer de cara e rolar por cima.
+     320px porque em 260px o texto caía sobre o rosto — nesta altura a
+     foto aparece quase inteira e a legenda assenta abaixo do queixo. */
+  .cad-visual { position: relative; height: 320px; }
+  .cad-visual-txt { padding: 0 22px 22px; }
+  .cad-visual-txt h2 { font-size: 30px; margin-bottom: 8px; }
+  .cad-visual-txt p { display: none; }
+  .cad-numeros { gap: 20px; }
+  .cad-numeros strong { font-size: 20px; }
+  .cad-form-side { padding: 22px 16px 48px; }
+  .cad-box { border-radius: 18px; }
 }
 
 /* ---------- Cabeçalho ---------- */
@@ -149,6 +221,7 @@
 /* ---------- Modo escuro do sistema ---------- */
 @media (prefers-color-scheme: dark) {
   .cad { background: linear-gradient(180deg, #0b1220, #0f1a2e); }
+  .cad-form-side { background: transparent; }
   .cad-box { background: #131d31; border-color: rgba(255, 255, 255, 0.09); }
   .cad-head h1, .cad-ok h1 { color: #eaf1ff; }
   .cad-head p, .cad-ok p { color: #9fb0cc; }
