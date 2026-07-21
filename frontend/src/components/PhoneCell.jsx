@@ -9,7 +9,7 @@ import { formatPhone, waLink, nomeProprio } from '../lib/format.js';
  */
 export default function PhoneCell({ person }) {
   const numero = person?.whatsapp || person?.phone;
-  const href = waLink(numero, `Olá, ${nomeProprio(person?.name).split(' ')[0]}! Aqui é da campanha do Márcio Bins Ely.`);
+  const href = waLink(numero, `Olá, ${nomeProprio(person?.name).split(' ')[0]}! Aqui é da pré-campanha do Márcio Bins Ely.`);
 
   if (!numero) return <span className="cell-sem-tel">Sem telefone</span>;
 
