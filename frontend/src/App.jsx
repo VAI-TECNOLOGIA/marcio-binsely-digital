@@ -27,6 +27,8 @@ import Settings from './pages/Settings.jsx';
 // Páginas pesadas saem do bundle principal (Leaflet/Google Maps, Recharts,
 // landing com CSS próprio) e carregam sob demanda na primeira visita.
 const Landing = lazy(() => import('./pages/Landing.jsx'));
+// Formulário público de captação — carrega sob demanda (CSS próprio).
+const Cadastro = lazy(() => import('./pages/Cadastro.jsx'));
 const MapView = lazy(() => import('./pages/MapView.jsx'));
 const Reports = lazy(() => import('./pages/Reports.jsx'));
 const TVPanel = lazy(() => import('./pages/TVPanel.jsx'));
@@ -51,6 +53,7 @@ export default function App() {
       <Route path="/esqueci-senha" element={<ForgotPassword />} />
       <Route path="/redefinir-senha" element={<ResetPassword />} />
       <Route path="/lp" element={<Landing />} />
+      <Route path="/cadastro" element={<Cadastro />} />
       <Route path="/painel-tv" element={P(['LIDER', 'MEMBRO'], <TVPanel />)} />
 
       <Route path="/" element={isLandingHost ? <Landing /> : P(null, <Dashboard />)} />

@@ -1,0 +1,159 @@
+/* ============================================================
+   Formulário público de cadastro (/cadastro)
+   Substitui o Fluent Forms do WordPress. Mobile-first: a maior
+   parte do tráfego chega por link de WhatsApp e Instagram.
+   ============================================================ */
+
+.cad {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 28px 16px 56px;
+  background:
+    radial-gradient(1100px 520px at 50% -12%, rgba(0, 62, 157, 0.10), transparent 62%),
+    linear-gradient(180deg, #fbfdff, #eef4fd 55%, #e8effc);
+}
+
+.cad-box {
+  width: 100%;
+  max-width: 620px;
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 20px;
+  padding: 30px 28px 26px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 18px 46px rgba(0, 62, 157, 0.10);
+}
+
+/* ---------- Cabeçalho ---------- */
+.cad-head { margin-bottom: 22px; }
+.cad-tag {
+  display: inline-block;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase;
+  color: #003E9D; background: rgba(0, 62, 157, 0.08);
+  padding: 5px 11px; border-radius: 999px; margin-bottom: 12px;
+}
+.cad-head h1 {
+  font-size: clamp(24px, 5vw, 31px); line-height: 1.14; font-weight: 800;
+  color: #0A326B; letter-spacing: -0.02em; margin: 0 0 7px;
+}
+.cad-head p { color: #5b6b86; font-size: 15px; margin: 0; }
+
+/* ---------- Campos ---------- */
+.cad-campo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
+.cad-campo label,
+.cad-radio legend {
+  font-size: 13px; font-weight: 650; color: #1f2b45;
+}
+.cad-campo label b { color: #F3083E; font-weight: 700; }
+
+.cad-campo input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 16px; /* 16px evita o zoom automático do iOS ao focar */
+  font-family: inherit; color: #0f172a;
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  border-radius: 11px;
+  transition: border-color 0.14s, box-shadow 0.14s;
+}
+.cad-campo input::placeholder { color: #9aa7bd; }
+.cad-campo input:focus {
+  outline: none;
+  border-color: #003E9D;
+  box-shadow: 0 0 0 3px rgba(0, 62, 157, 0.14);
+}
+
+/* Duas colunas no desktop, empilhado no celular. */
+.cad-linha { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 560px) { .cad-linha { grid-template-columns: 1fr; gap: 0; } }
+
+.cad-campo-cep { position: relative; }
+.cad-cep-carregando {
+  position: absolute; right: 12px; bottom: 13px;
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; color: #5b6b86;
+}
+.cad-cep-carregando svg { animation: cad-spin 0.9s linear infinite; }
+
+/* ---------- Sim / Não ---------- */
+.cad-radio { border: none; padding: 0; margin: 4px 0 16px; }
+.cad-radio legend { margin-bottom: 9px; line-height: 1.4; }
+.cad-opcoes { display: flex; gap: 10px; }
+.cad-opcoes label {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 11px 14px; cursor: pointer;
+  font-size: 14px; font-weight: 600; color: #1f2b45;
+  border: 1px solid rgba(15, 23, 42, 0.16); border-radius: 11px;
+  transition: border-color 0.14s, background 0.14s, color 0.14s;
+}
+.cad-opcoes label:hover { border-color: #003E9D; }
+.cad-opcoes label.on { border-color: #003E9D; background: rgba(0, 62, 157, 0.07); color: #003E9D; }
+.cad-opcoes input { accent-color: #003E9D; width: 16px; height: 16px; }
+
+/* ---------- Aceite (LGPD) ---------- */
+.cad-aceite {
+  display: flex; gap: 10px; align-items: flex-start;
+  margin: 6px 0 4px; padding: 13px;
+  background: #f7f9fc; border: 1px solid rgba(15, 23, 42, 0.07); border-radius: 12px;
+  font-size: 13px; line-height: 1.5; color: #46556f; cursor: pointer;
+}
+.cad-aceite input { margin-top: 2px; width: 17px; height: 17px; accent-color: #003E9D; flex: none; }
+.cad-aceite a { color: #003E9D; font-weight: 600; }
+
+/* ---------- Erros ---------- */
+.cad-erro { color: #b91c1c; font-size: 12px; font-weight: 600; }
+.cad-erro-campo { border-color: #dc2626 !important; }
+.cad-alerta {
+  background: rgba(243, 8, 62, 0.08); border: 1px solid rgba(243, 8, 62, 0.28);
+  color: #a3072f; padding: 11px 14px; border-radius: 11px;
+  font-size: 13.5px; font-weight: 600; margin-bottom: 16px;
+}
+
+/* ---------- Botão ---------- */
+.cad-btn {
+  width: 100%; margin-top: 16px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 15px 20px;
+  font-size: 16px; font-weight: 700; font-family: inherit; color: #fff;
+  background: linear-gradient(135deg, #003E9D, #0A326B);
+  border: none; border-radius: 12px; cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 62, 157, 0.24), 0 10px 26px rgba(0, 62, 157, 0.26);
+  transition: transform 0.14s, box-shadow 0.14s, filter 0.14s;
+}
+.cad-btn:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.07); }
+.cad-btn:disabled { opacity: 0.68; cursor: not-allowed; transform: none; }
+.cad-btn-sec {
+  background: #fff; color: #003E9D;
+  border: 1px solid rgba(0, 62, 157, 0.3); box-shadow: none;
+}
+.cad-girando { animation: cad-spin 0.9s linear infinite; }
+@keyframes cad-spin { to { transform: rotate(360deg); } }
+
+.cad-rodape {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  margin: 15px 0 0; font-size: 12px; color: #6b7a93; text-align: center; line-height: 1.45;
+}
+
+/* ---------- Confirmação ---------- */
+.cad-ok { text-align: center; padding: 44px 30px 38px; }
+.cad-ok-ic {
+  width: 62px; height: 62px; margin: 0 auto 18px;
+  display: grid; place-items: center;
+  border-radius: 50%; background: rgba(43, 177, 83, 0.13); color: #2BB153;
+}
+.cad-ok h1 { font-size: 26px; font-weight: 800; color: #0A326B; margin: 0 0 10px; }
+.cad-ok p { color: #46556f; font-size: 15px; line-height: 1.6; margin: 0 0 22px; }
+
+/* ---------- Modo escuro do sistema ---------- */
+@media (prefers-color-scheme: dark) {
+  .cad { background: linear-gradient(180deg, #0b1220, #0f1a2e); }
+  .cad-box { background: #131d31; border-color: rgba(255, 255, 255, 0.09); }
+  .cad-head h1, .cad-ok h1 { color: #eaf1ff; }
+  .cad-head p, .cad-ok p { color: #9fb0cc; }
+  .cad-campo label, .cad-radio legend, .cad-opcoes label { color: #dbe5f6; }
+  .cad-campo input, .cad-opcoes label { background: #0e1727; border-color: rgba(255, 255, 255, 0.14); color: #eaf1ff; }
+  .cad-aceite { background: #0e1727; border-color: rgba(255, 255, 255, 0.09); color: #a9b8d2; }
+  .cad-tag { background: rgba(120, 165, 255, 0.15); color: #9dc0ff; }
+}
