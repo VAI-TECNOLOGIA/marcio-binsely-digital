@@ -35,9 +35,20 @@ const TVPanel = lazy(() => import('./pages/TVPanel.jsx'));
 
 const P = (roles, element) => <ProtectedRoute roles={roles}>{element}</ProtectedRoute>;
 
-// No domínio da landing (lp.*) a raiz mostra o site público, não o sistema.
-const isLandingHost =
-  typeof window !== 'undefined' && window.location.hostname.startsWith('lp.');
+// O mesmo build atende três domínios; o host decide o que a raiz mostra.
+//   app.*      -> sistema (dashboard)
+//   lp.*       -> landing pública
+//   cadastro.* -> formulário de captação (link curto para anúncio e QR code)
+const host = typeof window !== 'undefined' ? window.location.hostname : '';
+const isLandingHost = host.startsWith('lp.');
+const isCadastroHost = host.startsWith('cadastro.');
+
+/** Página que responde por "/" neste domínio. */
+function raiz() {
+  if (isCadastroHost) return <Cadastro />;
+  if (isLandingHost) return <Landing />;
+  return P(null, <Dashboard />);
+}
 
 const lazyFallback = (
   <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center' }}>
@@ -56,7 +67,7 @@ export default function App() {
       <Route path="/cadastro" element={<Cadastro />} />
       <Route path="/painel-tv" element={P(['LIDER', 'MEMBRO'], <TVPanel />)} />
 
-      <Route path="/" element={isLandingHost ? <Landing /> : P(null, <Dashboard />)} />
+      <Route path="/" element={raiz()} />
       <Route path="/mapa" element={P(['LIDER', 'MEMBRO'], <MapView />)} />
       <Route path="/relatorios" element={P(['LIDER', 'MEMBRO'], <Reports />)} />
 
