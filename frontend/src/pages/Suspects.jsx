@@ -6,7 +6,8 @@ import DataTable from '../components/ui/DataTable.jsx';
 import { LoadingBox } from '../components/ui/Spinner.jsx';
 import EmptyState from '../components/ui/EmptyState.jsx';
 import { StatusBadge } from '../components/ui/Badge.jsx';
-import { formatPhone } from '../lib/format.js';
+import PhoneCell from '../components/PhoneCell.jsx';
+import { nomeProprio } from '../lib/format.js';
 import api, { apiError } from '../api/client.js';
 import { useToast } from '../context/ToastContext.jsx';
 
@@ -62,11 +63,12 @@ export default function Suspects() {
   }
 
   const columns = [
-    { key: 'name', label: 'Nome', render: (r) => <div className="cell-strong">{r.name}</div> },
-    { key: 'phone', label: 'Telefone', render: (r) => formatPhone(r.phone) },
+    { key: 'name', label: 'Nome', render: (r) => <div className="cell-strong">{nomeProprio(r.name)}</div> },
     { key: 'reason', label: 'Motivo da suspeita', render: (r) => <span className="cell-muted">{r.flaggedReason || '—'}</span> },
-    { key: 'dup', label: 'Duplicado de', render: (r) => r.duplicateOf?.name ? <span className="cell-strong">{r.duplicateOf.name}</span> : <span className="cell-muted">Não identificado</span> },
+    { key: 'dup', label: 'Duplicado de', render: (r) => r.duplicateOf?.name ? <span className="cell-strong">{nomeProprio(r.duplicateOf.name)}</span> : <span className="cell-muted">Não identificado</span> },
     { key: 'status', label: 'Status', render: (r) => <StatusBadge group="SupporterStatus" value={r.status} /> },
+    // Última coluna: telefone em destaque, com a ausência sinalizada em vermelho.
+    { key: 'phone', label: 'Telefone', thStyle: { width: 150 }, render: (r) => <PhoneCell person={r} /> },
   ];
 
   return (

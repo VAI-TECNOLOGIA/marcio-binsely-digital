@@ -8,6 +8,7 @@ import EmptyState from '../components/ui/EmptyState.jsx';
 import { StatusBadge } from '../components/ui/Badge.jsx';
 import Avatar from '../components/ui/Avatar.jsx';
 import WhatsAppButton from '../components/WhatsAppButton.jsx';
+import PhoneCell from '../components/PhoneCell.jsx';
 import api, { apiError } from '../api/client.js';
 import { nomeProprio } from '../lib/format.js';
 import { useToast } from '../context/ToastContext.jsx';
@@ -174,6 +175,13 @@ export default function Volunteers() {
       label: 'Situação',
       thStyle: { width: 110 },
       render: (r) => <StatusBadge group="SupporterStatus" value={r.active ? 'ATIVO' : 'INATIVO'} />,
+    },
+    // Última coluna: telefone em destaque, com a ausência sinalizada em vermelho.
+    {
+      key: 'phone',
+      label: 'Telefone',
+      thStyle: { width: 150 },
+      render: (r) => <PhoneCell person={r.supporter} />,
     },
   ];
 

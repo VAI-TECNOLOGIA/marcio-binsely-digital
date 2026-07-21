@@ -288,6 +288,27 @@ input, select, textarea { font-family: inherit; }
 /* Telefone clicável na listagem: parece texto comum até o mouse chegar. */
 .cell-phone-wa { color: var(--muted); text-decoration: none; }
 .cell-phone-wa:hover { color: #128C7E; text-decoration: underline; }
+
+/* --- Coluna Telefone das listagens de cadastro --- */
+.cell-tel {
+  color: var(--ink); text-decoration: none; font-weight: 600;
+  white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+.cell-tel:hover { color: #128C7E; text-decoration: underline; }
+/* Ausência de telefone é uma lacuna operacional: precisa saltar aos olhos. */
+.cell-sem-tel {
+  display: inline-flex; align-items: center; gap: 5px;
+  color: #dc2626; font-weight: 650; font-size: 12.5px; white-space: nowrap;
+}
+.cell-sem-tel::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: #dc2626; flex: none;
+}
+/* Número presente mas quebrado (veio incompleto da importação). */
+.cell-tel-invalido {
+  color: #b45309; font-weight: 600; white-space: nowrap;
+  text-decoration: underline dotted; text-underline-offset: 3px;
+}
 .btn-outline { background: transparent; border-color: var(--ink-600); color: var(--ink); }
 .btn-outline:hover { background: var(--surface-2); }
 .btn-dark { background: var(--ink); color: #fff; border-color: var(--ink); }

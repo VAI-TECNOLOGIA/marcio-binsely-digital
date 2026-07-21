@@ -1,7 +1,8 @@
 import { StatusBadge, Badge } from '../components/ui/Badge.jsx';
 import Avatar from '../components/ui/Avatar.jsx';
 import { label } from './enums.js';
-import { formatDate, formatPhone, waLink, nomeProprio } from '../lib/format.js';
+import PhoneCell from '../components/PhoneCell.jsx';
+import { formatDate, formatPhone, nomeProprio } from '../lib/format.js';
 
 const cut = (s, n = 56) => (s && s.length > n ? `${s.slice(0, n)}…` : s || '');
 
@@ -33,21 +34,9 @@ export const supporters = {
         <div className="cell-person">
           <Avatar name={r.name} src={r.photoUrl} size="avatar-sm" />
           <div className="cell-person-txt">
+            {/* O telefone saiu daqui e virou coluna própria no fim da linha. */}
             <div className="cell-strong">{nomeProprio(r.name)}</div>
-            {waLink(r.whatsapp || r.phone) ? (
-              <a
-                className="cell-phone-wa text-sm"
-                href={waLink(r.whatsapp || r.phone, `Olá, ${nomeProprio(r.name).split(' ')[0]}! Aqui é da campanha do Márcio Bins Ely.`)}
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Abrir conversa no WhatsApp"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {formatPhone(r.phone)}
-              </a>
-            ) : (
-              <div className="cell-muted text-sm">{r.phone ? formatPhone(r.phone) : 'sem telefone'}</div>
-            )}
+            {r.email && <div className="cell-muted text-sm">{r.email}</div>}
           </div>
         </div>
       ),
@@ -75,6 +64,13 @@ export const supporters = {
       label: 'Cadastro',
       thStyle: { width: 110 },
       render: (r) => <span className="cell-muted text-sm">{formatDate(r.createdAt)}</span>,
+    },
+    // Última coluna: telefone em destaque, com a ausência sinalizada em vermelho.
+    {
+      key: 'phone',
+      label: 'Telefone',
+      thStyle: { width: 150 },
+      render: (r) => <PhoneCell person={r} />,
     },
   ],
   fields: [

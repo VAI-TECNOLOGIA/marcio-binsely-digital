@@ -26,6 +26,19 @@ const joinSchema = z.object({
 //  preencheu um formulário, ainda não falou com a campanha.
 // ============================================================
 
+/**
+ * Normaliza telefone brasileiro para DDD + número (10 ou 11 dígitos).
+ * Remove o código do país quando vem colado ("+55 47 98866-5310"): sem isso
+ * o 55 é lido como DDD e o contato fica inalcançável. Validado no servidor
+ * também porque o endpoint é público e pode ser chamado fora do formulário.
+ */
+function telefoneBR(bruto) {
+  let d = onlyDigits(bruto);
+  if (d.length > 11 && d.startsWith('55')) d = d.slice(2);
+  if (d.startsWith('0')) d = d.replace(/^0+/, ''); // 0xx operadora
+  return d.length === 10 || d.length === 11 ? d : null;
+}
+
 /** Lê um campo aceitando as variações que o Fluent Forms manda. */
 function campo(body, ...chaves) {
   for (const k of chaves) {
@@ -44,10 +57,10 @@ export const siteJoin = asyncHandler(async (req, res) => {
     campo(b, 'names.last_name', 'names[last_name]', 'last_name'),
   ].filter(Boolean).join(' ').trim();
 
-  const telefone = onlyDigits(campo(b, 'whatsApp', 'whatsapp', 'phone', 'telefone', 'input_whatsapp'));
+  const telefone = telefoneBR(campo(b, 'whatsApp', 'whatsapp', 'phone', 'telefone', 'input_whatsapp'));
 
   if (nome.length < 2) return res.status(400).json({ error: 'Nome é obrigatório.' });
-  if (telefone.length < 8) return res.status(400).json({ error: 'WhatsApp é obrigatório.' });
+  if (!telefone) return res.status(400).json({ error: 'Informe um WhatsApp válido com DDD.' });
 
   // Mesma trava anti-enxurrada do /join.
   const recentes = await prisma.supporter.count({
