@@ -28,6 +28,7 @@ export const notices = resourceRouter(
 // 7 — Mídia Kit
 export const mediaKit = resourceRouter(
   crudFactory('mediaKit', {
+    orderBy: { title: 'asc' },
     searchFields: ['title', 'description', 'hashtags'],
     include: { author: { select: { name: true } }, region: { select: { name: true } } },
     allowedFilters: ['type', 'status', 'network', 'priority', 'regionId'],
@@ -41,6 +42,7 @@ export const mediaKit = resourceRouter(
 // 8 — Tarefas de engajamento
 export const tasks = resourceRouter(
   crudFactory('task', {
+    orderBy: { title: 'asc' },
     searchFields: ['title', 'description'],
     allowedFilters: ['type', 'active'],
     numberFields: ['points'],
@@ -53,6 +55,7 @@ export const tasks = resourceRouter(
 // 9 — Catálogo de materiais físicos
 export const materials = resourceRouter(
   crudFactory('material', {
+    orderBy: { name: 'asc' },
     searchFields: ['name', 'category'],
     allowedFilters: ['category', 'active'],
     numberFields: ['stock'],
@@ -65,6 +68,7 @@ export const materials = resourceRouter(
 // 10 — Faixas em casas
 export const banners = resourceRouter(
   crudFactory('bannerLocation', {
+    orderBy: { responsibleName: 'asc' },
     searchFields: ['responsibleName', 'address', 'cityName', 'neighborhood'],
     include: { supporter: { select: { name: true } } },
     allowedFilters: ['status', 'cityName'],
@@ -118,6 +122,7 @@ export const demands = resourceRouter(
 // 15 — Automações de relacionamento
 export const automations = resourceRouter(
   crudFactory('automation', {
+    orderBy: { name: 'asc' },
     searchFields: ['name', 'message'],
     allowedFilters: ['type', 'status'],
     dateFields: ['triggerDate'],
@@ -155,6 +160,7 @@ export const cities = resourceRouter(
 // Blacklist
 export const blacklist = resourceRouter(
   crudFactory('blacklist', {
+    orderBy: { name: 'asc' },
     searchFields: ['name', 'phone', 'cpf', 'reason'],
     writableFields: ['phone', 'cpf', 'name', 'reason', 'createdById'],
     transformIn: (d, req) => ({ ...d, createdById: d.createdById || req.user?.id }),

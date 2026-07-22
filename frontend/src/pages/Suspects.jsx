@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ShieldAlert, Check, Ban, Trash2 } from 'lucide-react';
+import { ShieldAlert, Check, Ban, Trash2, Search } from 'lucide-react';
 import Layout from '../components/layout/Layout.jsx';
 import { Card } from '../components/ui/Card.jsx';
 import DataTable from '../components/ui/DataTable.jsx';
@@ -15,11 +15,14 @@ export default function Suspects() {
   const toast = useToast();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
 
   async function load() {
     setLoading(true);
     try {
-      const { data } = await api.get('/supporters/suspects');
+      const { data } = await api.get('/supporters/suspects', {
+        params: search ? { search } : undefined,
+      });
       setRows(data.data);
     } catch (e) {
       toast.error(apiError(e));
@@ -28,9 +31,11 @@ export default function Suspects() {
     }
   }
   useEffect(() => {
-    load();
+    // Espera a digitação parar antes de consultar.
+    const t = setTimeout(load, search ? 350 : 0);
+    return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [search]);
 
   async function approve(row) {
     try {
@@ -73,6 +78,17 @@ export default function Suspects() {
 
   return (
     <Layout title="Suspeitos" subtitle="Análise manual de cadastros com telefone duplicado">
+      <div className="toolbar">
+        <div className="search">
+          <Search size={16} />
+          <input
+            className="input"
+            placeholder="Buscar por nome, telefone, cidade..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+      </div>
       <Card noBody>
         {loading ? (
           <LoadingBox />

@@ -20,6 +20,9 @@ const include = {
 const factory = crudFactory('supporter', {
   include,
   scope: supporterScope,
+  // Ordem alfabética: com 33 mil cadastros, ordenar por data de criação
+  // deixava a lista sem lógica de navegação.
+  orderBy: { name: 'asc' },
   searchFields: ['name', 'phone', 'email', 'cityName', 'neighborhood'],
   allowedFilters: ['status', 'supportType', 'regionId', 'cityId', 'coordinatorId'],
   arrayFilters: ['tags'],
@@ -158,10 +161,17 @@ export const remove = asyncHandler(async (req, res) => {
 });
 
 export const listSuspects = asyncHandler(async (req, res) => {
+  const where = { status: 'SUSPEITO' };
+  const busca = (req.query.search || '').trim();
+  if (busca) {
+    where.OR = ['name', 'phone', 'email', 'cityName', 'neighborhood'].map((f) => ({
+      [f]: { contains: busca, mode: 'insensitive' },
+    }));
+  }
   const data = await prisma.supporter.findMany({
-    where: { status: 'SUSPEITO' },
+    where,
     include: { ...include, duplicateOf: { select: { id: true, name: true, phone: true } } },
-    orderBy: { updatedAt: 'desc' },
+    orderBy: { name: 'asc' },
   });
   res.json({ data });
 });

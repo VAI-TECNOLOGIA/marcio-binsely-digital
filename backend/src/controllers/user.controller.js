@@ -21,7 +21,7 @@ export const list = asyncHandler(async (req, res) => {
       { email: { contains: req.query.search, mode: 'insensitive' } },
     ];
   }
-  const data = await prisma.user.findMany({ where, select, orderBy: { createdAt: 'desc' } });
+  const data = await prisma.user.findMany({ where, select, orderBy: { name: 'asc' } });
   res.json({ data });
 });
 

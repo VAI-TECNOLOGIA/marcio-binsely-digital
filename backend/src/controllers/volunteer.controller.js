@@ -27,7 +27,15 @@ export const list = asyncHandler(async (req, res) => {
   const page = Math.max(1, Number(req.query.page) || 1);
   const pageSize = Math.min(200, Number(req.query.pageSize) || 20);
   const [data, total] = await Promise.all([
-    prisma.volunteer.findMany({ where, include, orderBy: { totalScore: 'desc' }, take: pageSize, skip: (page - 1) * pageSize }),
+    // Ordem alfabética pelo nome do apoiador. `?ordem=pontos` volta ao ranking,
+    // que é o que a tela de Engajamento precisa.
+    prisma.volunteer.findMany({
+      where,
+      include,
+      orderBy: req.query.ordem === 'pontos' ? { totalScore: 'desc' } : { supporter: { name: 'asc' } },
+      take: pageSize,
+      skip: (page - 1) * pageSize,
+    }),
     prisma.volunteer.count({ where }),
   ]);
   res.json({ data, pagination: { page, pageSize, total, totalPages: Math.ceil(total / pageSize) || 1 } });

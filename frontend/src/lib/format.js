@@ -26,9 +26,13 @@ export function initials(name = '') {
 }
 
 export function formatPhone(phone = '') {
-  const d = String(phone).replace(/\D/g, '');
-  if (d.length === 13) return `+${d.slice(0, 2)} (${d.slice(2, 4)}) ${d.slice(4, 9)}-${d.slice(9)}`;
+  let d = String(phone).replace(/\D/g, '');
+  // Remove o código do país para formatar igual ao resto.
+  if (d.length > 11 && d.startsWith('55')) d = d.slice(2);
   if (d.length === 11) return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+  // Fixo: a base do gabinete tem ~2.900 números de 10 dígitos, que antes
+  // apareciam crus na tela por não cair em nenhum formato.
+  if (d.length === 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
   return phone || '—';
 }
 

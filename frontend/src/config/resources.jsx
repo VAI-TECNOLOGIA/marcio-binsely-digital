@@ -46,17 +46,20 @@ export const supporters = {
     {
       key: 'tags',
       label: 'Grupos',
-      render: (r) =>
-        r.tags?.length ? (
-          <div className="cell-tags">
-            {r.tags.slice(0, 2).map((t) => (
+      render: (r) => {
+        // "BASE HISTÓRICA" é marcador interno (separa a base migrada do fluxo
+        // novo na métrica diária) — aparecia em toda linha sem informar nada.
+        const grupos = (r.tags || []).filter((t) => t !== 'BASE HISTÓRICA');
+        if (!grupos.length) return '—';
+        return (
+          <div className="cell-tags" title={grupos.join(' · ')}>
+            {grupos.slice(0, 2).map((t) => (
               <Badge key={t}>{t}</Badge>
             ))}
-            {r.tags.length > 2 && <span className="cell-muted text-sm">+{r.tags.length - 2}</span>}
+            {grupos.length > 2 && <span className="cell-muted text-sm">+{grupos.length - 2}</span>}
           </div>
-        ) : (
-          '—'
-        ),
+        );
+      },
     },
     { key: 'status', label: 'Status', render: (r) => <StatusBadge group="SupporterStatus" value={r.status} /> },
     {
