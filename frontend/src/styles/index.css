@@ -289,6 +289,35 @@ input, select, textarea { font-family: inherit; }
 .cell-phone-wa { color: var(--muted); text-decoration: none; }
 .cell-phone-wa:hover { color: #128C7E; text-decoration: underline; }
 
+/* --- Navegação de páginas das listagens --- */
+.pager {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px; flex-wrap: wrap; margin-top: 14px;
+}
+.pager-info { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pager-info strong { color: var(--ink); font-weight: 650; }
+.pager-ctrl { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.pager-btn {
+  min-width: 34px; height: 34px; padding: 0 9px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; font-family: inherit;
+  color: var(--ink); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 9px; cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.pager-btn:hover:not(:disabled):not(.on) { background: var(--surface-2); border-color: var(--muted-2); }
+.pager-btn.on {
+  background: var(--brand); border-color: var(--brand); color: #fff;
+  box-shadow: 0 1px 2px rgba(0,62,157,.2);
+}
+.pager-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pager-gap { padding: 0 3px; color: var(--muted); font-size: 13px; }
+@media (max-width: 640px) {
+  .pager { justify-content: center; }
+  .pager-info { width: 100%; text-align: center; }
+}
+
 /* --- Coluna Telefone das listagens de cadastro --- */
 .cell-tel {
   color: var(--ink); text-decoration: none; font-weight: 600;

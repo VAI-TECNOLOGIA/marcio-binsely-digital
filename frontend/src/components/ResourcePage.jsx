@@ -5,6 +5,7 @@ import { useToast } from '../context/ToastContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { Card } from './ui/Card.jsx';
 import DataTable from './ui/DataTable.jsx';
+import Pagination from './ui/Pagination.jsx';
 import Modal from './ui/Modal.jsx';
 import Field from './ui/Field.jsx';
 import { LoadingBox } from './ui/Spinner.jsx';
@@ -21,6 +22,8 @@ export default function ResourcePage({ config }) {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterValues, setFilterValues] = useState({});
+  const [page, setPage] = useState(1);
+  const [pageInfo, setPageInfo] = useState(null);
   const [lookups, setLookups] = useState({});
   const [lookupRaw, setLookupRaw] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
@@ -34,20 +37,29 @@ export default function ResourcePage({ config }) {
   const canEdit = config.edit !== false && has(config.writeRoles);
   const canDelete = config.delete !== false && has(config.deleteRoles || config.writeRoles);
 
+  // Buscar ou filtrar sempre volta para a primeira página: sem isso, filtrar
+  // estando na página 40 cairia num intervalo que o novo resultado não tem,
+  // e a lista apareceria vazia.
+  useEffect(() => {
+    setPage(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, JSON.stringify(filterValues)]);
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const params = { ...filterValues };
+      const params = { ...filterValues, page };
       if (search) params.search = search;
       const { data } = await api.get(config.endpoint, { params });
       setRows(data.data || data);
+      setPageInfo(data.pagination || null);
     } catch (e) {
       toast.error(apiError(e));
     } finally {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [config.endpoint, search, JSON.stringify(filterValues)]);
+  }, [config.endpoint, search, page, JSON.stringify(filterValues)]);
 
   useEffect(() => {
     const t = setTimeout(load, search ? 350 : 0);
@@ -261,6 +273,14 @@ export default function ResourcePage({ config }) {
           />
         )}
       </Card>
+
+      <Pagination
+        info={pageInfo}
+        onChange={(p) => {
+          setPage(p);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
 
       {modalOpen && (
         <Modal

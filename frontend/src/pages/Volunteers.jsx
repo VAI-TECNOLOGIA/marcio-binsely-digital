@@ -3,6 +3,7 @@ import { Power, Trophy, Search, Check, X } from 'lucide-react';
 import Layout from '../components/layout/Layout.jsx';
 import { Card } from '../components/ui/Card.jsx';
 import DataTable from '../components/ui/DataTable.jsx';
+import Pagination from '../components/ui/Pagination.jsx';
 import { LoadingBox } from '../components/ui/Spinner.jsx';
 import EmptyState from '../components/ui/EmptyState.jsx';
 import { StatusBadge } from '../components/ui/Badge.jsx';
@@ -50,27 +51,36 @@ export default function Volunteers() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('');
   const [salvando, setSalvando] = useState(null);
+  const [page, setPage] = useState(1);
+  const [pageInfo, setPageInfo] = useState(null);
 
-  async function load() {
+  async function load(p = page) {
     setLoading(true);
     try {
-      const params = {};
+      const params = { page: p };
       if (search) params.search = search;
       if (filter === 'active') params.active = 'true';
       else if (filter) params.confirmationStatus = filter;
       const { data } = await api.get('/volunteers', { params });
       setRows(data.data);
+      setPageInfo(data.pagination || null);
     } catch (e) {
       toast.error(apiError(e));
     } finally {
       setLoading(false);
     }
   }
+
+  // Buscar ou filtrar volta para a primeira página (senão a lista vem vazia).
   useEffect(() => {
-    const t = setTimeout(load, search ? 350 : 0);
+    setPage(1);
+  }, [search, filter]);
+
+  useEffect(() => {
+    const t = setTimeout(() => load(page), search ? 350 : 0);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, filter]);
+  }, [search, filter, page]);
 
   async function toggle(row) {
     try {
@@ -219,6 +229,14 @@ export default function Volunteers() {
           />
         )}
       </Card>
+
+      <Pagination
+        info={pageInfo}
+        onChange={(p) => {
+          setPage(p);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
     </Layout>
   );
 }
