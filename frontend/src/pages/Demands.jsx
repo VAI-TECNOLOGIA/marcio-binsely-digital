@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import Layout from '../components/layout/Layout.jsx';
 import Modal from '../components/ui/Modal.jsx';
 import Field from '../components/ui/Field.jsx';
@@ -24,6 +24,7 @@ const FIELDS = [
 export default function Demands() {
   const toast = useToast();
   const [items, setItems] = useState([]);
+  const [busca, setBusca] = useState('');
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({});
@@ -32,7 +33,9 @@ export default function Demands() {
   async function load() {
     setLoading(true);
     try {
-      const { data } = await api.get('/demands', { params: { pageSize: 500 } });
+      const params = { pageSize: 500 };
+      if (busca.trim()) params.search = busca.trim();
+      const { data } = await api.get('/demands', { params });
       setItems(data.data);
     } catch (e) {
       toast.error(apiError(e));
@@ -41,9 +44,10 @@ export default function Demands() {
     }
   }
   useEffect(() => {
-    load();
+    const t = setTimeout(load, busca ? 350 : 0);
+    return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [busca]);
 
   async function move(demand, status) {
     setItems((arr) => arr.map((d) => (d.id === demand.id ? { ...d, status } : d)));
@@ -73,6 +77,15 @@ export default function Demands() {
   return (
     <Layout title="Departamento de demandas" subtitle="Pedidos da população organizados em quadro Kanban">
       <div className="toolbar">
+        <div className="search">
+          <Search size={16} />
+          <input
+            className="input"
+            placeholder="Buscar por cidadão, descrição, bairro..."
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+          />
+        </div>
         <div className="spacer" />
         <button className="btn btn-primary" onClick={() => { setForm({ category: 'OUTROS', priority: 'MEDIA' }); setOpen(true); }}>
           <Plus size={16} /> Nova demanda

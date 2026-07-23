@@ -5,6 +5,21 @@ import { sendWhatsApp } from '../services/whatsapp.service.js';
 import { SUPPORT_TYPES } from '../utils/enums.js';
 import { nullifyEmpty, onlyDigits } from '../utils/helpers.js';
 import { fallbackLatLng, linkCityByName } from '../utils/geo.js';
+import { zonaDoBairro, ehPortoAlegre } from '../utils/zonasPoa.js';
+
+/**
+ * Região do cadastro. Em Porto Alegre a zona vem do BAIRRO (a cidade é uma
+ * só e mandaria todo mundo para a mesma região); nas demais, vem da cidade.
+ */
+async function resolverRegiao({ cityName, neighborhood, cityRegionId }) {
+  if (ehPortoAlegre(cityName)) {
+    const zona = zonaDoBairro(neighborhood);
+    if (!zona) return null; // sem bairro conhecido: melhor sem região do que na errada
+    const r = await prisma.region.findFirst({ where: { name: zona }, select: { id: true } });
+    return r?.id || null;
+  }
+  return cityRegionId || null;
+}
 
 // ============================================================
 //  Endpoints PÚBLICOS (sem autenticação) — usados pela Landing Page.
@@ -117,7 +132,7 @@ export const siteJoin = asyncHandler(async (req, res) => {
       neighborhood: bairro || null,
       cityName: cidade,
       cityId: city?.id || null,
-      regionId: city?.regionId || null,
+      regionId: await resolverRegiao({ cityName: cidade, neighborhood: bairro, cityRegionId: city?.regionId }),
       lat: geo.lat,
       lng: geo.lng,
       instagram: campo(b, 'input_social', 'social', 'instagram') || null,
@@ -185,7 +200,7 @@ export const join = asyncHandler(async (req, res) => {
       neighborhood: data.neighborhood || null,
       cityName,
       cityId: city?.id || null,
-      regionId: city?.regionId || null,
+      regionId: await resolverRegiao({ cityName, neighborhood: data.neighborhood, cityRegionId: city?.regionId }),
       lat: geo.lat,
       lng: geo.lng,
       supportType: data.supportType || 'NOTICIAS',

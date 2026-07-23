@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Image, Copy, Download, Plus, Film } from 'lucide-react';
+import { Image, Copy, Download, Plus, Film, Search } from 'lucide-react';
 import Layout from '../components/layout/Layout.jsx';
 import Modal from '../components/ui/Modal.jsx';
 import Field from '../components/ui/Field.jsx';
@@ -51,6 +51,7 @@ export default function MediaKit() {
   const { user } = useAuth();
   const canManage = ['LIDER', 'MEMBRO'].includes(user?.role);
   const [items, setItems] = useState([]);
+  const [busca, setBusca] = useState('');
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({});
@@ -59,7 +60,7 @@ export default function MediaKit() {
   async function load() {
     setLoading(true);
     try {
-      const { data } = await api.get('/media-kit');
+      const { data } = await api.get('/media-kit', { params: busca.trim() ? { search: busca.trim() } : {} });
       setItems(data.data);
     } catch (e) {
       toast.error(apiError(e));
@@ -93,6 +94,10 @@ export default function MediaKit() {
   return (
     <Layout title="Mídia Kit da campanha" subtitle="Artes, vídeos, jingles e textos prontos para a militância">
       <div className="toolbar">
+        <div className="search">
+          <Search size={16} />
+          <input className="input" placeholder="Buscar material por titulo ou hashtag..." value={busca} onChange={(e) => setBusca(e.target.value)} />
+        </div>
         <div className="spacer" />
         {canManage && (
           <button className="btn btn-primary" onClick={() => { setForm({ type: 'ARTE', network: 'INSTAGRAM', priority: 'MEDIA' }); setOpen(true); }}>

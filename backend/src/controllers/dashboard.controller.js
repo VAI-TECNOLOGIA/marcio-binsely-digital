@@ -129,6 +129,31 @@ export const getDailySignups = asyncHandler(async (req, res) => {
 });
 
 /** Camadas georreferenciadas do mapa político (fonte única e agregada). */
+/**
+ * Apoiadores agrupados por bairro — bolhas no mapa.
+ * Desenhar 29 mil pontos trava o navegador e vira uma mancha ilegível;
+ * o mapa antes mostrava só os 3.000 primeiros, o que dava uma leitura
+ * errada de onde está a base. Agrupado, cada bairro vira uma bolha com
+ * o total real, e nada fica de fora.
+ */
+export const getMapClusters = asyncHandler(async (_req, res) => {
+  const linhas = await prisma.$queryRaw`
+    SELECT
+      COALESCE(NULLIF(btrim(neighborhood), ''), '(sem bairro)') AS bairro,
+      COALESCE(NULLIF(btrim("cityName"),   ''), '(sem cidade)') AS cidade,
+      count(*)::int AS total,
+      avg(lat)::float AS lat,
+      avg(lng)::float AS lng
+    FROM "Supporter"
+    WHERE lat IS NOT NULL AND lng IS NOT NULL
+    GROUP BY 1, 2
+    HAVING count(*) > 0
+    ORDER BY count(*) DESC
+  `;
+  const total = linhas.reduce((s, l) => s + l.total, 0);
+  res.json({ clusters: linhas, total, bairros: linhas.length });
+});
+
 export const getMap = asyncHandler(async (req, res) => {
   const geo = { lat: { not: null }, lng: { not: null } };
   const [supporters, banners, streetActions] = await Promise.all([

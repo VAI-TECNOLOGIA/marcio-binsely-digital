@@ -74,13 +74,21 @@ export default function MapView() {
   });
   // força re-render pra atualizar timeAgo(...) sem outra fetch
   const [tick, setTick] = useState(0);
+  // Apoiadores agrupados por bairro. Ligado por padrão: 29 mil pontos soltos
+  // travam o navegador, e o mapa mostrava só os 3.000 primeiros.
+  const [clusters, setClusters] = useState(null);
+  const [agrupar, setAgrupar] = useState(true);
 
   const load = useCallback(async (silent = false) => {
     if (silent) setRefreshing(true); else setLoading(true);
     if (!silent) setError(null);
     try {
-      const { data } = await api.get('/dashboard/map');
-      setData(data);
+      const [mapa, agrupado] = await Promise.all([
+        api.get('/dashboard/map'),
+        api.get('/dashboard/map/clusters').catch(() => ({ data: null })),
+      ]);
+      setData(mapa.data);
+      setClusters(agrupado.data);
       setLastUpdate(Date.now());
     } catch (e) {
       if (!silent) setError(apiError(e, 'Não foi possível carregar as camadas do mapa.'));
@@ -112,9 +120,12 @@ export default function MapView() {
   const counts = useMemo(() => {
     const c = {};
     for (const l of LAYERS) c[l.key] = data?.[l.key]?.length || 0;
+    // Agrupado, o mapa cobre a base inteira; solto, só os 3.000 que a API
+    // devolve. O contador precisa dizer o que está realmente representado.
+    if (agrupar && clusters?.total) c.supporters = clusters.total;
     c.total = c.supporters + c.banners + c.streetActions;
     return c;
-  }, [data]);
+  }, [data, clusters, agrupar]);
 
   const anyContent = data && counts.total > 0;
 
@@ -158,6 +169,17 @@ export default function MapView() {
             <div className="layer-list-title">
               <Layers size={11} /> Camadas
             </div>
+            <label className={`layer-item ${agrupar ? '' : 'off'}`} style={{ '--c': '#2563eb' }}>
+              <input
+                type="checkbox"
+                checked={agrupar}
+                disabled={loading || !!error || !clusters}
+                onChange={(e) => setAgrupar(e.target.checked)}
+              />
+              <div className="layer-dot"><Layers size={12} /></div>
+              <div className="layer-name">Agrupar por bairro</div>
+              <div className="layer-count">{clusters ? clusters.bairros : '—'}</div>
+            </label>
             {LAYERS.map((l) => (
               <label
                 key={l.key}
@@ -212,7 +234,7 @@ export default function MapView() {
         ) : USE_GOOGLE ? (
           <GoogleCanvas data={data} visible={visible} refreshing={refreshing} hasContent={anyContent} />
         ) : (
-          <LeafletCanvas data={data} visible={visible} refreshing={refreshing} hasContent={anyContent} />
+          <LeafletCanvas data={data} visible={visible} refreshing={refreshing} hasContent={anyContent} clusters={clusters} agrupar={agrupar} />
         )}
       </div>
     </Layout>
@@ -284,7 +306,7 @@ function CanvasOverlay({ refreshing, hasContent }) {
 }
 
 /* Canvas Leaflet (fallback, sempre disponível — sem key). */
-function LeafletCanvas({ data, visible, refreshing, hasContent }) {
+function LeafletCanvas({ data, visible, refreshing, hasContent, clusters, agrupar }) {
   return (
     <div className="map-wrap map-container-wrap">
       <MapContainer
@@ -296,9 +318,29 @@ function LeafletCanvas({ data, visible, refreshing, hasContent }) {
       >
         <TileLayer attribution={TILE_ATTR} url={TILE_URL} />
         <ZoomControl position="topright" />
+        {/* Apoiadores agrupados por bairro: uma bolha por bairro, com o total real. */}
+        {agrupar && visible.supporters && (clusters?.clusters || []).map((c, i) => (
+          <CircleMarker
+            key={`cl-${i}`}
+            center={[c.lat, c.lng]}
+            radius={Math.max(7, Math.min(34, Math.sqrt(c.total) * 1.7))}
+            pathOptions={{ color: '#ffffff', fillColor: '#2563eb', fillOpacity: 0.62, weight: 2 }}
+          >
+            <Popup>
+              <div className="map-pop">
+                <strong>{c.bairro}</strong>
+                <span>{c.cidade}</span>
+                <b className="map-pop-n">{c.total.toLocaleString('pt-BR')} apoiadores</b>
+              </div>
+            </Popup>
+          </CircleMarker>
+        ))}
+
         {LAYERS.map(
           (l) =>
             visible[l.key] &&
+            // No modo agrupado os apoiadores já são as bolhas acima.
+            !(agrupar && l.key === 'supporters') &&
             (data[l.key] || []).map((p) => (
               <CircleMarker
                 key={`${l.key}-${p.id}`}
