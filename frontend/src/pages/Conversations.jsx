@@ -52,6 +52,7 @@ function WhatsAppCRM() {
   const [active, setActive] = useState(null);
   const [text, setText] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [busca, setBusca] = useState('');
   const [showTpl, setShowTpl] = useState(false);
   const [tags, setTags] = useState([]);
   const [notes, setNotes] = useState('');
@@ -59,7 +60,11 @@ function WhatsAppCRM() {
 
   async function loadList() {
     try {
-      const { data } = await api.get('/conversations', { params: { channel: 'WHATSAPP', ...(statusFilter ? { status: statusFilter } : {}) } });
+      const { data } = await api.get('/conversations', { params: {
+        channel: 'WHATSAPP',
+        ...(statusFilter ? { status: statusFilter } : {}),
+        ...(busca.trim() ? { search: busca.trim() } : {}),
+      } });
       setList(data.data);
       if (!activeId && data.data[0]) setActiveId(data.data[0].id);
     } catch (e) { toast.error(apiError(e)); }
@@ -71,7 +76,11 @@ function WhatsAppCRM() {
       setActive(data); setTags(Array.isArray(data.tags) ? data.tags : []); setNotes(data.notes || '');
     } catch (e) { toast.error(apiError(e)); }
   }
-  useEffect(() => { loadList(); /* eslint-disable-next-line */ }, [statusFilter]);
+  useEffect(() => {
+    const t = setTimeout(loadList, busca ? 350 : 0);
+    return () => clearTimeout(t);
+    /* eslint-disable-next-line */
+  }, [statusFilter, busca]);
   useEffect(() => { loadActive(activeId); /* eslint-disable-next-line */ }, [activeId]);
 
   // Bug 1: envio otimista — a mensagem aparece na hora; o POST roda em background.
@@ -117,6 +126,15 @@ function WhatsAppCRM() {
   return (
     <>
       <div className="toolbar">
+        <div className="search">
+          <Search size={16} />
+          <input
+            className="input"
+            placeholder="Buscar por nome ou telefone..."
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+          />
+        </div>
         <select className="select" style={{ width: 'auto' }} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
           <option value="">Todas as conversas</option>
           {options('ConversationStatus').map((o) => (<option key={o.value} value={o.value}>{o.label}</option>))}

@@ -43,7 +43,7 @@ export default function MaterialRequests() {
     singular: 'pedido',
     createLabel: 'Solicitar material',
     titleField: 'materialName',
-    searchable: false,
+    searchPlaceholder: 'Buscar por material, solicitante, cidade...',
     edit: false,
     delete: false,
     lookups: [{ key: 'materials', endpoint: '/materials', valueKey: 'name', labelKey: 'name' }],

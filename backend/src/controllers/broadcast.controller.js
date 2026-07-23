@@ -8,6 +8,13 @@ import { CHANNELS } from '../utils/enums.js';
 export const list = asyncHandler(async (req, res) => {
   const where = {};
   if (req.query.status) where.status = req.query.status;
+  const busca = (req.query.search || '').trim();
+  if (busca) {
+    where.OR = [
+      { name: { contains: busca, mode: 'insensitive' } },
+      { message: { contains: busca, mode: 'insensitive' } },
+    ];
+  }
   const data = await prisma.broadcastCampaign.findMany({
     where,
     include: { owner: { select: { id: true, name: true } }, _count: { select: { contacts: true } } },

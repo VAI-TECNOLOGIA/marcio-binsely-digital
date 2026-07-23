@@ -14,6 +14,16 @@ export const list = asyncHandler(async (req, res) => {
   if (req.query.status) where.status = req.query.status;
   if (req.query.channel) where.channel = req.query.channel;
   if (req.query.mine === 'true') where.agentId = req.user.id;
+  // Busca por quem é o contato — a caixa de entrada cresce com a campanha
+  // e sem isso só dá para achar alguém rolando a lista.
+  const busca = (req.query.search || '').trim();
+  if (busca) {
+    where.OR = [
+      { contactName: { contains: busca, mode: 'insensitive' } },
+      { contactPhone: { contains: busca } },
+      { supporter: { name: { contains: busca, mode: 'insensitive' } } },
+    ];
+  }
   const data = await prisma.conversation.findMany({
     where,
     include: { ...include, _count: { select: { messages: true } } },

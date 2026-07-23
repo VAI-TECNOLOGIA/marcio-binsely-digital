@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Plus, Send, Upload, Megaphone, X } from 'lucide-react';
+import { Plus, Send, Upload, Megaphone, X, Search } from 'lucide-react';
 import Layout from '../components/layout/Layout.jsx';
 import { Card } from '../components/ui/Card.jsx';
 import Modal from '../components/ui/Modal.jsx';
@@ -22,11 +22,16 @@ export default function Broadcasts() {
   const [csv, setCsv] = useState('nome,telefone,cidade,bairro\nMaria,5551999990000,Porto Alegre,Centro');
   const [sendingState, setSendingState] = useState(null); // { sent, failed, total, pct } | null
   const cancelRef = useRef(false);
+  const [busca, setBusca] = useState('');
+  const [statusFiltro, setStatusFiltro] = useState('');
 
   async function load() {
     setLoading(true);
     try {
-      const { data } = await api.get('/broadcasts');
+      const params = {};
+      if (busca.trim()) params.search = busca.trim();
+      if (statusFiltro) params.status = statusFiltro;
+      const { data } = await api.get('/broadcasts', { params });
       setList(data.data);
     } catch (e) {
       toast.error(apiError(e));
@@ -35,9 +40,10 @@ export default function Broadcasts() {
     }
   }
   useEffect(() => {
-    load();
+    const t = setTimeout(load, busca ? 350 : 0);
+    return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [busca, statusFiltro]);
 
   async function create() {
     try {
@@ -113,6 +119,21 @@ export default function Broadcasts() {
       </div>
 
       <div className="toolbar">
+        <div className="search">
+          <Search size={16} />
+          <input
+            className="input"
+            placeholder="Buscar campanha por nome ou mensagem..."
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+          />
+        </div>
+        <select className="select" style={{ width: 'auto' }} value={statusFiltro} onChange={(e) => setStatusFiltro(e.target.value)}>
+          <option value="">Todos os status</option>
+          {options('BroadcastStatus').map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
         <div className="spacer" />
         <button className="btn btn-primary" onClick={() => { setForm({ channel: 'WHATSAPP' }); setCreateOpen(true); }}>
           <Plus size={16} /> Nova campanha

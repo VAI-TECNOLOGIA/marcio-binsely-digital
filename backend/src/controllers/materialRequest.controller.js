@@ -16,6 +16,15 @@ export const list = asyncHandler(async (req, res) => {
   const where = {};
   if (req.query.status) where.status = req.query.status;
   if (u.role === 'PARCEIRO') where.requesterId = u.id; // parceiro vê só os próprios pedidos
+  const busca = (req.query.search || '').trim();
+  if (busca) {
+    where.OR = [
+      { materialName: { contains: busca, mode: 'insensitive' } },
+      { cityName: { contains: busca, mode: 'insensitive' } },
+      { neighborhood: { contains: busca, mode: 'insensitive' } },
+      { requester: { name: { contains: busca, mode: 'insensitive' } } },
+    ];
+  }
 
   const page = Math.max(1, Number(req.query.page) || 1);
   const pageSize = Math.min(200, Number(req.query.pageSize) || 20);
