@@ -93,7 +93,14 @@ export const siteJoin = asyncHandler(async (req, res) => {
   const indicacao = campo(b, 'input_indicacao', 'indicacao');
   const tags = ['SITE 2026'];
   if (indicacao) tags.push(`INDICAÇÃO: ${indicacao.toUpperCase().replace(/\s+/g, ' ').trim()}`);
-  if (campo(b, 'input_propaganda', 'propaganda')) tags.push('QUER PLACA/FAIXA');
+
+  // A resposta é "Sim"/"Não" (ou o local escolhido, no formulário antigo).
+  // Só marcar quando for aceite: qualquer texto não-vazio marcaria também
+  // quem respondeu "Não".
+  const respPropaganda = campo(b, 'input_propaganda', 'propaganda');
+  const aceitouFaixa =
+    !!respPropaganda && !/^\s*(n[ãa]o|nao|no|n)\s*$/i.test(respPropaganda);
+  if (aceitouFaixa) tags.push('QUER PLACA/FAIXA');
 
   const cidade = campo(b, 'input_cidade', 'cidade', 'cityName') || 'Porto Alegre';
   const bairro = campo(b, 'input_bairro', 'bairro');
@@ -144,6 +151,27 @@ export const siteJoin = asyncHandler(async (req, res) => {
       flaggedReason: black ? `Telefone consta na blacklist: ${black.reason}` : null,
     },
   });
+
+  // Aceitou faixa no formulário -> já entra na aba Faixas, na fila de
+  // instalação. Sem isso a equipe não teria a lista para trabalhar.
+  if (aceitouFaixa && !black) {
+    await prisma.bannerLocation.create({
+      data: {
+        supporterId: apoiador.id,
+        responsibleName: apoiador.name,
+        phone: apoiador.whatsapp || apoiador.phone || null,
+        address: apoiador.street || null,
+        neighborhood: apoiador.neighborhood,
+        cityName: apoiador.cityName,
+        lat: apoiador.lat,
+        lng: apoiador.lng,
+        authorized: true,
+        authorizedAt: new Date(),
+        status: 'AGUARDANDO_INSTALACAO',
+        notes: `Autorizou no formulário de cadastro. Resposta: ${respPropaganda}`,
+      },
+    });
+  }
 
   res.status(201).json({ ok: true, id: apoiador.id, message: 'Cadastro recebido!' });
 });

@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Plus, Search, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Search, Pencil, Trash2, Download } from 'lucide-react';
 import api, { apiError } from '../api/client.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -25,6 +25,7 @@ export default function ResourcePage({ config }) {
   const [page, setPage] = useState(1);
   const [pageInfo, setPageInfo] = useState(null);
   const [ordem, setOrdem] = useState('az');
+  const [exportando, setExportando] = useState(false);
   const [lookups, setLookups] = useState({});
   const [lookupRaw, setLookupRaw] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
@@ -178,6 +179,55 @@ export default function ResourcePage({ config }) {
     }
   }
 
+  /**
+   * Exporta a lista inteira (respeitando busca e filtros) para abrir no Excel.
+   * Baixa todas as páginas: exportar só a página visível daria uma lista
+   * incompleta sem a pessoa perceber.
+   */
+  async function exportar() {
+    setExportando(true);
+    try {
+      const base = { ...filterValues, pageSize: 500 };
+      if (search) base.search = search;
+      if (config.sortable !== false && ordem) base.ordem = ordem;
+
+      let pagina = 1;
+      let todos = [];
+      let totalPaginas = 1;
+      do {
+        const { data } = await api.get(config.endpoint, { params: { ...base, page: pagina } });
+        todos = todos.concat(data.data || data);
+        totalPaginas = data.pagination?.totalPages || 1;
+        pagina++;
+      } while (pagina <= totalPaginas && pagina <= 40); // teto de segurança
+
+      const colunas = config.exportColumns || config.columns.map((c) => ({ key: c.key, label: c.label }));
+      const valor = (linha, col) => {
+        const v = col.value ? col.value(linha) : linha[col.key];
+        if (v == null) return '';
+        if (Array.isArray(v)) return v.join(' | ');
+        // ; e quebra de linha quebram a coluna no Excel
+        return String(v).replace(/[;\r\n]+/g, ' ').trim();
+      };
+
+      const linhas = [colunas.map((c) => c.label).join(';')];
+      todos.forEach((r) => linhas.push(colunas.map((c) => valor(r, c)).join(';')));
+
+      // BOM: sem ele o Excel do Windows mostra acento quebrado.
+      const blob = new Blob(['﻿' + linhas.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${config.exportName || 'lista'}-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      toast.success(`${todos.length} registros exportados.`);
+    } catch (e) {
+      toast.error(apiError(e, 'Não foi possível exportar agora.'));
+    } finally {
+      setExportando(false);
+    }
+  }
+
   async function del(row) {
     const name = row[config.titleField || 'name'] || row.title || 'este registro';
     if (!window.confirm(`Excluir "${name}"? Esta ação não pode ser desfeita.`)) return;
@@ -262,6 +312,11 @@ export default function ResourcePage({ config }) {
           </select>
         )}
         <div className="spacer" />
+        {config.exportable && (
+          <button className="btn" onClick={exportar} disabled={exportando} title="Baixar a lista para abrir no Excel">
+            <Download size={16} /> {exportando ? 'Exportando...' : 'Exportar Excel'}
+          </button>
+        )}
         {canCreate && config.fields && (
           <button className="btn btn-primary" onClick={openCreate}>
             <Plus size={16} />

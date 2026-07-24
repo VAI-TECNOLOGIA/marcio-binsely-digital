@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Download, BarChart3, Trophy, TrendingUp, UserPlus, Users } from 'lucide-react';
+import { Download, BarChart3, Trophy, TrendingUp, UserPlus, Users, Search } from 'lucide-react';
 import Layout from '../components/layout/Layout.jsx';
 import { Card, StatCard } from '../components/ui/Card.jsx';
 import { LoadingBox } from '../components/ui/Spinner.jsx';
@@ -103,6 +103,33 @@ export default function Reports() {
 /** Acompanhamento das indicações: quem indicou, quantos e o que aconteceu. */
 function BlocoIndicacoes({ dados }) {
   const { ranking = [], recentes = [], resumo = {} } = dados;
+  // O cliente precisa ver TODOS os indicantes para cobrar produtividade
+  // individual — não só o topo da lista.
+  const [verTodos, setVerTodos] = useState(false);
+  const [buscaInd, setBuscaInd] = useState('');
+
+  // Sem acento dos dois lados: a base está cheia de "SÉRGINHO", "JOÃO",
+  // "PROTÁSIO" — e ninguém digita acento na busca.
+  const semAcento = (s) =>
+    String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  const filtrado = buscaInd.trim()
+    ? ranking.filter((r) => semAcento(r.indicante).includes(semAcento(buscaInd.trim())))
+    : ranking;
+  const visiveis = verTodos ? filtrado : filtrado.slice(0, 15);
+
+  function exportarIndicacoes() {
+    const cab = ['Posição', 'Quem indicou', 'Indicados', 'Voluntários', 'Confirmados'];
+    const linhas = [cab.join(';')];
+    ranking.forEach((r, i) =>
+      linhas.push([i + 1, r.indicante.replace(/;/g, ' '), r.total, r.voluntarios, r.confirmados].join(';'))
+    );
+    const blob = new Blob(['﻿' + linhas.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `indicacoes-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
   const quando = (iso) => {
     const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
     if (s < 60) return 'agora';
@@ -120,8 +147,28 @@ function BlocoIndicacoes({ dados }) {
       </div>
 
       <div className="grid cols-2-1" style={{ marginTop: 18 }}>
-        <Card title="Ranking de indicações" icon={Trophy} subtitle="Quem mais trouxe gente para a pré-campanha">
-          <div className="table-wrap">
+        <Card
+          title={`Ranking de indicações (${ranking.length})`}
+          icon={Trophy}
+          subtitle="Produtividade individual de quem trouxe gente para a pré-campanha"
+        >
+          <div className="toolbar" style={{ marginBottom: 10 }}>
+            <div className="search">
+              <Search size={16} />
+              <input
+                className="input"
+                placeholder="Buscar quem indicou..."
+                value={buscaInd}
+                onChange={(e) => setBuscaInd(e.target.value)}
+              />
+            </div>
+            <div className="spacer" />
+            <button className="btn btn-sm" onClick={exportarIndicacoes} title="Baixar o ranking completo">
+              <Download size={15} /> Excel
+            </button>
+          </div>
+
+          <div className="table-wrap" style={verTodos ? { maxHeight: 460, overflowY: 'auto' } : undefined}>
             <table className="table">
               <thead>
                 <tr>
@@ -132,7 +179,7 @@ function BlocoIndicacoes({ dados }) {
                 </tr>
               </thead>
               <tbody>
-                {ranking.slice(0, 15).map((r, i) => (
+                {visiveis.map((r, i) => (
                   <tr key={r.indicante}>
                     <td className="cell-muted">{i + 1}º</td>
                     <td className="cell-strong">{r.indicante}</td>
@@ -141,14 +188,20 @@ function BlocoIndicacoes({ dados }) {
                     <td className="text-right cell-muted">{r.confirmados}</td>
                   </tr>
                 ))}
-                {!ranking.length && (
+                {!visiveis.length && (
                   <tr><td colSpan={5} className="cell-muted" style={{ textAlign: 'center', padding: 18 }}>
-                    Nenhuma indicação registrada ainda.
+                    {ranking.length ? 'Ninguém encontrado com esse nome.' : 'Nenhuma indicação registrada ainda.'}
                   </td></tr>
                 )}
               </tbody>
             </table>
           </div>
+
+          {filtrado.length > 15 && (
+            <button className="btn btn-sm" style={{ marginTop: 10, width: '100%' }} onClick={() => setVerTodos((v) => !v)}>
+              {verTodos ? 'Mostrar só os 15 primeiros' : `Ver todos os ${filtrado.length} que indicaram`}
+            </button>
+          )}
         </Card>
 
         <Card title="Últimas indicações" icon={TrendingUp} subtitle="Atualiza sozinho a cada 30s">

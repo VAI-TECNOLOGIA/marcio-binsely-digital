@@ -156,11 +156,26 @@ export const banners = {
   titleField: 'responsibleName',
   writeRoles: ['LIDER', 'MEMBRO', 'MEMBRO'],
   filters: [{ name: 'status', label: 'Status', enumGroup: 'BannerStatus' }],
+  // Exportação pensada para a equipe que sai instalando: endereço e telefone
+  // em colunas separadas, prontos para roteirizar.
+  exportable: true,
+  exportName: 'faixas',
+  exportColumns: [
+    { key: 'responsibleName', label: 'Responsável' },
+    { key: 'phone', label: 'Telefone', value: (r) => (r.phone ? formatPhone(r.phone) : '') },
+    { key: 'address', label: 'Endereço' },
+    { key: 'neighborhood', label: 'Bairro' },
+    { key: 'cityName', label: 'Cidade' },
+    { key: 'status', label: 'Status', value: (r) => label('BannerStatus', r.status) },
+    { key: 'authorized', label: 'Autorizado', value: (r) => (r.authorized ? 'Sim' : 'Não') },
+    { key: 'authorizedAt', label: 'Autorizado em', value: (r) => formatDate(r.authorizedAt) },
+    { key: 'notes', label: 'Observações' },
+  ],
   columns: [
-    { key: 'responsibleName', label: 'Responsável', render: (r) => <div className="cell-strong">{r.responsibleName}</div> },
-    { key: 'local', label: 'Endereço', render: (r) => <span className="cell-muted">{[r.address, r.neighborhood].filter(Boolean).join(' · ') || '—'}</span> },
-    { key: 'phone', label: 'Telefone', render: (r) => formatPhone(r.phone) },
+    { key: 'responsibleName', label: 'Responsável', render: (r) => <div className="cell-strong">{nomeProprio(r.responsibleName)}</div> },
+    { key: 'local', label: 'Endereço', render: (r) => <span className="cell-muted">{[r.address, r.neighborhood, r.cityName].filter(Boolean).join(' · ') || '—'}</span> },
     { key: 'status', label: 'Status', render: (r) => <StatusBadge group="BannerStatus" value={r.status} /> },
+    { key: 'phone', label: 'Telefone', thStyle: { width: 150 }, render: (r) => <PhoneCell person={{ name: r.responsibleName, phone: r.phone }} /> },
   ],
   fields: [
     { name: 'responsibleName', label: 'Nome do responsável', required: true, full: true },
