@@ -53,6 +53,9 @@ function WhatsAppCRM() {
   const [text, setText] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [busca, setBusca] = useState('');
+  // Caixa de entrada por canal. Instagram e Messenger já existem no modelo;
+  // as conversas passam a chegar quando a API da Meta for ativada.
+  const [canal, setCanal] = useState('WHATSAPP');
   const [showTpl, setShowTpl] = useState(false);
   const [tags, setTags] = useState([]);
   const [notes, setNotes] = useState('');
@@ -61,7 +64,7 @@ function WhatsAppCRM() {
   async function loadList() {
     try {
       const { data } = await api.get('/conversations', { params: {
-        channel: 'WHATSAPP',
+        channel: canal,
         ...(statusFilter ? { status: statusFilter } : {}),
         ...(busca.trim() ? { search: busca.trim() } : {}),
       } });
@@ -77,10 +80,12 @@ function WhatsAppCRM() {
     } catch (e) { toast.error(apiError(e)); }
   }
   useEffect(() => {
+    setActiveId(null);
+    setActive(null);
     const t = setTimeout(loadList, busca ? 350 : 0);
     return () => clearTimeout(t);
     /* eslint-disable-next-line */
-  }, [statusFilter, busca]);
+  }, [statusFilter, busca, canal]);
   useEffect(() => { loadActive(activeId); /* eslint-disable-next-line */ }, [activeId]);
 
   // Bug 1: envio otimista — a mensagem aparece na hora; o POST roda em background.
@@ -125,6 +130,22 @@ function WhatsAppCRM() {
 
   return (
     <>
+      <div className="canal-tabs">
+        {[
+          { k: 'WHATSAPP', lbl: 'WhatsApp' },
+          { k: 'INSTAGRAM', lbl: 'Instagram Direct' },
+          { k: 'MESSENGER', lbl: 'Messenger' },
+        ].map((c) => (
+          <button
+            key={c.k}
+            className={`canal-tab ${canal === c.k ? 'on' : ''}`}
+            onClick={() => setCanal(c.k)}
+          >
+            {c.lbl}
+          </button>
+        ))}
+      </div>
+
       <div className="toolbar">
         <div className="search">
           <Search size={16} />

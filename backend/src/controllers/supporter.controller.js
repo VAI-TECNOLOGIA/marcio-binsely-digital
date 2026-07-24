@@ -67,6 +67,8 @@ const createSchema = z.object({
   status: z.enum(SUPPORTER_STATUS).optional(),
   notes: z.string().nullable().optional(),
   coordinatorId: z.string().uuid().nullable().optional(),
+  // Grupos (ex.: "MULTIPLICADORES 2026"). Livre: a campanha cria os que precisar.
+  tags: z.array(z.string()).optional(),
 });
 
 export const create = asyncHandler(async (req, res) => {
@@ -144,6 +146,13 @@ export const update = asyncHandler(async (req, res) => {
   const data = nullifyEmpty(req.body);
   if (data.birthDate) data.birthDate = new Date(data.birthDate);
   if (data.phone) data.phone = onlyDigits(data.phone);
+  // Grupos chegam como lista; normaliza (MAIÚSCULA, sem repetido) para a
+  // taxonomia não se fragmentar em "Faixas 2024" / "FAIXAS 2024".
+  if (Array.isArray(data.tags)) {
+    data.tags = [...new Set(data.tags.map((t) => String(t).trim().toUpperCase()).filter(Boolean))];
+  } else {
+    delete data.tags; // não veio no formulário: não mexe nos grupos existentes
+  }
   delete data.id;
   delete data.volunteer;
   delete data.region;

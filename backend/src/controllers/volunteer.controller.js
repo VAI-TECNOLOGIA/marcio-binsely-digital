@@ -32,7 +32,12 @@ export const list = asyncHandler(async (req, res) => {
     prisma.volunteer.findMany({
       where,
       include,
-      orderBy: req.query.ordem === 'pontos' ? { totalScore: 'desc' } : { supporter: { name: 'asc' } },
+      orderBy: {
+        pontos: { totalScore: 'desc' },
+        za: { supporter: { name: 'desc' } },
+        recentes: { createdAt: 'desc' },
+        antigos: { createdAt: 'asc' },
+      }[req.query.ordem] || { supporter: { name: 'asc' } },
       take: pageSize,
       skip: (page - 1) * pageSize,
     }),

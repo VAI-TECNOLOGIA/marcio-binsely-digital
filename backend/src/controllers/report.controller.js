@@ -53,3 +53,55 @@ export const growth = asyncHandler(async (req, res) => {
   });
   res.json({ series });
 });
+
+/**
+ * Acompanhamento das indicações, em tempo real.
+ *
+ * Quem indicou fica na tag `INDICAÇÃO: <NOME>` do apoiador — é assim que a
+ * planilha de pré-campanha e o formulário do site gravam. Aqui a tag é
+ * revertida em ranking de indicantes, com quantos viraram voluntário e
+ * quantos já foram confirmados.
+ */
+export const indicacoes = asyncHandler(async (req, res) => {
+  const dias = Math.min(365, Math.max(1, Number(req.query.dias) || 30));
+  const desde = new Date();
+  desde.setHours(0, 0, 0, 0);
+  desde.setDate(desde.getDate() - (dias - 1));
+
+  const [ranking, recentes, totais] = await Promise.all([
+    // Ranking de quem mais indicou
+    prisma.$queryRaw`
+      SELECT
+        replace(t, 'INDICAÇÃO: ', '')                                    AS indicante,
+        count(*)::int                                                    AS total,
+        count(*) FILTER (WHERE s."supportType" = 'VOLUNTARIO')::int      AS voluntarios,
+        count(*) FILTER (WHERE s.status = 'CONFIRMADO')::int             AS confirmados,
+        count(*) FILTER (WHERE s."createdAt" >= ${desde})::int           AS no_periodo
+      FROM "Supporter" s, unnest(s.tags) t
+      WHERE t LIKE 'INDICAÇÃO: %'
+      GROUP BY 1
+      ORDER BY 2 DESC
+      LIMIT 100
+    `,
+    // Últimas indicações recebidas (o "tempo real" da tela)
+    prisma.$queryRaw`
+      SELECT s.id, s.name AS indicado, s."createdAt", s.status, s."supportType",
+             s."cityName", s.neighborhood,
+             replace(t, 'INDICAÇÃO: ', '') AS indicante
+      FROM "Supporter" s, unnest(s.tags) t
+      WHERE t LIKE 'INDICAÇÃO: %'
+      ORDER BY s."createdAt" DESC
+      LIMIT 40
+    `,
+    prisma.$queryRaw`
+      SELECT
+        count(DISTINCT s.id)::int                                   AS indicados,
+        count(DISTINCT replace(t, 'INDICAÇÃO: ', ''))::int          AS indicantes,
+        count(DISTINCT s.id) FILTER (WHERE s."createdAt" >= ${desde})::int AS no_periodo
+      FROM "Supporter" s, unnest(s.tags) t
+      WHERE t LIKE 'INDICAÇÃO: %'
+    `,
+  ]);
+
+  res.json({ ranking, recentes, resumo: totais[0] || {}, dias });
+});

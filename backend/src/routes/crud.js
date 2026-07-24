@@ -14,6 +14,7 @@ const SP = 'MEMBRO'; // antes SUPPORT
 // 6 — Mural de avisos
 export const notices = resourceRouter(
   crudFactory('notice', {
+    sortField: 'title',
     searchFields: ['title', 'description'],
     include: { author: { select: { name: true } }, region: { select: { name: true } } },
     allowedFilters: ['type', 'priority', 'status', 'regionId'],
@@ -28,6 +29,7 @@ export const notices = resourceRouter(
 // 7 — Mídia Kit
 export const mediaKit = resourceRouter(
   crudFactory('mediaKit', {
+    sortField: 'title',
     orderBy: { title: 'asc' },
     searchFields: ['title', 'description', 'hashtags'],
     include: { author: { select: { name: true } }, region: { select: { name: true } } },
@@ -42,6 +44,7 @@ export const mediaKit = resourceRouter(
 // 8 — Tarefas de engajamento
 export const tasks = resourceRouter(
   crudFactory('task', {
+    sortField: 'title',
     orderBy: { title: 'asc' },
     searchFields: ['title', 'description'],
     allowedFilters: ['type', 'active'],
@@ -68,6 +71,7 @@ export const materials = resourceRouter(
 // 10 — Faixas em casas
 export const banners = resourceRouter(
   crudFactory('bannerLocation', {
+    sortField: 'responsibleName',
     orderBy: { responsibleName: 'asc' },
     searchFields: ['responsibleName', 'address', 'cityName', 'neighborhood'],
     include: { supporter: { select: { name: true } } },
@@ -83,6 +87,7 @@ export const banners = resourceRouter(
 // 12 — Ações de rua
 export const streetActions = resourceRouter(
   crudFactory('streetAction', {
+    sortField: 'title',
     searchFields: ['title', 'cityName', 'neighborhood', 'address'],
     include: { coordinator: { select: { name: true } }, region: { select: { name: true } } },
     allowedFilters: ['type', 'status', 'regionId', 'cityName'],
@@ -98,6 +103,7 @@ export const streetActions = resourceRouter(
 // 13 — Agenda / eventos
 export const events = resourceRouter(
   crudFactory('event', {
+    sortField: 'title',
     searchFields: ['title', 'location', 'cityName'],
     include: { responsible: { select: { name: true } }, region: { select: { name: true } } },
     allowedFilters: ['status', 'regionId', 'cityName'],
@@ -111,6 +117,7 @@ export const events = resourceRouter(
 // 16 — Demandas da população (Kanban via status)
 export const demands = resourceRouter(
   crudFactory('demand', {
+    sortField: 'citizenName',
     searchFields: ['citizenName', 'description', 'cityName', 'neighborhood'],
     include: { responsible: { select: { name: true } } },
     allowedFilters: ['status', 'category', 'priority', 'cityName'],

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Download, BarChart3 } from 'lucide-react';
+import { Download, BarChart3, Trophy, TrendingUp, UserPlus, Users } from 'lucide-react';
 import Layout from '../components/layout/Layout.jsx';
-import { Card } from '../components/ui/Card.jsx';
+import { Card, StatCard } from '../components/ui/Card.jsx';
 import { LoadingBox } from '../components/ui/Spinner.jsx';
 import { BarChartCard, PieChartCard, LineChartCard } from '../components/charts/Charts.jsx';
 import api from '../api/client.js';
@@ -13,9 +13,20 @@ export default function Reports() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    Promise.all([api.get('/reports/summary'), api.get('/reports/growth')])
-      .then(([s, g]) => setData({ ...s.data, growth: g.data.series }))
-      .catch(() => setData({ error: true }));
+    let vivo = true;
+    const carregar = () =>
+      Promise.all([
+        api.get('/reports/summary'),
+        api.get('/reports/growth'),
+        api.get('/reports/indicacoes').catch(() => ({ data: null })),
+      ])
+        .then(([s, g, i]) => vivo && setData({ ...s.data, growth: g.data.series, indicacoes: i.data }))
+        .catch(() => vivo && setData({ error: true }));
+
+    carregar();
+    // "Tempo real": recarrega a cada 30s enquanto a aba está aberta.
+    const t = setInterval(carregar, 30_000);
+    return () => { vivo = false; clearInterval(t); };
   }, []);
 
   function exportCsv() {
@@ -83,6 +94,81 @@ export default function Reports() {
           <LineChartCard data={data.growth} />
         </Card>
       </div>
+
+      {data.indicacoes && <BlocoIndicacoes dados={data.indicacoes} />}
     </Layout>
+  );
+}
+
+/** Acompanhamento das indicações: quem indicou, quantos e o que aconteceu. */
+function BlocoIndicacoes({ dados }) {
+  const { ranking = [], recentes = [], resumo = {} } = dados;
+  const quando = (iso) => {
+    const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+    if (s < 60) return 'agora';
+    if (s < 3600) return `há ${Math.floor(s / 60)} min`;
+    if (s < 86400) return `há ${Math.floor(s / 3600)} h`;
+    return new Date(iso).toLocaleDateString('pt-BR');
+  };
+
+  return (
+    <>
+      <div className="grid stats-grid" style={{ marginTop: 18 }}>
+        <StatCard label="Pessoas indicadas" value={resumo.indicados ?? 0} icon={UserPlus} tone="blue" />
+        <StatCard label="Quem indicou" value={resumo.indicantes ?? 0} icon={Users} tone="violet" />
+        <StatCard label={`Novas em ${dados.dias} dias`} value={resumo.no_periodo ?? 0} icon={TrendingUp} tone="green" />
+      </div>
+
+      <div className="grid cols-2-1" style={{ marginTop: 18 }}>
+        <Card title="Ranking de indicações" icon={Trophy} subtitle="Quem mais trouxe gente para a pré-campanha">
+          <div className="table-wrap">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>#</th><th>Quem indicou</th>
+                  <th className="text-right">Indicados</th>
+                  <th className="text-right">Voluntários</th>
+                  <th className="text-right">Confirmados</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ranking.slice(0, 15).map((r, i) => (
+                  <tr key={r.indicante}>
+                    <td className="cell-muted">{i + 1}º</td>
+                    <td className="cell-strong">{r.indicante}</td>
+                    <td className="text-right"><span className="rank-score">{r.total}</span></td>
+                    <td className="text-right cell-muted">{r.voluntarios}</td>
+                    <td className="text-right cell-muted">{r.confirmados}</td>
+                  </tr>
+                ))}
+                {!ranking.length && (
+                  <tr><td colSpan={5} className="cell-muted" style={{ textAlign: 'center', padding: 18 }}>
+                    Nenhuma indicação registrada ainda.
+                  </td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+
+        <Card title="Últimas indicações" icon={TrendingUp} subtitle="Atualiza sozinho a cada 30s">
+          <div className="ind-feed">
+            {recentes.slice(0, 12).map((r) => (
+              <div className="ind-item" key={r.id}>
+                <div>
+                  <div className="cell-strong">{r.indicado}</div>
+                  <div className="cell-muted text-sm">
+                    por <b>{r.indicante}</b>
+                    {r.neighborhood ? ` · ${r.neighborhood}` : ''}
+                  </div>
+                </div>
+                <span className="cell-muted text-sm">{quando(r.createdAt)}</span>
+              </div>
+            ))}
+            {!recentes.length && <div className="cell-muted text-sm">Nenhuma indicação ainda.</div>}
+          </div>
+        </Card>
+      </div>
+    </>
   );
 }

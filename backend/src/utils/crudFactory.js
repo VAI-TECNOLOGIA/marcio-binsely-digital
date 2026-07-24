@@ -16,6 +16,8 @@ export function crudFactory(modelKey, options = {}) {
     searchFields = [],
     include,
     orderBy = { createdAt: 'desc' },
+    // Campo usado quando o usuário pede ordem alfabética (?ordem=az).
+    sortField = 'name',
     scope,
     allowedFilters = [],
     // Filtros sobre colunas de array (ex.: tags) — usam `has` em vez de igualdade.
@@ -76,8 +78,17 @@ export function crudFactory(modelKey, options = {}) {
     const page = Math.max(1, Number(req.query.page) || 1);
     const pageSize = Math.min(500, Number(req.query.pageSize) || 20);
     const where = buildWhere(req);
+    // ?ordem=az (alfabética) | recentes (novos primeiro) | antigos.
+    // Sem o parâmetro, mantém a ordem padrão de cada recurso.
+    const ORDENS = {
+      az: { [sortField]: 'asc' },
+      za: { [sortField]: 'desc' },
+      recentes: { createdAt: 'desc' },
+      antigos: { createdAt: 'asc' },
+    };
+    const ordenacao = ORDENS[req.query.ordem] || orderBy;
     const [data, total] = await Promise.all([
-      model().findMany({ where, include, orderBy, take: pageSize, skip: (page - 1) * pageSize }),
+      model().findMany({ where, include, orderBy: ordenacao, take: pageSize, skip: (page - 1) * pageSize }),
       model().count({ where }),
     ]);
     res.json({

@@ -53,11 +53,12 @@ export default function Volunteers() {
   const [salvando, setSalvando] = useState(null);
   const [page, setPage] = useState(1);
   const [pageInfo, setPageInfo] = useState(null);
+  const [ordem, setOrdem] = useState('az');
 
   async function load(p = page) {
     setLoading(true);
     try {
-      const params = { page: p };
+      const params = { page: p, ordem };
       if (search) params.search = search;
       if (filter === 'active') params.active = 'true';
       else if (filter) params.confirmationStatus = filter;
@@ -80,7 +81,7 @@ export default function Volunteers() {
     const t = setTimeout(() => load(page), search ? 350 : 0);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, filter, page]);
+  }, [search, filter, page, ordem]);
 
   async function toggle(row) {
     try {
@@ -208,6 +209,13 @@ export default function Volunteers() {
           <option value="CONFIRMADO">Confirmados</option>
           <option value="CANCELADO">Cancelados</option>
           <option value="active">Somente ativos</option>
+        </select>
+        <select className="select" style={{ width: 'auto' }} value={ordem} onChange={(e) => setOrdem(e.target.value)} title="Ordenar a lista">
+          <option value="az">Ordem alfabética (A–Z)</option>
+          <option value="za">Ordem alfabética (Z–A)</option>
+          <option value="recentes">Mais recentes primeiro</option>
+          <option value="antigos">Mais antigos primeiro</option>
+          <option value="pontos">Mais pontos primeiro</option>
         </select>
       </div>
       <Card noBody>

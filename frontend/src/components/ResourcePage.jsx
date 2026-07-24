@@ -24,6 +24,7 @@ export default function ResourcePage({ config }) {
   const [filterValues, setFilterValues] = useState({});
   const [page, setPage] = useState(1);
   const [pageInfo, setPageInfo] = useState(null);
+  const [ordem, setOrdem] = useState('az');
   const [lookups, setLookups] = useState({});
   const [lookupRaw, setLookupRaw] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
@@ -50,6 +51,7 @@ export default function ResourcePage({ config }) {
     try {
       const params = { ...filterValues, page };
       if (search) params.search = search;
+      if (config.sortable !== false && ordem) params.ordem = ordem;
       const { data } = await api.get(config.endpoint, { params });
       setRows(data.data || data);
       setPageInfo(data.pagination || null);
@@ -59,7 +61,7 @@ export default function ResourcePage({ config }) {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [config.endpoint, search, page, JSON.stringify(filterValues)]);
+  }, [config.endpoint, search, page, ordem, JSON.stringify(filterValues)]);
 
   useEffect(() => {
     const t = setTimeout(load, search ? 350 : 0);
@@ -92,7 +94,10 @@ export default function ResourcePage({ config }) {
 
   function resolveField(f) {
     if (f.optionsFrom) {
-      const resolved = { ...f, type: 'select', options: lookups[f.optionsFrom] || [] };
+      // 'tags' também usa optionsFrom (para sugerir os grupos existentes),
+      // mas não é um select — preserva o tipo declarado.
+      const tipo = f.type === 'tags' ? 'tags' : 'select';
+      const resolved = { ...f, type: tipo, options: lookups[f.optionsFrom] || [] };
       // Ao escolher a região, mostra o coordenador responsável (vem no lookup).
       if (f.optionsFrom === 'regions' && form[f.name]) {
         const region = (lookupRaw.regions || []).find((r) => r.id === form[f.name]);
@@ -119,6 +124,7 @@ export default function ResourcePage({ config }) {
     for (const field of config.fields || []) {
       let v = row[field.name];
       if (field.type === 'date') v = toInputDate(v);
+      if (field.type === 'tags') { f[field.name] = Array.isArray(v) ? v : []; continue; }
       f[field.name] = v ?? '';
     }
     setForm(f);
@@ -147,6 +153,7 @@ export default function ResourcePage({ config }) {
     const payload = {};
     for (const f of config.fields || []) {
       let v = form[f.name];
+      if (f.type === 'tags') { payload[f.name] = Array.isArray(v) ? v : []; continue; }
       if (v === '') v = null;
       if (f.type === 'number' && v != null) v = Number(v);
       payload[f.name] = v;
@@ -240,6 +247,20 @@ export default function ResourcePage({ config }) {
             </select>
           );
         })}
+        {config.sortable !== false && (
+          <select
+            className="select"
+            style={{ width: 'auto' }}
+            value={ordem}
+            onChange={(e) => setOrdem(e.target.value)}
+            title="Ordenar a lista"
+          >
+            <option value="az">Ordem alfabética (A–Z)</option>
+            <option value="za">Ordem alfabética (Z–A)</option>
+            <option value="recentes">Mais recentes primeiro</option>
+            <option value="antigos">Mais antigos primeiro</option>
+          </select>
+        )}
         <div className="spacer" />
         {canCreate && config.fields && (
           <button className="btn btn-primary" onClick={openCreate}>

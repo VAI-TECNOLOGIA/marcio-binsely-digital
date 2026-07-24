@@ -1,4 +1,5 @@
 import FileUpload from './FileUpload.jsx';
+import TagsInput from './TagsInput.jsx';
 
 /** Renderiza um campo de formulário a partir de uma especificação (field spec). */
 export default function Field({ field, value, onChange, error }) {
@@ -13,7 +14,9 @@ export default function Field({ field, value, onChange, error }) {
         </label>
       )}
 
-      {type === 'select' ? (
+      {type === 'tags' ? (
+        <TagsInput value={value} onChange={set} sugestoes={options.map((o) => o.value ?? o)} />
+      ) : type === 'select' ? (
         <select className="select" data-field={name} aria-invalid={error ? 'true' : undefined} value={value ?? ''} onChange={(e) => set(e.target.value)}>
           <option value="">Selecione...</option>
           {options.map((o) => (

@@ -91,6 +91,8 @@ export const supporters = {
     { name: 'cityName', label: 'Cidade' },
     { name: 'regionId', label: 'Região', optionsFrom: 'regions' },
     { name: 'coordinatorId', label: 'Coordenador responsável', optionsFrom: 'coordinators' },
+    { name: 'tags', label: 'Grupos', type: 'tags', optionsFrom: 'tags', full: true,
+      hint: 'Use os grupos existentes ou digite um novo e tecle Enter.' },
     { name: 'supportType', label: 'Tipo de apoio', enumGroup: 'SupportType', required: true },
     { name: 'status', label: 'Status', enumGroup: 'SupporterStatus' },
     { name: 'instagram', label: 'Instagram' },
