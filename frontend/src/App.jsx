@@ -35,19 +35,23 @@ const TVPanel = lazy(() => import('./pages/TVPanel.jsx'));
 
 const P = (roles, element) => <ProtectedRoute roles={roles}>{element}</ProtectedRoute>;
 
-// O mesmo build atende três domínios; o host decide o que a raiz mostra.
-//   app.*      -> sistema (dashboard)
-//   lp.*       -> landing pública
-//   cadastro.* -> formulário de captação (link curto para anúncio e QR code)
+// O mesmo build atende todos os domínios; o host decide o que a raiz mostra.
+//   app.*                     -> sistema (dashboard)
+//   cadastro.*                -> formulário de captação (link curto)
+//   marciobinsely.site, www.,
+//   lp.*                      -> site público (landing)
+//
+// O padrão é a landing: qualquer domínio novo apontado para cá mostra o site,
+// nunca o sistema interno.
 const host = typeof window !== 'undefined' ? window.location.hostname : '';
-const isLandingHost = host.startsWith('lp.');
+const isSistema = host.startsWith('app.');
 const isCadastroHost = host.startsWith('cadastro.');
 
 /** Página que responde por "/" neste domínio. */
 function raiz() {
   if (isCadastroHost) return <Cadastro />;
-  if (isLandingHost) return <Landing />;
-  return P(null, <Dashboard />);
+  if (isSistema) return P(null, <Dashboard />);
+  return <Landing />;
 }
 
 const lazyFallback = (
