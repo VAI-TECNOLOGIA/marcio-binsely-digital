@@ -104,6 +104,9 @@ export const siteJoin = asyncHandler(async (req, res) => {
 
   const cidade = campo(b, 'input_cidade', 'cidade', 'cityName') || 'Porto Alegre';
   const bairro = campo(b, 'input_bairro', 'bairro');
+  // Data de nascimento (opcional) — alimenta o relatório de aniversariantes.
+  const nascRaw = campo(b, 'input_nascimento', 'nascimento', 'birthDate');
+  const nascimento = /^\d{4}-\d{2}-\d{2}$/.test(nascRaw) ? new Date(nascRaw) : null;
   const notas = [
     indicacao && `Indicado por: ${indicacao}`,
     campo(b, 'input_propaganda') && `Propaganda: ${campo(b, 'input_propaganda')}`,
@@ -117,6 +120,7 @@ export const siteJoin = asyncHandler(async (req, res) => {
       data: {
         tags: Array.from(new Set([...(existente.tags || []), ...tags])),
         email: existente.email || campo(b, 'email') || null,
+        birthDate: existente.birthDate || nascimento,
         neighborhood: existente.neighborhood || bairro || null,
         notes: existente.notes ? `${existente.notes}\n--- site ---\n${notas}` : notas,
         ...(existente.status === 'BLACKLIST' ? {} : { status: 'PENDENTE' }),
@@ -135,6 +139,7 @@ export const siteJoin = asyncHandler(async (req, res) => {
       whatsapp: telefone,
       email: campo(b, 'email') || null,
       cep: onlyDigits(campo(b, 'input_cep', 'cep')) || null,
+      birthDate: nascimento,
       street: campo(b, 'input_endereco', 'endereco') || null,
       neighborhood: bairro || null,
       cityName: cidade,

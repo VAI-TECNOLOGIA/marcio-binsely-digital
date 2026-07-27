@@ -104,3 +104,55 @@ export const indicacoes = asyncHandler(async (req, res) => {
 
   res.json({ ranking, recentes, resumo: totais[0] || {}, dias });
 });
+
+/**
+ * Lista de quem uma pessoa indicou — o drill-down do ranking.
+ * Recebe o nome do indicante (como aparece na tag) e devolve os apoiadores
+ * que têm `INDICAÇÃO: <nome>`.
+ */
+export const indicadosDe = asyncHandler(async (req, res) => {
+  const nome = String(req.params.nome || '').trim().toUpperCase();
+  if (!nome) return res.json({ indicados: [] });
+
+  const indicados = await prisma.supporter.findMany({
+    where: { tags: { has: `INDICAÇÃO: ${nome}` } },
+    select: {
+      id: true, name: true, phone: true, whatsapp: true, status: true,
+      supportType: true, cityName: true, neighborhood: true, createdAt: true,
+    },
+    orderBy: { name: 'asc' },
+  });
+  res.json({ indicante: nome, total: indicados.length, indicados });
+});
+
+/**
+ * Aniversariantes de uma data (padrão: hoje). Compara dia e mês, ignorando
+ * o ano — é o que a campanha usa para mandar "feliz aniversário".
+ */
+export const aniversariantes = asyncHandler(async (req, res) => {
+  // data no formato YYYY-MM-DD; sem isso, usa o dia de hoje no fuso de Brasília.
+  let dia, mes;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(req.query.data || '')) {
+    [, mes, dia] = req.query.data.match(/^\d{4}-(\d{2})-(\d{2})$/);
+  } else {
+    const hoje = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+    dia = String(hoje.getDate()).padStart(2, '0');
+    mes = String(hoje.getMonth() + 1).padStart(2, '0');
+  }
+
+  // Metade da base tem só dia/mês (ano veio inválido do CSV do gabinete). O
+  // dia/mês é o que importa para o aniversário; a idade só aparece quando o
+  // ano é real (>= 1920), senão daria "2025 anos".
+  const lista = await prisma.$queryRawUnsafe(
+    `SELECT id, name, phone, whatsapp, "cityName", neighborhood, "birthDate", "supportType",
+            CASE WHEN date_part('year', "birthDate") >= 1920
+                 THEN date_part('year', age("birthDate"))::int END AS idade
+     FROM "Supporter"
+     WHERE "birthDate" IS NOT NULL
+       AND to_char("birthDate", 'MM-DD') = $1
+     ORDER BY name ASC`,
+    `${mes}-${dia}`
+  );
+
+  res.json({ data: `${dia}/${mes}`, total: lista.length, aniversariantes: lista });
+});

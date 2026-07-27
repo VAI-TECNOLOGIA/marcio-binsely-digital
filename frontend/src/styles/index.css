@@ -303,6 +303,23 @@ input, select, textarea { font-family: inherit; }
   border-color: var(--border); box-shadow: 0 1px 2px rgba(15,23,42,.05);
 }
 
+/* Linha do ranking clicável (abre quem a pessoa indicou). */
+.ind-clicavel { cursor: pointer; }
+.ind-clicavel:hover { background: var(--surface-2); }
+
+/* Rodapé do card de demanda: WhatsApp de retorno + status. */
+.kanban-card-foot { display: flex; flex-direction: column; gap: 6px; }
+.kanban-wa {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 600; color: #128C7E; text-decoration: none;
+  font-variant-numeric: tabular-nums;
+}
+.kanban-wa:hover { text-decoration: underline; }
+.kanban-card { cursor: grab; }
+.kanban-card:active { cursor: grabbing; }
+/* Coluna destacada quando um card está sendo arrastado sobre ela. */
+.kanban-col--alvo { outline: 2px dashed var(--brand); outline-offset: -2px; background: var(--brand-soft, rgba(0,62,157,.05)); }
+
 /* --- Feed de indicações (Relatórios) --- */
 .ind-feed { display: flex; flex-direction: column; }
 .ind-item {

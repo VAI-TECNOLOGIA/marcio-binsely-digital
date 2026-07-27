@@ -16,6 +16,7 @@ import '../styles/cadastro.css';
 
 const VAZIO = {
   nome: '', whatsapp: '', email: '', social: '',
+  nascimento: '',
   cep: '', endereco: '', bairro: '', cidade: '',
   propaganda: '', indicacao: '', aceite: false,
 };
@@ -99,6 +100,7 @@ export default function Cadastro() {
         whatsApp: f.whatsapp,
         email: f.email || undefined,
         input_social: f.social || undefined,
+        input_nascimento: f.nascimento || undefined,
         input_cep: f.cep || undefined,
         input_endereco: f.endereco || undefined,
         input_bairro: f.bairro || undefined,
@@ -204,6 +206,15 @@ export default function Cadastro() {
             <label htmlFor="social">Instagram</label>
             <input id="social" value={f.social} onChange={set('social')} placeholder="@seuperfil" />
           </div>
+        </div>
+
+        <div className="cad-linha">
+          <div className="cad-campo">
+            <label htmlFor="nasc">Data de nascimento</label>
+            <input id="nasc" type="date" value={f.nascimento} onChange={set('nascimento')}
+              max={new Date().toISOString().slice(0, 10)} />
+          </div>
+          <div className="cad-campo" aria-hidden="true" />
         </div>
 
         <div className="cad-linha">

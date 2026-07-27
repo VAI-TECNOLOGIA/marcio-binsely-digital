@@ -7,9 +7,14 @@ import { formatPhone, waLink, nomeProprio } from '../lib/format.js';
  * vista de longe, porque sem número a pessoa não entra em disparo nem em
  * confirmação por WhatsApp.
  */
-export default function PhoneCell({ person }) {
+export default function PhoneCell({ person, message }) {
   const numero = person?.whatsapp || person?.phone;
-  const href = waLink(numero, `Olá, ${nomeProprio(person?.name).split(' ')[0]}! Aqui é da pré-campanha do Márcio Bins Ely.`);
+  // Mensagem: prop explícita > mensagem embutida no registro > saudação padrão.
+  const texto =
+    message ||
+    person?.__msg ||
+    `Olá, ${nomeProprio(person?.name).split(' ')[0]}! Aqui é da pré-campanha do Márcio Bins Ely.`;
+  const href = waLink(numero, texto);
 
   if (!numero) return <span className="cell-sem-tel">Sem telefone</span>;
 

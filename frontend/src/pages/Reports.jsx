@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Download, BarChart3, Trophy, TrendingUp, UserPlus, Users, Search } from 'lucide-react';
+import { Download, BarChart3, Trophy, TrendingUp, UserPlus, Users, Search, Cake } from 'lucide-react';
 import Layout from '../components/layout/Layout.jsx';
 import { Card, StatCard } from '../components/ui/Card.jsx';
 import { LoadingBox } from '../components/ui/Spinner.jsx';
 import { BarChartCard, PieChartCard, LineChartCard } from '../components/charts/Charts.jsx';
+import Modal from '../components/ui/Modal.jsx';
+import { StatusBadge } from '../components/ui/Badge.jsx';
+import PhoneCell from '../components/PhoneCell.jsx';
 import api from '../api/client.js';
 import { label } from '../config/enums.js';
+import { nomeProprio } from '../lib/format.js';
 
 const tr = (group, arr = []) => arr.map((x) => ({ ...x, name: label(group, x.name) }));
 
@@ -96,7 +100,78 @@ export default function Reports() {
       </div>
 
       {data.indicacoes && <BlocoIndicacoes dados={data.indicacoes} />}
+      <BlocoAniversariantes />
     </Layout>
+  );
+}
+
+/** Aniversariantes do dia (ou de uma data escolhida) — para mandar parabéns. */
+function BlocoAniversariantes() {
+  const hoje = new Date().toISOString().slice(0, 10);
+  const [dataSel, setDataSel] = useState(hoje);
+  const [lista, setLista] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+
+  useEffect(() => {
+    let vivo = true;
+    setCarregando(true);
+    api.get('/reports/aniversariantes', { params: { data: dataSel } })
+      .then((r) => vivo && setLista(r.data.aniversariantes || []))
+      .catch(() => vivo && setLista([]))
+      .finally(() => vivo && setCarregando(false));
+    return () => { vivo = false; };
+  }, [dataSel]);
+
+  const ehHoje = dataSel === hoje;
+  const [d, m] = [dataSel.slice(8, 10), dataSel.slice(5, 7)];
+
+  return (
+    <div style={{ marginTop: 18 }}>
+      <Card
+        title={`Aniversariantes ${ehHoje ? 'de hoje' : `de ${d}/${m}`}`}
+        icon={Cake}
+        subtitle="Mande o feliz aniversário — clique no telefone para abrir o WhatsApp"
+      >
+        <div className="toolbar" style={{ marginBottom: 10 }}>
+          <label className="cell-muted text-sm" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            Data:
+            <input type="date" className="input" style={{ width: 'auto' }} value={dataSel}
+              onChange={(e) => setDataSel(e.target.value || hoje)} />
+          </label>
+          {!ehHoje && <button className="btn btn-sm" onClick={() => setDataSel(hoje)}>Hoje</button>}
+          <div className="spacer" />
+          <span className="rank-score">{lista.length} {lista.length === 1 ? 'aniversariante' : 'aniversariantes'}</span>
+        </div>
+
+        {carregando ? (
+          <LoadingBox />
+        ) : !lista.length ? (
+          <p className="cell-muted text-sm" style={{ textAlign: 'center', padding: 16 }}>
+            Ninguém faz aniversário nesta data.
+          </p>
+        ) : (
+          <div className="table-wrap" style={{ maxHeight: 420, overflowY: 'auto' }}>
+            <table className="table">
+              <thead>
+                <tr><th>Nome</th><th>Idade</th><th>Cidade / Bairro</th><th className="text-right">WhatsApp</th></tr>
+              </thead>
+              <tbody>
+                {lista.map((p) => (
+                  <tr key={p.id}>
+                    <td className="cell-strong">{nomeProprio(p.name)}</td>
+                    <td className="cell-muted">{p.idade != null ? `${p.idade} anos` : '—'}</td>
+                    <td className="cell-muted">{[p.cityName, p.neighborhood].filter(Boolean).join(' · ') || '—'}</td>
+                    <td className="text-right">
+                      <PhoneCell person={{ ...p, __msg: `Feliz aniversário, ${nomeProprio(p.name).split(' ')[0]}! 🎉 A equipe do Márcio Bins Ely deseja tudo de bom pra você.` }} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
+    </div>
   );
 }
 
@@ -107,6 +182,18 @@ function BlocoIndicacoes({ dados }) {
   // individual — não só o topo da lista.
   const [verTodos, setVerTodos] = useState(false);
   const [buscaInd, setBuscaInd] = useState('');
+  // Drill-down: clicar num indicante mostra QUEM ele indicou.
+  const [abrir, setAbrir] = useState(null); // { indicante, indicados[] } | 'carregando'
+
+  async function verIndicados(nome) {
+    setAbrir('carregando');
+    try {
+      const { data } = await api.get(`/reports/indicacoes/${encodeURIComponent(nome)}`);
+      setAbrir({ indicante: nome, indicados: data.indicados || [] });
+    } catch {
+      setAbrir({ indicante: nome, indicados: [], erro: true });
+    }
+  }
 
   // Sem acento dos dois lados: a base está cheia de "SÉRGINHO", "JOÃO",
   // "PROTÁSIO" — e ninguém digita acento na busca.
@@ -180,7 +267,7 @@ function BlocoIndicacoes({ dados }) {
               </thead>
               <tbody>
                 {visiveis.map((r, i) => (
-                  <tr key={r.indicante}>
+                  <tr key={r.indicante} className="ind-clicavel" onClick={() => verIndicados(r.indicante)} title="Ver quem esta pessoa indicou">
                     <td className="cell-muted">{i + 1}º</td>
                     <td className="cell-strong">{r.indicante}</td>
                     <td className="text-right"><span className="rank-score">{r.total}</span></td>
@@ -222,6 +309,43 @@ function BlocoIndicacoes({ dados }) {
           </div>
         </Card>
       </div>
+
+      {abrir && (
+        <Modal
+          title={abrir === 'carregando' ? 'Carregando...' : `Indicados por ${abrir.indicante}`}
+          onClose={() => setAbrir(null)}
+          wide
+        >
+          {abrir === 'carregando' ? (
+            <LoadingBox />
+          ) : !abrir.indicados.length ? (
+            <p className="cell-muted">Nenhum indicado encontrado.</p>
+          ) : (
+            <>
+              <p className="cell-muted text-sm" style={{ marginBottom: 10 }}>
+                {abrir.indicados.length} {abrir.indicados.length === 1 ? 'pessoa indicada' : 'pessoas indicadas'}.
+              </p>
+              <div className="table-wrap" style={{ maxHeight: 420, overflowY: 'auto' }}>
+                <table className="table">
+                  <thead>
+                    <tr><th>Nome</th><th>Cidade / Bairro</th><th>Situação</th><th className="text-right">WhatsApp</th></tr>
+                  </thead>
+                  <tbody>
+                    {abrir.indicados.map((p) => (
+                      <tr key={p.id}>
+                        <td className="cell-strong">{nomeProprio(p.name)}</td>
+                        <td className="cell-muted">{[p.cityName, p.neighborhood].filter(Boolean).join(' · ') || '—'}</td>
+                        <td><StatusBadge group="SupporterStatus" value={p.status} /></td>
+                        <td className="text-right"><PhoneCell person={p} /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+        </Modal>
+      )}
     </>
   );
 }
