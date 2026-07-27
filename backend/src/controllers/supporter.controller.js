@@ -69,11 +69,46 @@ const createSchema = z.object({
   coordinatorId: z.string().uuid().nullable().optional(),
   // Grupos (ex.: "MULTIPLICADORES 2026"). Livre: a campanha cria os que precisar.
   tags: z.array(z.string()).optional(),
+  // Quem indicou este apoiador (campo dedicado; vira a tag INDICAÇÃO).
+  indicante: z.string().nullable().optional(),
 });
+
+const PREFIXO_INDICACAO = 'INDICAÇÃO: ';
+const TAGS_INTERNAS = ['BASE HISTÓRICA']; // marcadores que o form não mostra, mas devem sobreviver
+
+/**
+ * Monta o array final de tags a partir das partes que a interface controla
+ * separadamente: grupos (campo Grupos), quem indicou (campo dedicado) e os
+ * marcadores internos, que são preservados mesmo sem aparecer no formulário.
+ */
+function montarTags({ grupos, indicante, tagsExistentes = [] }) {
+  const norm = (t) => String(t).trim().toUpperCase();
+
+  // Grupos digitados, já sem a indicação (ela tem campo próprio).
+  const gruposLimpos = (Array.isArray(grupos) ? grupos : [])
+    .map(norm)
+    .filter((t) => t && !t.startsWith(PREFIXO_INDICACAO));
+
+  // Indicação: usa o campo se veio; senão preserva a que já existia.
+  let indicacao = tagsExistentes.find((t) => t.startsWith(PREFIXO_INDICACAO)) || null;
+  if (indicante !== undefined) {
+    const nome = String(indicante || '').trim().toUpperCase();
+    indicacao = nome ? PREFIXO_INDICACAO + nome : null;
+  }
+
+  const internas = tagsExistentes.filter((t) => TAGS_INTERNAS.includes(t));
+
+  return [...new Set([...gruposLimpos, ...internas, ...(indicacao ? [indicacao] : [])])];
+}
 
 export const create = asyncHandler(async (req, res) => {
   const data = createSchema.parse(nullifyEmpty(req.body));
   const phone = onlyDigits(data.phone);
+  // "Quem indicou" vira a tag INDICAÇÃO (junto com os grupos digitados).
+  if (data.tags !== undefined || data.indicante !== undefined) {
+    data.tags = montarTags({ grupos: data.tags, indicante: data.indicante });
+  }
+  delete data.indicante;
 
   const [black, existing] = await Promise.all([
     prisma.blacklist.findFirst({ where: { phone } }),
@@ -146,13 +181,21 @@ export const update = asyncHandler(async (req, res) => {
   const data = nullifyEmpty(req.body);
   if (data.birthDate) data.birthDate = new Date(data.birthDate);
   if (data.phone) data.phone = onlyDigits(data.phone);
-  // Grupos chegam como lista; normaliza (MAIÚSCULA, sem repetido) para a
-  // taxonomia não se fragmentar em "Faixas 2024" / "FAIXAS 2024".
-  if (Array.isArray(data.tags)) {
-    data.tags = [...new Set(data.tags.map((t) => String(t).trim().toUpperCase()).filter(Boolean))];
-  } else {
-    delete data.tags; // não veio no formulário: não mexe nos grupos existentes
+
+  // Grupos (campo Grupos) + quem indicou (campo dedicado) + marcadores
+  // internos (preservados). Só busca o estado atual quando algum dos dois veio.
+  if (data.tags !== undefined || data.indicante !== undefined) {
+    const atual = await prisma.supporter.findUnique({
+      where: { id: req.params.id },
+      select: { tags: true },
+    });
+    data.tags = montarTags({
+      grupos: data.tags !== undefined ? data.tags : atual?.tags,
+      indicante: data.indicante,
+      tagsExistentes: atual?.tags || [],
+    });
   }
+  delete data.indicante;
   delete data.id;
   delete data.volunteer;
   delete data.region;

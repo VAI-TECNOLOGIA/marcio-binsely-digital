@@ -125,7 +125,17 @@ export default function ResourcePage({ config }) {
     for (const field of config.fields || []) {
       let v = row[field.name];
       if (field.type === 'date') v = toInputDate(v);
-      if (field.type === 'tags') { f[field.name] = Array.isArray(v) ? v : []; continue; }
+      // Campo derivado de uma tag (ex.: "Quem indicou" ← INDICAÇÃO: X).
+      if (field.fromTag) {
+        const t = (row.tags || []).find((x) => x.startsWith(field.fromTag));
+        f[field.name] = t ? t.slice(field.fromTag.length) : '';
+        continue;
+      }
+      if (field.type === 'tags') {
+        const arr = Array.isArray(row.tags) ? row.tags : [];
+        f[field.name] = field.excludeTags ? arr.filter((t) => !field.excludeTags(t)) : arr;
+        continue;
+      }
       f[field.name] = v ?? '';
     }
     setForm(f);

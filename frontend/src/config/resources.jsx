@@ -91,7 +91,12 @@ export const supporters = {
     { name: 'cityName', label: 'Cidade' },
     { name: 'regionId', label: 'Região', optionsFrom: 'regions' },
     { name: 'coordinatorId', label: 'Coordenador responsável', optionsFrom: 'coordinators' },
+    { name: 'indicante', label: 'Quem indicou', type: 'text', fromTag: 'INDICAÇÃO: ', full: true,
+      placeholder: 'Nome de quem indicou esta pessoa',
+      hint: 'Deixe em branco para remover a indicação.' },
     { name: 'tags', label: 'Grupos', type: 'tags', optionsFrom: 'tags', full: true,
+      // A indicação tem campo próprio acima; marcador interno não é grupo.
+      excludeTags: (t) => t.startsWith('INDICAÇÃO: ') || t === 'BASE HISTÓRICA',
       hint: 'Use os grupos existentes ou digite um novo e tecle Enter.' },
     { name: 'supportType', label: 'Tipo de apoio', enumGroup: 'SupportType', required: true },
     { name: 'status', label: 'Status', enumGroup: 'SupporterStatus' },
