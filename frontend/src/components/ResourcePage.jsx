@@ -95,9 +95,9 @@ export default function ResourcePage({ config }) {
 
   function resolveField(f) {
     if (f.optionsFrom) {
-      // 'tags' também usa optionsFrom (para sugerir os grupos existentes),
-      // mas não é um select — preserva o tipo declarado.
-      const tipo = f.type === 'tags' ? 'tags' : 'select';
+      // 'tags' e 'checklist' também usam optionsFrom, mas não são select —
+      // preservam o tipo declarado.
+      const tipo = f.type === 'tags' || f.type === 'checklist' ? f.type : 'select';
       const resolved = { ...f, type: tipo, options: lookups[f.optionsFrom] || [] };
       // Ao escolher a região, mostra o coordenador responsável (vem no lookup).
       if (f.optionsFrom === 'regions' && form[f.name]) {
@@ -136,6 +136,7 @@ export default function ResourcePage({ config }) {
         f[field.name] = field.excludeTags ? arr.filter((t) => !field.excludeTags(t)) : arr;
         continue;
       }
+      if (field.type === 'checklist') { f[field.name] = Array.isArray(v) ? v : []; continue; }
       f[field.name] = v ?? '';
     }
     setForm(f);
@@ -164,7 +165,7 @@ export default function ResourcePage({ config }) {
     const payload = {};
     for (const f of config.fields || []) {
       let v = form[f.name];
-      if (f.type === 'tags') { payload[f.name] = Array.isArray(v) ? v : []; continue; }
+      if (f.type === 'tags' || f.type === 'checklist') { payload[f.name] = Array.isArray(v) ? v : []; continue; }
       if (v === '') v = null;
       if (f.type === 'number' && v != null) v = Number(v);
       payload[f.name] = v;

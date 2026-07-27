@@ -37,7 +37,9 @@ export const list = asyncHandler(async (req, res) => {
 
 const schema = z.object({
   materialId: z.string().uuid().nullable().optional(),
-  materialName: z.string().min(1, 'Material obrigatório'),
+  materialName: z.string().optional(),
+  materials: z.array(z.string()).optional(),
+  materialType: z.string().nullable().optional(),
   quantity: z.coerce.number().int().positive(),
   justification: z.string().nullable().optional(),
   cityName: z.string().nullable().optional(),
@@ -47,6 +49,17 @@ const schema = z.object({
 
 export const create = asyncHandler(async (req, res) => {
   const data = schema.parse(nullifyEmpty(req.body));
+
+  // Vários materiais numa solicitação: materialName vira o resumo legível.
+  const materiais = (data.materials || []).map((m) => String(m).trim()).filter(Boolean);
+  if (materiais.length) {
+    data.materials = materiais;
+    data.materialName = materiais.join(', ');
+    data.materialId = null; // resumo de vários itens não aponta para um só
+  } else if (!data.materialName) {
+    return res.status(400).json({ error: 'Selecione pelo menos um material.' });
+  }
+
   const request = await prisma.materialRequest.create({ data: { ...data, requesterId: req.user?.id }, include });
   res.status(201).json(request);
 });

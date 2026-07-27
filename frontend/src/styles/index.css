@@ -328,6 +328,19 @@ input, select, textarea { font-family: inherit; }
 }
 .ind-item:last-child { border-bottom: none; }
 
+/* --- Checklist (marcar vários itens, ex.: materiais) --- */
+.checklist { display: flex; flex-direction: column; gap: 6px; }
+.checklist-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 9px 12px; border-radius: 10px; cursor: pointer;
+  font-size: 14px; color: var(--ink);
+  border: 1px solid var(--border); background: var(--surface);
+  transition: border-color 0.12s, background 0.12s;
+}
+.checklist-item:hover { border-color: var(--muted-2); }
+.checklist-item.on { border-color: var(--brand); background: var(--brand-soft, rgba(0,62,157,.06)); color: var(--brand); font-weight: 600; }
+.checklist-item input { width: 16px; height: 16px; accent-color: var(--brand); flex: none; }
+
 /* --- Campo de grupos (tags) do apoiador --- */
 .tags-input { display: flex; flex-direction: column; gap: 8px; }
 .tags-atuais { display: flex; flex-wrap: wrap; gap: 6px; }

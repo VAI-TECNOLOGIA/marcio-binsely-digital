@@ -14,7 +14,29 @@ export default function Field({ field, value, onChange, error }) {
         </label>
       )}
 
-      {type === 'tags' ? (
+      {type === 'checklist' ? (
+        <div className="checklist" data-field={name}>
+          {options.map((o) => {
+            const val = o.value ?? o;
+            const lbl = o.label ?? o;
+            const marcado = Array.isArray(value) && value.includes(val);
+            return (
+              <label key={val} className={`checklist-item ${marcado ? 'on' : ''}`}>
+                <input
+                  type="checkbox"
+                  checked={marcado}
+                  onChange={(e) => {
+                    const atual = Array.isArray(value) ? value : [];
+                    set(e.target.checked ? [...atual, val] : atual.filter((x) => x !== val));
+                  }}
+                />
+                {lbl}
+              </label>
+            );
+          })}
+          {!options.length && <span className="cell-muted text-sm">Nenhum material cadastrado.</span>}
+        </div>
+      ) : type === 'tags' ? (
         <TagsInput value={value} onChange={set} sugestoes={options.map((o) => o.value ?? o)} />
       ) : type === 'select' ? (
         <select className="select" data-field={name} aria-invalid={error ? 'true' : undefined} value={value ?? ''} onChange={(e) => set(e.target.value)}>

@@ -10,6 +10,8 @@ import api, { apiError } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 
+const TIPO_LABEL = { INDIVIDUAL: 'Individual', DOBRADINHA: 'Dobradinha estadual' };
+
 export default function MaterialRequests() {
   const { user } = useAuth();
   const toast = useToast();
@@ -49,15 +51,29 @@ export default function MaterialRequests() {
     lookups: [{ key: 'materials', endpoint: '/materials', valueKey: 'name', labelKey: 'name' }],
     filters: [{ name: 'status', label: 'Status', enumGroup: 'MaterialRequestStatus' }],
     columns: [
-      { key: 'materialName', label: 'Material', render: (r) => <div className="cell-strong">{r.quantity}× {r.materialName}</div> },
+      {
+        key: 'materialName',
+        label: 'Material',
+        render: (r) => (
+          <div>
+            <div className="cell-strong">{r.quantity}× {(r.materials?.length ? r.materials.join(', ') : r.materialName)}</div>
+            {r.materialType && <Badge tone={r.materialType === 'DOBRADINHA' ? 'violet' : 'gray'}>{TIPO_LABEL[r.materialType] || r.materialType}</Badge>}
+          </div>
+        ),
+      },
       { key: 'requester', label: 'Solicitante', render: (r) => r.requester?.name || '—' },
       { key: 'local', label: 'Local', render: (r) => [r.neighborhood, r.cityName].filter(Boolean).join(', ') || '—' },
       { key: 'requestedAt', label: 'Solicitado', render: (r) => formatDate(r.createdAt) },
       { key: 'status', label: 'Status', render: (r) => <StatusBadge group="MaterialRequestStatus" value={r.status} /> },
     ],
     fields: [
-      { name: 'materialName', label: 'Material', optionsFrom: 'materials', required: true },
-      { name: 'quantity', label: 'Quantidade', type: 'number', required: true },
+      { name: 'materials', label: 'Materiais', type: 'checklist', optionsFrom: 'materials', required: true, full: true,
+        hint: 'Marque um ou mais itens.' },
+      { name: 'materialType', label: 'Tipo', type: 'select', options: [
+        { value: 'INDIVIDUAL', label: 'Individual (só Márcio)' },
+        { value: 'DOBRADINHA', label: 'Dobradinha com candidato a estadual' },
+      ] },
+      { name: 'quantity', label: 'Quantidade (de cada)', type: 'number', required: true },
       { name: 'justification', label: 'Justificativa', type: 'textarea', full: true },
       { name: 'cityName', label: 'Cidade' },
       { name: 'neighborhood', label: 'Bairro' },

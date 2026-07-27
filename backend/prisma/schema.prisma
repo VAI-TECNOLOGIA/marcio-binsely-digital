@@ -561,7 +561,14 @@ model MaterialRequest {
   id          String   @id @default(uuid())
   materialId  String?
   material    Material? @relation(fields: [materialId], references: [id], onDelete: SetNull)
+  // materialName vira o resumo legível ("Adesivo, Bandeira") — mantido para
+  // busca, histórico e relatórios que já agrupam por ele.
   materialName String
+  // Vários materiais numa solicitação só (o cliente pediu marcar os itens
+  // em vez de abrir um pedido por material).
+  materials    String[] @default([])
+  // "INDIVIDUAL" ou "DOBRADINHA" (material conjunto com candidato a estadual).
+  materialType String?
   quantity    Int      @default(1)
   justification String?
   cityName    String?
