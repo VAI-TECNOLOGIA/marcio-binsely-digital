@@ -8,12 +8,24 @@ import env from '../config/env.js';
 //  restante do código.
 // ============================================================
 
+// Garante o código do país (55) em números brasileiros digitados sem DDI.
+// Idempotente: número que já começa com 55 (ex.: importado no Disparos) passa
+// intacto; 10/11 dígitos (DDD + número) recebem o 55 na frente.
+function normalizarNumeroBR(to) {
+  const d = String(to || '').replace(/\D/g, '');
+  if (!d) return d;
+  if (d.startsWith('55') && (d.length === 12 || d.length === 13)) return d;
+  if (d.length === 10 || d.length === 11) return '55' + d;
+  return d;
+}
+
 export async function sendWhatsApp({ to, body, template }) {
   if (env.whatsapp.provider === 'meta_cloud' && env.whatsapp.token) {
     const url = `https://graph.facebook.com/v20.0/${env.whatsapp.phoneNumberId}/messages`;
+    const dest = normalizarNumeroBR(to);
     const payload = template
-      ? { messaging_product: 'whatsapp', to, type: 'template', template }
-      : { messaging_product: 'whatsapp', to, type: 'text', text: { body } };
+      ? { messaging_product: 'whatsapp', to: dest, type: 'template', template }
+      : { messaging_product: 'whatsapp', to: dest, type: 'text', text: { body } };
     let data = null;
     try {
       const resp = await fetch(url, {
@@ -71,6 +83,40 @@ export async function getTemplates() {
   } catch {
     return [];
   }
+}
+
+/**
+ * Utilitário 1 — Acesso liberado: envia login + botão com link para a pessoa
+ * criar a própria senha (não trafega senha em texto; a Meta não aprova senha
+ * em template). O parâmetro do botão é o SUFIXO que substitui {{1}} na URL
+ * cadastrada (https://app.marciobinsely.site/redefinir-senha?token={{1}}).
+ */
+export async function enviarAcessoLiberado({ to, nome, email, token }) {
+  const template = {
+    name: 'cadastro_aprovado',
+    language: { code: 'pt_BR' },
+    components: [
+      { type: 'body', parameters: [
+        { type: 'text', text: String(nome || 'Ola') },
+        { type: 'text', text: String(email || '') },
+      ] },
+      { type: 'button', sub_type: 'url', index: '0', parameters: [{ type: 'text', text: String(token) }] },
+    ],
+  };
+  return sendWhatsApp({ to, template });
+}
+
+/** Utilitário 2 — Esqueci a senha: envia o link de redefinição (token no botão). */
+export async function enviarRecuperarSenha({ to, nome, token }) {
+  const template = {
+    name: 'recuperar_senha',
+    language: { code: 'pt_BR' },
+    components: [
+      { type: 'body', parameters: [{ type: 'text', text: String(nome || 'Ola') }] },
+      { type: 'button', sub_type: 'url', index: '0', parameters: [{ type: 'text', text: String(token) }] },
+    ],
+  };
+  return sendWhatsApp({ to, template });
 }
 
 /** Estrutura de um template pelo nome (para montar o envio). */

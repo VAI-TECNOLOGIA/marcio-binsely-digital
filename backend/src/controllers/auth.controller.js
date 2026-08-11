@@ -6,8 +6,9 @@ import { AppError } from '../utils/AppError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { audit } from '../utils/audit.js';
 import { USER_ROLES } from '../utils/enums.js';
-import { nullifyEmpty } from '../utils/helpers.js';
+import { nullifyEmpty, onlyDigits } from '../utils/helpers.js';
 import { sendEmail, resetPasswordEmail } from '../services/email.service.js';
+import { enviarRecuperarSenha } from '../services/whatsapp.service.js';
 import env from '../config/env.js';
 
 const loginSchema = z.object({
@@ -92,6 +93,17 @@ export const forgotPassword = asyncHandler(async (req, res) => {
     } catch (e) {
       // Não vaza a falha pro solicitante (evita enumeração); loga pra operação.
       console.error('[forgot-password] falha ao enviar e-mail:', e.message);
+    }
+
+    // Também envia o link por WhatsApp (template oficial), se houver telefone.
+    const phone = onlyDigits(user.phone || '');
+    if (phone) {
+      try {
+        const nome = (user.name || '').split(' ')[0] || user.name || '';
+        await enviarRecuperarSenha({ to: phone, nome, token });
+      } catch (e) {
+        console.error('[forgot-password] falha ao enviar WhatsApp:', e.message);
+      }
     }
 
     return res.json({

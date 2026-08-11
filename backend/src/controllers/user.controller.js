@@ -4,7 +4,10 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { AppError } from '../utils/AppError.js';
 import { hashPassword } from '../utils/password.js';
 import { USER_ROLES } from '../utils/enums.js';
-import { nullifyEmpty } from '../utils/helpers.js';
+import { nullifyEmpty, onlyDigits } from '../utils/helpers.js';
+import { signSetupToken } from '../utils/jwt.js';
+import { enviarAcessoLiberado } from '../services/whatsapp.service.js';
+import { audit } from '../utils/audit.js';
 
 const select = {
   id: true, name: true, email: true, role: true, phone: true, active: true,
@@ -60,4 +63,36 @@ export const remove = asyncHandler(async (req, res) => {
   if (req.params.id === req.user.id) throw new AppError('Você não pode remover o próprio usuário', 400);
   await prisma.user.delete({ where: { id: req.params.id } });
   res.status(204).send();
+});
+
+/**
+ * Aprova o usuário e envia o acesso por WhatsApp (template oficial UTILITY).
+ * A mensagem leva o login (e-mail) + um link para a própria pessoa criar a
+ * senha — nunca enviamos senha em texto (a Meta não aprova, e é mais seguro).
+ */
+export const enviarAcesso = asyncHandler(async (req, res) => {
+  const user = await prisma.user.findUnique({ where: { id: req.params.id } });
+  if (!user) throw new AppError('Usuário não encontrado', 404);
+
+  const phone = onlyDigits(user.phone || '');
+  if (!phone) {
+    throw new AppError('Este usuário não tem WhatsApp cadastrado. Adicione o telefone antes de enviar o acesso.', 400);
+  }
+
+  // "Aprovar" = garantir o usuário ativo + gerar o link de primeiro acesso
+  // (reaproveita o resetToken; a pessoa define a senha ao clicar).
+  const token = signSetupToken({ sub: user.id });
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { active: true, resetToken: token, resetTokenExpires: new Date(Date.now() + 3 * 24 * 3600_000) },
+  });
+
+  const nome = (user.name || '').split(' ')[0] || user.name || '';
+  const result = await enviarAcessoLiberado({ to: phone, nome, email: user.email, token });
+  if (result?.success === false) {
+    throw new AppError(result.error || 'Não foi possível enviar pelo WhatsApp.', 502);
+  }
+
+  await audit({ userId: req.user?.id, action: 'SEND_ACCESS', entity: 'User', entityId: user.id, ip: req.ip });
+  res.json({ ok: true, message: 'Acesso enviado por WhatsApp.' });
 });

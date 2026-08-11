@@ -941,6 +941,11 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .access-pwd .input { font-family: ui-monospace, 'SF Mono', Menlo, monospace; letter-spacing: 0.02em; }
 .access-pwd .icon-btn { width: 40px; height: 40px; flex-shrink: 0; }
 .access-box { white-space: pre-wrap; font-size: 13px; line-height: 1.6; color: var(--ink-700); background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 13px 15px; font-family: ui-monospace, 'SF Mono', Menlo, monospace; }
+.access-official { border: 1px solid var(--brand-soft); border-radius: 12px; padding: 14px; margin-bottom: 16px; background: var(--brand-soft); }
+.access-official-head { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: var(--brand-700); }
+.access-official .access-note { background: transparent; padding: 0; margin: 7px 0 12px; }
+.access-divider { display: flex; align-items: center; text-align: center; gap: 10px; color: var(--muted); font-size: 12px; margin: 2px 0 15px; text-transform: uppercase; letter-spacing: 0.04em; }
+.access-divider::before, .access-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
 /* ============================================================
    ASSISTENTE DE IA — botão flutuante + painel lateral direito

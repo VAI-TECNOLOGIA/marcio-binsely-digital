@@ -6,6 +6,7 @@ const r = Router();
 
 r.get('/', authorize('LIDER', 'MEMBRO'), user.list);
 r.post('/', authorize('LIDER'), user.create);
+r.post('/:id/enviar-acesso', authorize('LIDER'), user.enviarAcesso);
 r.put('/:id', authorize('LIDER'), user.update);
 r.delete('/:id', authorize('LIDER'), user.remove);
 
