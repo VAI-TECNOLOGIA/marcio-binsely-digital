@@ -1,7 +1,7 @@
 import prisma from '../config/prisma.js';
 import env from '../config/env.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
-import { sendWhatsApp } from '../services/whatsapp.service.js';
+import { sendWhatsApp, getTemplates } from '../services/whatsapp.service.js';
 import { onlyDigits } from '../utils/helpers.js';
 
 /** Verificação do webhook (handshake exigido pela Meta Cloud API). */
@@ -19,6 +19,7 @@ export const verifyWebhook = (req, res) => {
 export const receiveWebhook = asyncHandler(async (req, res) => {
   try {
     const value = req.body?.entry?.[0]?.changes?.[0]?.value;
+    console.log('[wa:webhook]', JSON.stringify(value || req.body || {}).slice(0, 700));
     const message = value?.messages?.[0];
     if (message) {
       await handleInbound({
@@ -38,6 +39,12 @@ export const simulateInbound = asyncHandler(async (req, res) => {
   const { phone, name, body } = req.body;
   const result = await handleInbound({ phone: onlyDigits(phone), name, body });
   res.json(result);
+});
+
+/** Templates aprovados da conta — alimenta o seletor de disparo por template. */
+export const listTemplates = asyncHandler(async (_req, res) => {
+  const data = await getTemplates();
+  res.json({ data });
 });
 
 async function handleInbound({ phone, name, body }) {

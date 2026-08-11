@@ -64,6 +64,7 @@ const env = {
     provider: process.env.WHATSAPP_PROVIDER || 'simulado',
     token: process.env.WHATSAPP_TOKEN || '',
     phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID || '',
+    wabaId: process.env.WHATSAPP_WABA_ID || '',
     verifyToken: process.env.WHATSAPP_VERIFY_TOKEN || 'mbd-verify',
   },
   sms: {

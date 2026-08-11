@@ -3,6 +3,7 @@ import prisma from '../config/prisma.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { AppError } from '../utils/AppError.js';
 import { sendViaChannel, renderTemplate } from '../services/messaging.service.js';
+import { sendWhatsApp, getTemplate } from '../services/whatsapp.service.js';
 import { CHANNELS } from '../utils/enums.js';
 
 export const list = asyncHandler(async (req, res) => {
@@ -34,19 +35,29 @@ export const get = asyncHandler(async (req, res) => {
 
 const schema = z.object({
   name: z.string().min(2),
-  message: z.string().min(2),
+  message: z.string().optional().default(''),
   channel: z.enum(CHANNELS).optional(),
   scheduledAt: z.string().nullable().optional(),
+  templateName: z.string().nullable().optional(),
+  templateLang: z.string().nullable().optional(),
+  headerImageUrl: z.string().nullable().optional(),
 });
 
 export const create = asyncHandler(async (req, res) => {
   const data = schema.parse(req.body);
+  // Precisa de template OU mensagem livre.
+  if (!data.templateName && (!data.message || data.message.trim().length < 2)) {
+    throw new AppError('Escolha um template aprovado ou escreva a mensagem.', 400);
+  }
   const c = await prisma.broadcastCampaign.create({
     data: {
       name: data.name,
-      message: data.message,
+      message: data.message || '',
       channel: data.channel || 'WHATSAPP',
       scheduledAt: data.scheduledAt ? new Date(data.scheduledAt) : null,
+      templateName: data.templateName || null,
+      templateLang: data.templateLang || 'pt_BR',
+      headerImageUrl: data.headerImageUrl || null,
       ownerId: req.user?.id,
     },
   });
@@ -97,16 +108,40 @@ export const send = asyncHandler(async (req, res) => {
     await prisma.broadcastCampaign.update({ where: { id: campaignId }, data: { status: 'ENVIANDO' } });
   }
 
+  // Campanha por template aprovado: busca a estrutura uma vez (header/variáveis).
+  const tpl = campaign.templateName ? await getTemplate(campaign.templateName) : null;
+  if (campaign.templateName && !tpl) {
+    await prisma.broadcastCampaign.update({ where: { id: campaignId }, data: { status: 'PAUSADA' } });
+    throw new AppError(`Template "${campaign.templateName}" não encontrado ou não aprovado na conta.`, 400);
+  }
+
   let sent = 0;
   let failed = 0;
   for (const c of batch) {
-    const body = renderTemplate(campaign.message, { nome: c.name, cidade: c.cityName, bairro: c.neighborhood, responsavel: c.responsible });
     try {
-      await sendViaChannel(campaign.channel, { to: c.phone, body });
-      await prisma.broadcastContact.update({ where: { id: c.id }, data: { status: 'ENVIADO', sentAt: new Date() } });
-      sent++;
+      let result;
+      if (tpl) {
+        result = await sendWhatsApp({
+          to: c.phone,
+          template: {
+            name: tpl.name,
+            language: { code: campaign.templateLang || tpl.language || 'pt_BR' },
+            components: montarComponentesTemplate(tpl, campaign, c),
+          },
+        });
+      } else {
+        const body = renderTemplate(campaign.message, { nome: c.name, cidade: c.cityName, bairro: c.neighborhood, responsavel: c.responsible });
+        result = await sendViaChannel(campaign.channel, { to: c.phone, body });
+      }
+      if (result && result.success === false) {
+        await prisma.broadcastContact.update({ where: { id: c.id }, data: { status: 'FALHA', error: (result.error || 'Falha no envio').slice(0, 300) } });
+        failed++;
+      } else {
+        await prisma.broadcastContact.update({ where: { id: c.id }, data: { status: 'ENVIADO', sentAt: new Date() } });
+        sent++;
+      }
     } catch (e) {
-      await prisma.broadcastContact.update({ where: { id: c.id }, data: { status: 'FALHA', error: e.message } });
+      await prisma.broadcastContact.update({ where: { id: c.id }, data: { status: 'FALHA', error: (e.message || 'erro').slice(0, 300) } });
       failed++;
     }
   }
@@ -143,6 +178,27 @@ export const remove = asyncHandler(async (req, res) => {
   await prisma.broadcastCampaign.delete({ where: { id: req.params.id } });
   res.status(204).send();
 });
+
+/**
+ * Componentes do template para um contato: imagem do header (quando o template
+ * tem header de imagem) e as variáveis do corpo mapeadas dos dados do contato
+ * ({{1}}=nome, {{2}}=cidade, {{3}}=bairro, {{4}}=responsável).
+ */
+function montarComponentesTemplate(tpl, campaign, contact) {
+  const components = [];
+  if (tpl.headerFormat === 'IMAGE' && campaign.headerImageUrl) {
+    components.push({ type: 'header', parameters: [{ type: 'image', image: { link: campaign.headerImageUrl } }] });
+  }
+  if (tpl.bodyVarCount > 0) {
+    const fontes = [contact.name, contact.cityName, contact.neighborhood, contact.responsible];
+    const parameters = [];
+    for (let i = 0; i < tpl.bodyVarCount; i++) {
+      parameters.push({ type: 'text', text: String(fontes[i] ?? contact.name ?? '—') });
+    }
+    components.push({ type: 'body', parameters });
+  }
+  return components;
+}
 
 function parseCsv(csv) {
   const lines = csv.trim().split(/\r?\n/);

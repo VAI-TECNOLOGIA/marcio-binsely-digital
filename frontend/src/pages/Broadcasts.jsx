@@ -24,6 +24,25 @@ export default function Broadcasts() {
   const cancelRef = useRef(false);
   const [busca, setBusca] = useState('');
   const [statusFiltro, setStatusFiltro] = useState('');
+  const [templates, setTemplates] = useState([]);
+  const [modo, setModo] = useState('template'); // 'template' (marketing) | 'livre' (janela 24h)
+
+  useEffect(() => {
+    api.get('/whatsapp/templates').then(({ data }) => setTemplates(data.data || [])).catch(() => {});
+  }, []);
+
+  const setCampo = (n, v) => setForm((s) => ({ ...s, [n]: v }));
+  function selecionarTemplate(name) {
+    const t = templates.find((x) => x.name === name);
+    setForm((s) => ({
+      ...s,
+      templateName: name || null,
+      templateLang: t?.language || 'pt_BR',
+      channel: 'WHATSAPP',
+      headerImageUrl: t?.headerFormat === 'IMAGE' ? (s.headerImageUrl || 'https://app.marciobinsely.site/logo.png') : null,
+    }));
+  }
+  const tplSel = templates.find((t) => t.name === form.templateName) || null;
 
   async function load() {
     setLoading(true);
@@ -46,8 +65,11 @@ export default function Broadcasts() {
   }, [busca, statusFiltro]);
 
   async function create() {
+    const payload = modo === 'template'
+      ? { name: form.name, channel: 'WHATSAPP', templateName: form.templateName, templateLang: form.templateLang, headerImageUrl: form.headerImageUrl }
+      : { name: form.name, channel: form.channel || 'WHATSAPP', message: form.message };
     try {
-      await api.post('/broadcasts', form);
+      await api.post('/broadcasts', payload);
       toast.success('Campanha criada!');
       setCreateOpen(false);
       setForm({});
@@ -113,8 +135,8 @@ export default function Broadcasts() {
     <Layout title="Disparador da equipe" subtitle="Campanhas com variáveis e relatório — pronto para API Oficial">
       <div className="warning-box" style={{ marginBottom: 16 }}>
         <span>
-          Envios <strong>simulados</strong> pela arquitetura segura. Para produção, conecte um provedor oficial
-          (WhatsApp Cloud API / SMS autorizado) — sem alterar este fluxo.
+          Conectado à <strong>API Oficial do WhatsApp</strong>. Disparo em massa (marketing) usa <strong>template aprovado</strong> —
+          entrega para qualquer número. Mensagem livre só chega a quem respondeu nas últimas 24h. Limite atual: <strong>250 envios/dia</strong>.
         </span>
       </div>
 
@@ -135,7 +157,7 @@ export default function Broadcasts() {
           ))}
         </select>
         <div className="spacer" />
-        <button className="btn btn-primary" onClick={() => { setForm({ channel: 'WHATSAPP' }); setCreateOpen(true); }}>
+        <button className="btn btn-primary" onClick={() => { setForm({ channel: 'WHATSAPP', templateLang: 'pt_BR' }); setModo('template'); setCreateOpen(true); }}>
           <Plus size={16} /> Nova campanha
         </button>
       </div>
@@ -166,13 +188,46 @@ export default function Broadcasts() {
             </>
           }
         >
-          <Field field={{ name: 'name', label: 'Nome da campanha', required: true }} value={form.name} onChange={(n, v) => setForm((s) => ({ ...s, [n]: v }))} />
-          <Field field={{ name: 'channel', label: 'Canal', type: 'select', options: options('Channel') }} value={form.channel} onChange={(n, v) => setForm((s) => ({ ...s, [n]: v }))} />
-          <Field
-            field={{ name: 'message', label: 'Mensagem', type: 'textarea', rows: 4, hint: 'Variáveis: {{nome}}, {{cidade}}, {{bairro}}, {{responsavel}}' }}
-            value={form.message}
-            onChange={(n, v) => setForm((s) => ({ ...s, [n]: v }))}
-          />
+          <Field field={{ name: 'name', label: 'Nome da campanha', required: true }} value={form.name} onChange={setCampo} />
+
+          <div className="field">
+            <label>Tipo de envio</label>
+            <div className="flex gap-8">
+              <button type="button" className={`btn ${modo === 'template' ? 'btn-primary' : ''}`} onClick={() => setModo('template')}>Template aprovado</button>
+              <button type="button" className={`btn ${modo === 'livre' ? 'btn-primary' : ''}`} onClick={() => setModo('livre')}>Mensagem livre</button>
+            </div>
+            <span className="field-hint">{modo === 'template' ? 'Marketing/massa — entrega para qualquer número.' : 'Só entrega para quem te respondeu nas últimas 24h.'}</span>
+          </div>
+
+          {modo === 'template' ? (
+            <>
+              <div className="field">
+                <label>Template aprovado <span className="req">*</span></label>
+                <select className="select" value={form.templateName || ''} onChange={(e) => selecionarTemplate(e.target.value)}>
+                  <option value="">Selecione um template...</option>
+                  {templates.map((t) => <option key={t.name} value={t.name}>{t.name} · {t.category}</option>)}
+                </select>
+                {templates.length === 0 && <span className="field-hint">Nenhum template aprovado encontrado na conta.</span>}
+              </div>
+              {tplSel && (
+                <>
+                  <div className="field">
+                    <label>Prévia (corpo do template)</label>
+                    <div className="media-caption">{tplSel.bodyText || '—'}</div>
+                    {tplSel.bodyVarCount > 0 && <span className="field-hint">Variáveis preenchidas automaticamente: {'{{1}}'}=nome, {'{{2}}'}=cidade, {'{{3}}'}=bairro.</span>}
+                  </div>
+                  {tplSel.headerFormat === 'IMAGE' && (
+                    <Field field={{ name: 'headerImageUrl', label: 'Imagem do topo (URL)', hint: 'URL pública da imagem do header do template.' }} value={form.headerImageUrl} onChange={setCampo} />
+                  )}
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              <Field field={{ name: 'channel', label: 'Canal', type: 'select', options: options('Channel') }} value={form.channel} onChange={setCampo} />
+              <Field field={{ name: 'message', label: 'Mensagem', type: 'textarea', rows: 4, hint: 'Variáveis: {{nome}}, {{cidade}}, {{bairro}}, {{responsavel}}' }} value={form.message} onChange={setCampo} />
+            </>
+          )}
         </Modal>
       )}
 
@@ -186,8 +241,8 @@ export default function Broadcasts() {
           </div>
 
           <div className="field">
-            <label>Mensagem</label>
-            <div className="media-caption">{detail.message}</div>
+            <label>{detail.templateName ? 'Template de disparo' : 'Mensagem'}</label>
+            <div className="media-caption">{detail.templateName ? `${detail.templateName} · ${detail.templateLang || 'pt_BR'}` : (detail.message || '—')}</div>
           </div>
 
           <div className="field">

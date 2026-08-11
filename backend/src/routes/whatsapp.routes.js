@@ -10,5 +10,7 @@ r.post('/webhook', wa.receiveWebhook);
 
 // Protegido — simula uma mensagem recebida para testar o fluxo de confirmação.
 r.post('/simulate', authenticate, wa.simulateInbound);
+// Templates aprovados (para o seletor do módulo de Disparos).
+r.get('/templates', authenticate, wa.listTemplates);
 
 export default r;

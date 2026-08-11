@@ -14,19 +14,75 @@ export async function sendWhatsApp({ to, body, template }) {
     const payload = template
       ? { messaging_product: 'whatsapp', to, type: 'template', template }
       : { messaging_product: 'whatsapp', to, type: 'text', text: { body } };
-    const resp = await fetch(url, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${env.whatsapp.token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
-    const data = await resp.json();
-    return { provider: 'meta_cloud', id: data?.messages?.[0]?.id, raw: data };
+    let data = null;
+    try {
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${env.whatsapp.token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+      data = await resp.json();
+      const id = data?.messages?.[0]?.id;
+      // Só é sucesso quando a Meta devolve o id da mensagem. Caso contrário
+      // (janela de 24h fechada, número inválido, sem template/pagamento…) é
+      // FALHA — não pode ser tratado como enviado.
+      if (resp.ok && id) return { provider: 'meta_cloud', id, success: true, raw: data };
+      const err = data?.error;
+      const motivo = err?.error_user_msg || err?.message || 'A Meta recusou o envio.';
+      return { provider: 'meta_cloud', id: null, success: false, error: motivo, raw: data };
+    } catch (e) {
+      return { provider: 'meta_cloud', id: null, success: false, error: 'Falha de conexão com a API do WhatsApp.', raw: data };
+    }
   }
 
   const id = `wamid.SIMULATED.${Date.now()}`;
   console.log(`[whatsapp:simulado] -> ${to}: ${body || JSON.stringify(template)}`);
-  return { provider: 'simulado', id, simulated: true };
+  return { provider: 'simulado', id, simulated: true, success: true };
+}
+
+function resumirTemplate(t) {
+  const comps = t.components || [];
+  const header = comps.find((c) => c.type === 'HEADER');
+  const body = comps.find((c) => c.type === 'BODY');
+  const bodyText = body?.text || '';
+  const varCount = (bodyText.match(/\{\{\s*\d+\s*\}\}/g) || []).length;
+  return {
+    name: t.name,
+    language: t.language,
+    category: t.category,
+    status: t.status,
+    headerFormat: header?.format || null, // IMAGE / TEXT / VIDEO / DOCUMENT / null
+    bodyText,
+    bodyVarCount: varCount,
+  };
+}
+
+/** Lista os templates APROVADOS da WABA (alimenta o seletor de disparo). */
+export async function getTemplates() {
+  if (!(env.whatsapp.provider === 'meta_cloud' && env.whatsapp.token && env.whatsapp.wabaId)) return [];
+  const url = `https://graph.facebook.com/v20.0/${env.whatsapp.wabaId}/message_templates?fields=name,status,category,language,components&limit=200`;
+  try {
+    const resp = await fetch(url, { headers: { Authorization: `Bearer ${env.whatsapp.token}` } });
+    const data = await resp.json();
+    return (data.data || []).filter((t) => t.status === 'APPROVED').map(resumirTemplate);
+  } catch {
+    return [];
+  }
+}
+
+/** Estrutura de um template pelo nome (para montar o envio). */
+export async function getTemplate(name) {
+  if (!(env.whatsapp.provider === 'meta_cloud' && env.whatsapp.token && env.whatsapp.wabaId)) return null;
+  const url = `https://graph.facebook.com/v20.0/${env.whatsapp.wabaId}/message_templates?name=${encodeURIComponent(name)}&fields=name,status,category,language,components`;
+  try {
+    const resp = await fetch(url, { headers: { Authorization: `Bearer ${env.whatsapp.token}` } });
+    const data = await resp.json();
+    const t = (data.data || [])[0];
+    return t ? resumirTemplate(t) : null;
+  } catch {
+    return null;
+  }
 }
