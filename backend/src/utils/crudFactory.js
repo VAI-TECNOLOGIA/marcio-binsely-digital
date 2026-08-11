@@ -19,6 +19,8 @@ export function crudFactory(modelKey, options = {}) {
     // Campo usado quando o usuário pede ordem alfabética (?ordem=az).
     sortField = 'name',
     scope,
+    // Filtro sempre aplicado (ex.: Apoiadores esconde quem já é voluntário).
+    baseWhere = null,
     allowedFilters = [],
     // Filtros sobre colunas de array (ex.: tags) — usam `has` em vez de igualdade.
     arrayFilters = [],
@@ -53,6 +55,7 @@ export function crudFactory(modelKey, options = {}) {
 
   function buildWhere(req) {
     const and = [];
+    if (baseWhere) and.push(baseWhere);
     if (scope) {
       const s = scope(req);
       if (s && Object.keys(s).length) and.push(s);

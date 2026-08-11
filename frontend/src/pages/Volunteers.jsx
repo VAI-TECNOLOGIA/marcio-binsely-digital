@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Power, Trophy, Search, Check, X } from 'lucide-react';
+import { Power, Trophy, Search, Check, X, Pencil, Trash2 } from 'lucide-react';
 import Layout from '../components/layout/Layout.jsx';
 import { Card } from '../components/ui/Card.jsx';
 import DataTable from '../components/ui/DataTable.jsx';
@@ -8,10 +8,13 @@ import { LoadingBox } from '../components/ui/Spinner.jsx';
 import EmptyState from '../components/ui/EmptyState.jsx';
 import { StatusBadge } from '../components/ui/Badge.jsx';
 import Avatar from '../components/ui/Avatar.jsx';
+import Modal from '../components/ui/Modal.jsx';
+import Field from '../components/ui/Field.jsx';
 import WhatsAppButton from '../components/WhatsAppButton.jsx';
 import PhoneCell from '../components/PhoneCell.jsx';
 import api, { apiError } from '../api/client.js';
 import { nomeProprio } from '../lib/format.js';
+import { options } from '../config/enums.js';
 import { useToast } from '../context/ToastContext.jsx';
 
 /**
@@ -44,6 +47,22 @@ const CONFIRMACAO = {
   CANCELADO: { rotulo: 'Cancelado', tom: 'red' },
 };
 
+// Campos editáveis do cadastro (subconjunto do apoiador) — mesma multi-seleção.
+const EDIT_FIELDS = [
+  { name: 'name', label: 'Nome completo', required: true, full: true },
+  { name: 'phone', label: 'Telefone', type: 'tel' },
+  { name: 'whatsapp', label: 'WhatsApp', type: 'tel' },
+  { name: 'email', label: 'E-mail', type: 'email' },
+  { name: 'neighborhood', label: 'Bairro' },
+  { name: 'cityName', label: 'Cidade' },
+  { name: 'supportTypes', label: 'Tipo de apoio', type: 'checklist', full: true, options: [
+    { value: 'VOLUNTARIO', label: 'Quero ser voluntário' },
+    { value: 'FAIXA_CASA', label: 'Faixa na minha casa' },
+    { value: 'KIT_MATERIAL', label: 'Kit de material' },
+  ] },
+  { name: 'status', label: 'Status', type: 'select', options: options('SupporterStatus') },
+];
+
 export default function Volunteers() {
   const toast = useToast();
   const [rows, setRows] = useState([]);
@@ -54,6 +73,9 @@ export default function Volunteers() {
   const [page, setPage] = useState(1);
   const [pageInfo, setPageInfo] = useState(null);
   const [ordem, setOrdem] = useState('az');
+  const [editing, setEditing] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [savingEdit, setSavingEdit] = useState(false);
 
   async function load(p = page) {
     setLoading(true);
@@ -104,6 +126,55 @@ export default function Volunteers() {
       toast.error(apiError(e));
     } finally {
       setSalvando(null);
+    }
+  }
+
+  // Editar o cadastro da pessoa (o apoiador por trás do voluntário).
+  async function abrirEdicao(row) {
+    try {
+      const { data } = await api.get(`/supporters/${row.supporter.id}`);
+      setEditForm({
+        name: data.name || '',
+        phone: data.phone || '',
+        whatsapp: data.whatsapp || '',
+        email: data.email || '',
+        neighborhood: data.neighborhood || '',
+        cityName: data.cityName || '',
+        supportTypes: Array.isArray(data.supportTypes) ? data.supportTypes : [],
+        status: data.status || 'NOVO',
+      });
+      setEditing(row);
+    } catch (e) {
+      toast.error(apiError(e));
+    }
+  }
+
+  const setCampo = (name, value) => setEditForm((f) => ({ ...f, [name]: value }));
+
+  async function salvarEdicao() {
+    if (!editing) return;
+    setSavingEdit(true);
+    try {
+      await api.put(`/supporters/${editing.supporter.id}`, editForm);
+      toast.success('Cadastro atualizado.');
+      setEditing(null);
+      load();
+    } catch (e) {
+      toast.error(apiError(e));
+    } finally {
+      setSavingEdit(false);
+    }
+  }
+
+  async function excluir(row) {
+    const nome = row.supporter?.name || 'esta pessoa';
+    if (!window.confirm(`Excluir o cadastro de ${nome}? A pessoa sai da base (voluntário e apoiador).`)) return;
+    try {
+      await api.delete(`/volunteers/${row.id}`);
+      toast.success('Cadastro excluído.');
+      load();
+    } catch (e) {
+      toast.error(apiError(e));
     }
   }
 
@@ -225,12 +296,18 @@ export default function Volunteers() {
           <DataTable
             columns={columns}
             rows={rows}
-            empty={<EmptyState icon={Trophy} title="Nenhum voluntário" message="Cadastros do tipo 'Quero ser voluntário' aparecem aqui." />}
+            empty={<EmptyState icon={Trophy} title="Nenhum voluntário" message="Cadastros do formulário e apoiadores classificados aparecem aqui." />}
             actions={(row) => (
               <>
                 <WhatsAppButton person={row.supporter} />
+                <button className="btn btn-ghost btn-sm" title="Editar cadastro" onClick={() => abrirEdicao(row)}>
+                  <Pencil size={15} />
+                </button>
                 <button className="btn btn-ghost btn-sm" title={row.active ? 'Desativar' : 'Ativar'} onClick={() => toggle(row)}>
                   <Power size={15} />
+                </button>
+                <button className="btn btn-ghost btn-sm" title="Excluir cadastro" onClick={() => excluir(row)}>
+                  <Trash2 size={15} />
                 </button>
               </>
             )}
@@ -245,6 +322,22 @@ export default function Volunteers() {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
       />
+
+      {editing && (
+        <Modal title={`Editar ${editing.supporter?.name || 'cadastro'}`} onClose={() => setEditing(null)}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {EDIT_FIELDS.map((f) => (
+              <Field key={f.name} field={f} value={editForm[f.name]} onChange={setCampo} />
+            ))}
+          </div>
+          <div className="flex items-center gap-8" style={{ justifyContent: 'flex-end', marginTop: 16 }}>
+            <button className="btn btn-ghost" onClick={() => setEditing(null)} disabled={savingEdit}>Cancelar</button>
+            <button className="btn btn-primary" onClick={salvarEdicao} disabled={savingEdit}>
+              {savingEdit ? 'Salvando...' : 'Salvar'}
+            </button>
+          </div>
+        </Modal>
+      )}
     </Layout>
   );
 }

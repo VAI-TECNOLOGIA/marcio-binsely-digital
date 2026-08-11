@@ -9,6 +9,7 @@ export const LABELS = {
   SupportType: {
     VOLUNTARIO: 'Quero ser voluntário',
     FAIXA_CASA: 'Faixa na minha casa',
+    KIT_MATERIAL: 'Kit de material',
     ADESIVO_CARRO: 'Adesivo para carro',
     MATERIAL_DIGITAL: 'Material digital',
     CAMINHADA: 'Participar de caminhada',

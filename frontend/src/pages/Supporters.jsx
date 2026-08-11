@@ -1,4 +1,4 @@
-import { UserCheck, Ban } from 'lucide-react';
+import { Ban } from 'lucide-react';
 import Layout from '../components/layout/Layout.jsx';
 import ResourcePage from '../components/ResourcePage.jsx';
 import WhatsAppButton from '../components/WhatsAppButton.jsx';
@@ -11,23 +11,6 @@ export default function Supporters() {
     rowActionsExtra: (row, reload, toast) => (
       <>
         {row.status !== 'BLACKLIST' && <WhatsAppButton person={row} />}
-        {row.supportType === 'VOLUNTARIO' && row.status !== 'CONFIRMADO' && row.status !== 'BLACKLIST' && (
-          <button
-            className="btn btn-ghost btn-sm"
-            title="Confirmar voluntário"
-            onClick={async () => {
-              try {
-                await api.post(`/supporters/${row.id}/confirm`);
-                toast.success('Voluntário confirmado!');
-                reload();
-              } catch (e) {
-                toast.error(apiError(e));
-              }
-            }}
-          >
-            <UserCheck size={15} />
-          </button>
-        )}
         {row.status !== 'BLACKLIST' && (
           <button
             className="btn btn-ghost btn-sm"
@@ -52,7 +35,10 @@ export default function Supporters() {
   };
 
   return (
-    <Layout title="Apoiadores e voluntários" subtitle="Base completa, com antifraude e confirmação automática via WhatsApp">
+    <Layout
+      title="Apoiadores"
+      subtitle="Base de apoiadores. Ao marcar o tipo de apoio (voluntário, faixa ou kit) e salvar, a pessoa vira voluntário e migra para a tela de Voluntários."
+    >
       <ResourcePage config={config} />
     </Layout>
   );

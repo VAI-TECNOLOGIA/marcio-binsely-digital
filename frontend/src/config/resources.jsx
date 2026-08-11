@@ -2,7 +2,7 @@ import { StatusBadge, Badge } from '../components/ui/Badge.jsx';
 import Avatar from '../components/ui/Avatar.jsx';
 import { label } from './enums.js';
 import PhoneCell from '../components/PhoneCell.jsx';
-import { formatDate, formatPhone, nomeProprio } from '../lib/format.js';
+import { formatDate, formatDateOnly, formatPhone, nomeProprio } from '../lib/format.js';
 
 const cut = (s, n = 56) => (s && s.length > n ? `${s.slice(0, n)}…` : s || '');
 
@@ -41,7 +41,11 @@ export const supporters = {
         </div>
       ),
     },
-    { key: 'supportType', label: 'Apoio', render: (r) => <Badge>{label('SupportType', r.supportType)}</Badge> },
+    { key: 'supportType', label: 'Apoio', render: (r) => {
+      const tipos = (r.supportTypes && r.supportTypes.length) ? r.supportTypes : (r.supportType ? [r.supportType] : []);
+      if (!tipos.length) return '—';
+      return <div className="cell-tags">{tipos.slice(0, 3).map((t) => <Badge key={t}>{label('SupportType', t)}</Badge>)}</div>;
+    } },
     { key: 'local', label: 'Local', render: (r) => [r.neighborhood, r.cityName].filter(Boolean).join(', ') || '—' },
     {
       key: 'tags',
@@ -98,7 +102,13 @@ export const supporters = {
       // A indicação tem campo próprio acima; marcador interno não é grupo.
       excludeTags: (t) => t.startsWith('INDICAÇÃO: ') || t === 'BASE HISTÓRICA',
       hint: 'Use os grupos existentes ou digite um novo e tecle Enter.' },
-    { name: 'supportType', label: 'Tipo de apoio', enumGroup: 'SupportType', required: true },
+    { name: 'supportTypes', label: 'Tipo de apoio', type: 'checklist', full: true,
+      options: [
+        { value: 'VOLUNTARIO', label: 'Quero ser voluntário' },
+        { value: 'FAIXA_CASA', label: 'Faixa na minha casa' },
+        { value: 'KIT_MATERIAL', label: 'Kit de material' },
+      ],
+      hint: 'Marque uma ou mais. Qualquer opção classifica a pessoa como Voluntário (sai de Apoiadores). Faixa vai para a lista de Faixas; Kit vai para Pedidos de Material.' },
     { name: 'status', label: 'Status', enumGroup: 'SupporterStatus' },
     { name: 'instagram', label: 'Instagram' },
     { name: 'facebook', label: 'Facebook' },
@@ -118,6 +128,7 @@ export const notices = {
   singular: 'aviso',
   createLabel: 'Novo aviso',
   titleField: 'title',
+  sortable: false, // mural: mais recentes primeiro (backend), não alfabético
   writeRoles: ['LIDER', 'MEMBRO'],
   filters: [
     { name: 'type', label: 'Tipo', enumGroup: 'NoticeType' },
@@ -138,7 +149,7 @@ export const notices = {
     { key: 'type', label: 'Tipo', render: (r) => <Badge>{label('NoticeType', r.type)}</Badge> },
     { key: 'priority', label: 'Prioridade', render: (r) => <StatusBadge group="Priority" value={r.priority} /> },
     { key: 'region', label: 'Região', render: (r) => r.region?.name || 'Todas' },
-    { key: 'date', label: 'Publicado', render: (r) => formatDate(r.publishDate || r.createdAt) },
+    { key: 'date', label: 'Publicado', render: (r) => (r.publishDate ? formatDateOnly(r.publishDate) : formatDate(r.createdAt)) },
   ],
   fields: [
     { name: 'title', label: 'Título', required: true, full: true },
@@ -204,6 +215,7 @@ export const streetActions = {
   singular: 'ação',
   createLabel: 'Nova ação',
   titleField: 'title',
+  sortable: false, // ordena por data (backend), não alfabético
   writeRoles: ['LIDER', 'MEMBRO', 'MEMBRO'],
   filters: [
     { name: 'type', label: 'Tipo', enumGroup: 'StreetActionType' },
@@ -222,7 +234,7 @@ export const streetActions = {
       ),
     },
     { key: 'local', label: 'Local', render: (r) => [r.neighborhood, r.cityName].filter(Boolean).join(', ') || '—' },
-    { key: 'date', label: 'Data', render: (r) => formatDate(r.date) },
+    { key: 'date', label: 'Data', render: (r) => formatDateOnly(r.date) },
     { key: 'people', label: 'Pessoas', render: (r) => r.peopleReached || 0 },
     { key: 'status', label: 'Status', render: (r) => <StatusBadge group="ActionStatus" value={r.status} /> },
   ],
@@ -249,19 +261,26 @@ export const events = {
   singular: 'evento',
   createLabel: 'Novo evento',
   titleField: 'title',
+  // Ordena pela DATA do evento (padrão do backend), não em ordem alfabética.
+  sortable: false,
   writeRoles: ['LIDER', 'MEMBRO'],
   filters: [{ name: 'status', label: 'Status', enumGroup: 'EventStatus' }],
   lookups: [{ key: 'regions', endpoint: '/regions' }],
   columns: [
     { key: 'title', label: 'Evento', render: (r) => <div className="cell-strong">{r.title}</div> },
-    { key: 'date', label: 'Quando', render: (r) => `${formatDate(r.date)} ${r.time || ''}` },
+    { key: 'date', label: 'Quando', render: (r) => (
+      <div>
+        <div className="cell-strong">{formatDateOnly(r.date)}</div>
+        <div className="cell-muted text-sm">{r.time ? `${r.time}h` : 'sem horário'}</div>
+      </div>
+    ) },
     { key: 'local', label: 'Local', render: (r) => [r.location, r.neighborhood].filter(Boolean).join(' · ') || '—' },
     { key: 'status', label: 'Status', render: (r) => <StatusBadge group="EventStatus" value={r.status} /> },
   ],
   fields: [
     { name: 'title', label: 'Título', required: true, full: true },
     { name: 'date', label: 'Data', type: 'date', required: true },
-    { name: 'time', label: 'Hora', placeholder: '19:30' },
+    { name: 'time', label: 'Horário', type: 'time' },
     { name: 'location', label: 'Local' },
     { name: 'cityName', label: 'Cidade' },
     { name: 'neighborhood', label: 'Bairro' },

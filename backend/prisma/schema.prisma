@@ -36,6 +36,7 @@ enum VolunteerConfirmation {
 enum SupportType {
   VOLUNTARIO
   FAIXA_CASA
+  KIT_MATERIAL
   ADESIVO_CARRO
   MATERIAL_DIGITAL
   CAMINHADA
@@ -350,7 +351,11 @@ model Supporter {
   photoUrl    String?
   instagram   String?
   facebook    String?
+  // Tipo de apoio principal (legado — usado em relatórios/coluna).
   supportType SupportType     @default(NOTICIAS)
+  // Tipos de apoio (multi-seleção): Voluntário / Faixa na casa / Kit de material.
+  // Qualquer um destes classifica a pessoa como VOLUNTÁRIO (sai de Apoiadores).
+  supportTypes SupportType[]  @default([])
   status      SupporterStatus @default(NOVO)
   notes       String?
   flaggedReason String?
@@ -367,6 +372,7 @@ model Supporter {
   conversations   Conversation[]
   bannerLocations BannerLocation[]
   broadcastContacts BroadcastContact[]
+  materialRequests  MaterialRequest[] @relation("SupporterMaterialRequests")
 
   @@index([phone])
   @@index([status])
@@ -575,6 +581,11 @@ model MaterialRequest {
   neighborhood String?
   deliveryAddress String?
 
+  // Quando o pedido nasce de um apoiador (ex.: "quero faixa em casa") ao ser
+  // promovido a voluntário, aponta para o apoiador — a lista mostra o nome dele.
+  supporterId String?
+  supporter   Supporter? @relation("SupporterMaterialRequests", fields: [supporterId], references: [id], onDelete: SetNull)
+
   requesterId String?
   requester   User?    @relation("RequestRequester", fields: [requesterId], references: [id], onDelete: SetNull)
   approverId  String?
@@ -591,6 +602,7 @@ model MaterialRequest {
 
   @@index([status])
   @@index([requesterId])
+  @@index([supporterId])
 }
 
 model BannerLocation {
@@ -743,6 +755,11 @@ model BroadcastCampaign {
   name        String
   message     String
   channel     Channel  @default(WHATSAPP)
+  // Disparo por TEMPLATE aprovado (marketing/massa). Sem template = texto livre,
+  // que a Meta só entrega para quem respondeu nas últimas 24h.
+  templateName   String?
+  templateLang   String? @default("pt_BR")
+  headerImageUrl String?
   status      BroadcastStatus @default(RASCUNHO)
   scheduledAt DateTime?
   totalContacts Int    @default(0)
