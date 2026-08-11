@@ -1,6 +1,7 @@
 import { crudFactory } from '../utils/crudFactory.js';
 import { resourceRouter } from './resourceRouter.js';
 import { regionScopeWithGlobal } from '../utils/scope.js';
+import prisma from '../config/prisma.js';
 
 // Hierarquia: LIDER (total) · MEMBRO (equipe interna) · PARCEIRO (externo).
 // As antigas siglas viram aliases dos novos níveis para preservar a lógica.
@@ -14,7 +15,9 @@ const SP = 'MEMBRO'; // antes SUPPORT
 // 6 — Mural de avisos
 export const notices = resourceRouter(
   crudFactory('notice', {
-    sortField: 'title',
+    // Mural de avisos: mais recentes primeiro (não em ordem alfabética).
+    sortField: 'createdAt',
+    orderBy: { createdAt: 'desc' },
     searchFields: ['title', 'description'],
     include: { author: { select: { name: true } }, region: { select: { name: true } } },
     allowedFilters: ['type', 'priority', 'status', 'regionId'],
@@ -87,7 +90,9 @@ export const banners = resourceRouter(
 // 12 — Ações de rua
 export const streetActions = resourceRouter(
   crudFactory('streetAction', {
-    sortField: 'title',
+    // Ações de rua têm data: ordena por data (mais recentes primeiro).
+    sortField: 'date',
+    orderBy: { date: 'desc' },
     searchFields: ['title', 'cityName', 'neighborhood', 'address'],
     include: { coordinator: { select: { name: true } }, region: { select: { name: true } } },
     allowedFilters: ['type', 'status', 'regionId', 'cityName'],
@@ -103,13 +108,23 @@ export const streetActions = resourceRouter(
 // 13 — Agenda / eventos
 export const events = resourceRouter(
   crudFactory('event', {
-    sortField: 'title',
+    // sortField 'date' garante ordem por data mesmo se o front pedir ?ordem=az
+    // (cache antigo). O padrão ordena por data e, dentro dela, por horário.
+    sortField: 'date',
     searchFields: ['title', 'location', 'cityName'],
     include: { responsible: { select: { name: true } }, region: { select: { name: true } } },
     allowedFilters: ['status', 'regionId', 'cityName'],
-    orderBy: { date: 'asc' },
+    orderBy: [{ date: 'asc' }, { time: 'asc' }],
     dateFields: ['date'],
     writableFields: ['title', 'description', 'location', 'cityName', 'cityId', 'neighborhood', 'date', 'time', 'participants', 'status', 'regionId', 'responsibleId'],
+    // A data do evento é dia-cheio (o horário fica no campo `time`). Fixa ao
+    // meio-dia UTC para não "voltar" um dia ao exibir no fuso do Brasil (UTC-3).
+    transformIn: (d) => {
+      if (d.date instanceof Date && !Number.isNaN(d.date.getTime())) {
+        d.date = new Date(Date.UTC(d.date.getUTCFullYear(), d.date.getUTCMonth(), d.date.getUTCDate(), 12, 0, 0));
+      }
+      return d;
+    },
   }),
   { writeRoles: [A, C] }
 );
@@ -122,6 +137,23 @@ export const demands = resourceRouter(
     include: { responsible: { select: { name: true } } },
     allowedFilters: ['status', 'category', 'priority', 'cityName'],
     writableFields: ['citizenName', 'phone', 'cityName', 'cityId', 'neighborhood', 'category', 'description', 'priority', 'status', 'history', 'responsibleId'],
+    // Histórico por demanda: registra a criação e cada troca de status
+    // (status anterior → novo, data e autor).
+    transformIn: async (d, req) => {
+      const em = new Date().toISOString();
+      const por = req.user?.name || null;
+      if (!req.params?.id) {
+        return { ...d, history: [{ tipo: 'criada', para: d.status || 'NOVA', em, por }] };
+      }
+      if (d.status) {
+        const atual = await prisma.demand.findUnique({ where: { id: req.params.id }, select: { status: true, history: true } });
+        if (atual && atual.status !== d.status) {
+          const hist = Array.isArray(atual.history) ? atual.history : [];
+          return { ...d, history: [...hist, { tipo: 'status', de: atual.status, para: d.status, em, por }] };
+        }
+      }
+      return d;
+    },
   }),
   { writeRoles: [A, SP, C] }
 );
