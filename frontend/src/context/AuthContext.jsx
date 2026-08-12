@@ -4,6 +4,17 @@ import api from '../api/client.js';
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
 
+// Dispara o registro de push (Capacitor/FCM) de forma best-effort.
+// No-op na web; só age em plataforma nativa (Android/iOS).
+function triggerPushSetup() {
+  import('../lib/pushNotifications.js')
+    .then((m) => {
+      m.setupNativeChrome();
+      return m.setupPushNotifications();
+    })
+    .catch(() => {});
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -16,7 +27,11 @@ export function AuthProvider({ children }) {
     }
     api
       .get('/auth/me')
-      .then((r) => setUser(r.data))
+      .then((r) => {
+        setUser(r.data);
+        // Usuário já logado que reabre o app: registra push no boot.
+        triggerPushSetup();
+      })
       .catch(() => localStorage.removeItem('mbd_token'))
       .finally(() => setLoading(false));
   }, []);
@@ -25,6 +40,8 @@ export function AuthProvider({ children }) {
     const { data } = await api.post('/auth/login', { email, password });
     localStorage.setItem('mbd_token', data.token);
     setUser(data.user);
+    // Registra push logo após login bem-sucedido (nativo).
+    triggerPushSetup();
     return data.user;
   };
 

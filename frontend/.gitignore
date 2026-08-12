@@ -1,0 +1,37 @@
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Capacitor — arquivos sensíveis (NUNCA commitar)
+android/key.properties
+android/app/*.keystore
+android/keystore-backup/
+android/app/google-services.json
+ios/App/App/GoogleService-Info.plist
+android/.gradle/
+android/local.properties
+android/app/build/
+android/build/
+android/capacitor-cordova-android-plugins/build/
+ios/App/Pods/
+ios/App/build/
+
+# Playwright
+test-results/
+playwright-report/
+
+# Build artifacts mobile (não versionar binários)
+play-assets/
+*.aab
+*.ipa
+*.apk
+ios/App/build/
+ios-assets/screenshots/
+# Segredos extras (reforço)
+*.p8
+*.jks
+*.keystore
+*.mobileprovision
+**/GoogleService-Info.plist
+**/google-services.json

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Márcio Bins Ely</string>
+    <string name="title_activity_main">Márcio Bins Ely</string>
+    <string name="package_name">site.marciobinsely.app</string>
+    <string name="custom_url_scheme">site.marciobinsely.app</string>
+</resources>

@@ -1,0 +1,9 @@
+# Upload do IPA para App Store Connect (rodar quando tiver a app-specific password):
+# 1) Gere a senha em https://appleid.apple.com → Segurança → Senhas específicas de app
+# 2) Rode:
+cd /Users/bello/Documents/marcioapp/marcio-binsely-digital/frontend/ios/App
+xcrun altool --upload-app -f ./build/export/App.ipa -t ios \
+  -u "APPLE_ID_EMAIL_DO_TITULAR" \
+  -p "xxxx-xxxx-xxxx-xxxx"
+# Esperado: *** No errors uploading 'App.ipa'.
+# Depois, em ASC → app 6800920037 → versão 1.0 → seção Compilação → selecionar o build.
