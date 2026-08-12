@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { RefreshCw, Copy, Check, Eye, EyeOff, MessageCircle, KeyRound } from 'lucide-react';
+import { RefreshCw, Copy, Check, Eye, EyeOff, MessageCircle, KeyRound, Send, ShieldCheck } from 'lucide-react';
 import Modal from './ui/Modal.jsx';
 import api, { apiError } from '../api/client.js';
 import { useToast } from '../context/ToastContext.jsx';
@@ -26,6 +26,8 @@ export default function AccessModal({ user, onClose }) {
   const [show, setShow] = useState(true);
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [sendingAuto, setSendingAuto] = useState(false);
+  const [sentAuto, setSentAuto] = useState(false);
 
   const loginUrl = `${window.location.origin}/login`;
   const first = (user.name || '').split(' ')[0] || user.name || '';
@@ -74,6 +76,22 @@ export default function AccessModal({ user, onClose }) {
     toast.success('Acesso ativado! Abrindo o WhatsApp…');
   }
 
+  // Envio automático pelo WhatsApp OFICIAL (template): a pessoa recebe o login
+  // e um link para criar a própria senha. Não usa a senha do campo acima.
+  async function sendAuto() {
+    if (!phone) { toast.error('Este usuário não tem WhatsApp cadastrado.'); return; }
+    setSendingAuto(true);
+    try {
+      await api.post(`/users/${user.id}/enviar-acesso`);
+      setSentAuto(true);
+      toast.success('Acesso enviado pelo WhatsApp oficial! A pessoa vai receber um link para criar a senha.');
+    } catch (e) {
+      toast.error(apiError(e, 'Não foi possível enviar o acesso.'));
+    } finally {
+      setSendingAuto(false);
+    }
+  }
+
   return (
     <Modal
       title="Enviar acesso"
@@ -97,6 +115,29 @@ export default function AccessModal({ user, onClose }) {
           <span>{user.email}</span>
         </div>
       </div>
+
+      <div className="access-official">
+        <div className="access-official-head">
+          <ShieldCheck size={16} /> Envio automático (recomendado)
+        </div>
+        <p className="access-note">
+          Dispara pelo WhatsApp <b>oficial da campanha</b> uma mensagem com o login e um
+          link para a pessoa <b>criar a própria senha</b> e entrar. Mais seguro — não envia senha em texto.
+          {!phone && <><br /><b>Cadastre o telefone deste usuário</b> para habilitar este envio.</>}
+        </p>
+        <button
+          className="btn btn-green btn-block"
+          onClick={sendAuto}
+          disabled={sendingAuto || !phone}
+          title={!phone ? 'Sem WhatsApp cadastrado' : ''}
+        >
+          {sentAuto ? <Check size={15} /> : <Send size={15} />}{' '}
+          {sentAuto ? 'Acesso enviado!' : sendingAuto ? 'Enviando…' : 'Enviar acesso pelo WhatsApp oficial'}
+        </button>
+      </div>
+
+      <div className="access-divider">ou envie manualmente</div>
+
       <p className="access-note">
         Gere a senha, ative e envie o acesso para a pessoa. Como a senha fica criptografada,
         ao copiar ou enviar nós <b>definimos essa senha agora</b> na conta dela.

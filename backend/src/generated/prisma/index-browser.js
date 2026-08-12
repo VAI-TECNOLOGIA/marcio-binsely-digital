@@ -173,6 +173,7 @@ exports.Prisma.SupporterScalarFieldEnum = {
   name: 'name',
   phone: 'phone',
   whatsapp: 'whatsapp',
+  tags: 'tags',
   email: 'email',
   cpf: 'cpf',
   birthDate: 'birthDate',
@@ -190,6 +191,7 @@ exports.Prisma.SupporterScalarFieldEnum = {
   instagram: 'instagram',
   facebook: 'facebook',
   supportType: 'supportType',
+  supportTypes: 'supportTypes',
   status: 'status',
   notes: 'notes',
   flaggedReason: 'flaggedReason',
@@ -204,6 +206,7 @@ exports.Prisma.VolunteerScalarFieldEnum = {
   supporterId: 'supporterId',
   active: 'active',
   totalScore: 'totalScore',
+  confirmationStatus: 'confirmationStatus',
   confirmed: 'confirmed',
   confirmedAt: 'confirmedAt',
   confirmationChannel: 'confirmationChannel',
@@ -326,11 +329,14 @@ exports.Prisma.MaterialRequestScalarFieldEnum = {
   id: 'id',
   materialId: 'materialId',
   materialName: 'materialName',
+  materials: 'materials',
+  materialType: 'materialType',
   quantity: 'quantity',
   justification: 'justification',
   cityName: 'cityName',
   neighborhood: 'neighborhood',
   deliveryAddress: 'deliveryAddress',
+  supporterId: 'supporterId',
   requesterId: 'requesterId',
   approverId: 'approverId',
   status: 'status',
@@ -451,6 +457,9 @@ exports.Prisma.BroadcastCampaignScalarFieldEnum = {
   name: 'name',
   message: 'message',
   channel: 'channel',
+  templateName: 'templateName',
+  templateLang: 'templateLang',
+  headerImageUrl: 'headerImageUrl',
   status: 'status',
   scheduledAt: 'scheduledAt',
   totalContacts: 'totalContacts',
@@ -553,6 +562,21 @@ exports.Prisma.InternalMessageScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.DataDeletionRequestScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  phone: 'phone',
+  reason: 'reason',
+  status: 'status',
+  matchedSupporterId: 'matchedSupporterId',
+  handledById: 'handledById',
+  handledAt: 'handledAt',
+  note: 'note',
+  ip: 'ip',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -591,6 +615,7 @@ exports.UserRole = exports.$Enums.UserRole = {
 exports.SupportType = exports.$Enums.SupportType = {
   VOLUNTARIO: 'VOLUNTARIO',
   FAIXA_CASA: 'FAIXA_CASA',
+  KIT_MATERIAL: 'KIT_MATERIAL',
   ADESIVO_CARRO: 'ADESIVO_CARRO',
   MATERIAL_DIGITAL: 'MATERIAL_DIGITAL',
   CAMINHADA: 'CAMINHADA',
@@ -607,6 +632,12 @@ exports.SupporterStatus = exports.$Enums.SupporterStatus = {
   SUSPEITO: 'SUSPEITO',
   INATIVO: 'INATIVO',
   BLACKLIST: 'BLACKLIST'
+};
+
+exports.VolunteerConfirmation = exports.$Enums.VolunteerConfirmation = {
+  A_CONFIRMAR: 'A_CONFIRMAR',
+  CONFIRMADO: 'CONFIRMADO',
+  CANCELADO: 'CANCELADO'
 };
 
 exports.Channel = exports.$Enums.Channel = {
@@ -818,7 +849,8 @@ exports.Prisma.ModelName = {
   Setting: 'Setting',
   InternalThread: 'InternalThread',
   InternalMember: 'InternalMember',
-  InternalMessage: 'InternalMessage'
+  InternalMessage: 'InternalMessage',
+  DataDeletionRequest: 'DataDeletionRequest'
 };
 
 /**

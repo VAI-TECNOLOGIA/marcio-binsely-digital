@@ -32,6 +32,11 @@ const Cadastro = lazy(() => import('./pages/Cadastro.jsx'));
 const MapView = lazy(() => import('./pages/MapView.jsx'));
 const Reports = lazy(() => import('./pages/Reports.jsx'));
 const TVPanel = lazy(() => import('./pages/TVPanel.jsx'));
+// Páginas legais públicas (LGPD / Google Play) — CSS próprio, carregam sob demanda.
+const Privacy = lazy(() => import('./pages/Privacy.jsx'));
+const Terms = lazy(() => import('./pages/Terms.jsx'));
+const DataDeletion = lazy(() => import('./pages/DataDeletion.jsx'));
+const DataDeletionRequests = lazy(() => import('./pages/DataDeletionRequests.jsx'));
 
 const P = (roles, element) => <ProtectedRoute roles={roles}>{element}</ProtectedRoute>;
 
@@ -69,6 +74,10 @@ export default function App() {
       <Route path="/redefinir-senha" element={<ResetPassword />} />
       <Route path="/lp" element={<Landing />} />
       <Route path="/cadastro" element={<Cadastro />} />
+      {/* Páginas legais públicas (LGPD / requisito Google Play) */}
+      <Route path="/privacidade" element={<Privacy />} />
+      <Route path="/termos" element={<Terms />} />
+      <Route path="/excluir-dados" element={<DataDeletion />} />
       <Route path="/painel-tv" element={P(['LIDER', 'MEMBRO'], <TVPanel />)} />
 
       <Route path="/" element={raiz()} />
@@ -96,6 +105,7 @@ export default function App() {
 
       <Route path="/usuarios" element={P(['LIDER'], <Users />)} />
       <Route path="/configuracoes" element={P(['LIDER'], <Settings />)} />
+      <Route path="/solicitacoes-exclusao" element={P(['LIDER'], <DataDeletionRequests />)} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

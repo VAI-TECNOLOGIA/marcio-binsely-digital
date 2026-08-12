@@ -48,6 +48,11 @@ export const reply = asyncHandler(async (req, res) => {
   if (!convo) throw new AppError('Conversa não encontrada', 404);
 
   const result = await sendViaChannel(convo.channel, { to: convo.contactPhone, body });
+  // Se o canal (WhatsApp) recusou o envio, NÃO salva a mensagem como enviada —
+  // devolve o motivo (ex.: fora da janela de 24h) para o atendente ver e reenviar.
+  if (result && result.success === false) {
+    throw new AppError(result.error || 'Não foi possível enviar a mensagem pelo WhatsApp.', 400);
+  }
   const msg = await prisma.message.create({
     data: {
       conversationId: convo.id,

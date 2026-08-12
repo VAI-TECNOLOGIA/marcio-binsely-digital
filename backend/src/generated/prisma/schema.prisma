@@ -27,9 +27,16 @@ enum UserRole {
   PARCEIRO
 }
 
+enum VolunteerConfirmation {
+  A_CONFIRMAR // cadastrou-se / veio de importação — ainda não falou com a campanha
+  CONFIRMADO // confirmou que quer participar
+  CANCELADO // desistiu ou recusou
+}
+
 enum SupportType {
   VOLUNTARIO
   FAIXA_CASA
+  KIT_MATERIAL
   ADESIVO_CARRO
   MATERIAL_DIGITAL
   CAMINHADA
@@ -319,8 +326,13 @@ model City {
 model Supporter {
   id            String          @id @default(uuid())
   name          String
-  phone         String
+  // Opcional: bases importadas de gabinete trazem contatos sem telefone
+  // (nome + endereço + histórico). O cadastro manual continua exigindo.
+  phone         String?
   whatsapp      String?
+  // Segmentação livre (ex.: "MULTIPLICADORES 2026", "FAIXAS 2024").
+  // Filtrar com: where: { tags: { has: 'X' } }
+  tags          String[]        @default([])
   email         String?
   cpf           String?
   birthDate     DateTime?
@@ -339,7 +351,11 @@ model Supporter {
   photoUrl      String?
   instagram     String?
   facebook      String?
+  // Tipo de apoio principal (legado — usado em relatórios/coluna).
   supportType   SupportType     @default(NOTICIAS)
+  // Tipos de apoio (multi-seleção): Voluntário / Faixa na casa / Kit de material.
+  // Qualquer um destes classifica a pessoa como VOLUNTÁRIO (sai de Apoiadores).
+  supportTypes  SupportType[]   @default([])
   status        SupporterStatus @default(NOVO)
   notes         String?
   flaggedReason String?
@@ -356,6 +372,7 @@ model Supporter {
   conversations     Conversation[]
   bannerLocations   BannerLocation[]
   broadcastContacts BroadcastContact[]
+  materialRequests  MaterialRequest[]  @relation("SupporterMaterialRequests")
 
   @@index([phone])
   @@index([status])
@@ -369,9 +386,12 @@ model Volunteer {
   supporterId String    @unique
   supporter   Supporter @relation(fields: [supporterId], references: [id], onDelete: Cascade)
 
-  active              Boolean   @default(false)
-  totalScore          Int       @default(0)
-  confirmed           Boolean   @default(false)
+  active              Boolean               @default(false)
+  totalScore          Int                   @default(0)
+  // Situação da confirmação. `confirmed` continua espelhando
+  // (confirmationStatus == CONFIRMADO) para não quebrar o fluxo do WhatsApp.
+  confirmationStatus  VolunteerConfirmation @default(A_CONFIRMAR)
+  confirmed           Boolean               @default(false)
   confirmedAt         DateTime?
   confirmationChannel Channel?
   helpPreference      String?
@@ -547,12 +567,24 @@ model MaterialRequest {
   id              String    @id @default(uuid())
   materialId      String?
   material        Material? @relation(fields: [materialId], references: [id], onDelete: SetNull)
+  // materialName vira o resumo legível ("Adesivo, Bandeira") — mantido para
+  // busca, histórico e relatórios que já agrupam por ele.
   materialName    String
+  // Vários materiais numa solicitação só (o cliente pediu marcar os itens
+  // em vez de abrir um pedido por material).
+  materials       String[]  @default([])
+  // "INDIVIDUAL" ou "DOBRADINHA" (material conjunto com candidato a estadual).
+  materialType    String?
   quantity        Int       @default(1)
   justification   String?
   cityName        String?
   neighborhood    String?
   deliveryAddress String?
+
+  // Quando o pedido nasce de um apoiador (ex.: "quero faixa em casa") ao ser
+  // promovido a voluntário, aponta para o apoiador — a lista mostra o nome dele.
+  supporterId String?
+  supporter   Supporter? @relation("SupporterMaterialRequests", fields: [supporterId], references: [id], onDelete: SetNull)
 
   requesterId String?
   requester   User?   @relation("RequestRequester", fields: [requesterId], references: [id], onDelete: SetNull)
@@ -570,6 +602,7 @@ model MaterialRequest {
 
   @@index([status])
   @@index([requesterId])
+  @@index([supporterId])
 }
 
 model BannerLocation {
@@ -718,16 +751,21 @@ model Demand {
 }
 
 model BroadcastCampaign {
-  id            String          @id @default(uuid())
-  name          String
-  message       String
-  channel       Channel         @default(WHATSAPP)
-  status        BroadcastStatus @default(RASCUNHO)
-  scheduledAt   DateTime?
-  totalContacts Int             @default(0)
-  sentCount     Int             @default(0)
-  failedCount   Int             @default(0)
-  pendingCount  Int             @default(0)
+  id             String          @id @default(uuid())
+  name           String
+  message        String
+  channel        Channel         @default(WHATSAPP)
+  // Disparo por TEMPLATE aprovado (marketing/massa). Sem template = texto livre,
+  // que a Meta só entrega para quem respondeu nas últimas 24h.
+  templateName   String?
+  templateLang   String?         @default("pt_BR")
+  headerImageUrl String?
+  status         BroadcastStatus @default(RASCUNHO)
+  scheduledAt    DateTime?
+  totalContacts  Int             @default(0)
+  sentCount      Int             @default(0)
+  failedCount    Int             @default(0)
+  pendingCount   Int             @default(0)
 
   ownerId String?
   owner   User?   @relation("BroadcastOwner", fields: [ownerId], references: [id], onDelete: SetNull)
@@ -872,4 +910,24 @@ model InternalMessage {
   createdAt     DateTime       @default(now())
 
   @@index([threadId])
+}
+
+// Solicitações de exclusão de dados (LGPD, art. 18, VI · requisito Google Play).
+// Registro público criado pela página /excluir-dados; o líder trata e conclui.
+model DataDeletionRequest {
+  id                 String    @id @default(uuid())
+  name               String
+  email              String?
+  phone              String?
+  reason             String?
+  status             String    @default("PENDENTE") // PENDENTE | CONCLUIDA
+  matchedSupporterId String? // apoiador localizado no momento da solicitação (se houver)
+  handledById        String? // usuário (líder) que concluiu
+  handledAt          DateTime?
+  note               String? // observação do tratamento
+  ip                 String?
+  createdAt          DateTime  @default(now())
+
+  @@index([status])
+  @@index([createdAt])
 }

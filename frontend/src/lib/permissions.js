@@ -39,6 +39,7 @@ export const NAV = [
 
   { section: 'Administração' },
   { to: '/usuarios', label: 'Usuários', icon: 'UserCog', roles: LIDER },
+  { to: '/solicitacoes-exclusao', label: 'Solicitações de exclusão', icon: 'ShieldCheck', roles: LIDER },
   { to: '/configuracoes', label: 'Configurações', icon: 'Settings', roles: LIDER },
   { to: '/painel-tv', label: 'Painel TV', icon: 'Tv', roles: INTERNO },
 ];

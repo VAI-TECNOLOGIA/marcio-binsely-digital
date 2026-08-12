@@ -88,6 +88,14 @@ function WhatsAppCRM() {
   }, [statusFilter, busca, canal]);
   useEffect(() => { loadActive(activeId); /* eslint-disable-next-line */ }, [activeId]);
 
+  // Atendimento ao vivo: atualiza a caixa e a conversa aberta a cada 8s, para
+  // que novas mensagens recebidas apareçam sem precisar recarregar a página.
+  useEffect(() => {
+    const t = setInterval(() => { loadList(); if (activeId) loadActive(activeId); }, 8000);
+    return () => clearInterval(t);
+    /* eslint-disable-next-line */
+  }, [activeId, canal, statusFilter, busca]);
+
   // Bug 1: envio otimista — a mensagem aparece na hora; o POST roda em background.
   function sendText(body) {
     const id = activeId;

@@ -128,6 +128,14 @@ export const update = asyncHandler(async (req, res) => {
   res.json(v);
 });
 
+/** Exclui o cadastro da pessoa (o voluntário cai em cascata). */
+export const remove = asyncHandler(async (req, res) => {
+  const v = await prisma.volunteer.findUnique({ where: { id: req.params.id }, select: { supporterId: true } });
+  if (!v) throw new AppError('Voluntário não encontrado', 404);
+  await prisma.supporter.delete({ where: { id: v.supporterId } });
+  res.status(204).send();
+});
+
 export const ranking = asyncHandler(async (req, res) => {
   const data = await volunteerRanking({
     limit: Number(req.query.limit) || 20,

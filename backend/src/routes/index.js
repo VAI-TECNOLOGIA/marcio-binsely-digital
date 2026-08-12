@@ -18,6 +18,7 @@ import reportRoutes from './report.routes.js';
 import settingsRoutes from './settings.routes.js';
 import uploadRoutes from './upload.routes.js';
 import aiRoutes from './ai.routes.js';
+import dataDeletionRoutes from './dataDeletion.routes.js';
 import * as crud from './crud.js';
 
 const router = Router();
@@ -44,6 +45,7 @@ router.use('/reports', reportRoutes);
 router.use('/settings', settingsRoutes);
 router.use('/ai', aiRoutes);
 router.use('/upload', uploadRoutes);
+router.use('/data-deletion', dataDeletionRoutes);
 
 // CRUDs genéricos
 router.use('/notices', crud.notices);

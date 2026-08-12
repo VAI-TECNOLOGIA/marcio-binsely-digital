@@ -4,8 +4,10 @@ import Layout from '../components/layout/Layout.jsx';
 import ResourcePage from '../components/ResourcePage.jsx';
 import Modal from '../components/ui/Modal.jsx';
 import { StatusBadge, Badge } from '../components/ui/Badge.jsx';
-import { formatDate } from '../lib/format.js';
-import { options } from '../config/enums.js';
+import PhoneCell from '../components/PhoneCell.jsx';
+import WhatsAppButton from '../components/WhatsAppButton.jsx';
+import { formatDate, formatPhone } from '../lib/format.js';
+import { options, label } from '../config/enums.js';
 import api, { apiError } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -50,21 +52,44 @@ export default function MaterialRequests() {
     delete: false,
     lookups: [{ key: 'materials', endpoint: '/materials', valueKey: 'name', labelKey: 'name' }],
     filters: [{ name: 'status', label: 'Status', enumGroup: 'MaterialRequestStatus' }],
+    // Lista pensada para o envio do kit pelo correio: nome, endereço e telefone,
+    // com ação de WhatsApp e exportação para gerar etiqueta.
+    exportable: true,
+    exportName: 'pedidos-material',
+    exportColumns: [
+      { key: 'nome', label: 'Nome', value: (r) => r.supporter?.name || r.requester?.name || '' },
+      { key: 'telefone', label: 'Telefone', value: (r) => { const p = r.supporter?.phone || r.supporter?.whatsapp || ''; return p ? formatPhone(p) : ''; } },
+      { key: 'cep', label: 'CEP', value: (r) => r.supporter?.cep || '' },
+      { key: 'endereco', label: 'Endereço', value: (r) => (r.supporter ? [r.supporter.street, r.supporter.number].filter(Boolean).join(', ') : r.deliveryAddress) || '' },
+      { key: 'complemento', label: 'Complemento', value: (r) => r.supporter?.complement || '' },
+      { key: 'bairro', label: 'Bairro', value: (r) => r.supporter?.neighborhood || r.neighborhood || '' },
+      { key: 'cidade', label: 'Cidade', value: (r) => r.supporter?.cityName || r.cityName || '' },
+      { key: 'item', label: 'Item', value: (r) => (r.materials?.length ? r.materials.join(', ') : r.materialName) || '' },
+      { key: 'status', label: 'Status', value: (r) => label('MaterialRequestStatus', r.status) },
+    ],
     columns: [
       {
-        key: 'materialName',
-        label: 'Material',
+        key: 'name',
+        label: 'Nome',
         render: (r) => (
           <div>
-            <div className="cell-strong">{r.quantity}× {(r.materials?.length ? r.materials.join(', ') : r.materialName)}</div>
-            {r.materialType && <Badge tone={r.materialType === 'DOBRADINHA' ? 'violet' : 'gray'}>{TIPO_LABEL[r.materialType] || r.materialType}</Badge>}
+            <div className="cell-strong">{r.supporter?.name || r.requester?.name || '—'}</div>
+            {r.supporter && <Badge tone="green">Voluntário</Badge>}
           </div>
         ),
       },
-      { key: 'requester', label: 'Solicitante', render: (r) => r.requester?.name || '—' },
-      { key: 'local', label: 'Local', render: (r) => [r.neighborhood, r.cityName].filter(Boolean).join(', ') || '—' },
-      { key: 'requestedAt', label: 'Solicitado', render: (r) => formatDate(r.createdAt) },
-      { key: 'status', label: 'Status', render: (r) => <StatusBadge group="MaterialRequestStatus" value={r.status} /> },
+      {
+        key: 'address',
+        label: 'Endereço',
+        render: (r) => {
+          const s = r.supporter;
+          const rua = s ? [s.street, s.number].filter(Boolean).join(', ') : r.deliveryAddress;
+          const linha = [rua, s?.neighborhood || r.neighborhood, s?.cityName || r.cityName].filter(Boolean).join(' · ');
+          return <span className="cell-muted">{linha || '—'}</span>;
+        },
+      },
+      { key: 'status', label: 'Status', thStyle: { width: 130 }, render: (r) => <StatusBadge group="MaterialRequestStatus" value={r.status} /> },
+      { key: 'phone', label: 'Telefone', thStyle: { width: 150 }, render: (r) => <PhoneCell person={r.supporter || { name: r.requester?.name }} /> },
     ],
     fields: [
       { name: 'materials', label: 'Materiais', type: 'checklist', optionsFrom: 'materials', required: true, full: true,
@@ -81,6 +106,7 @@ export default function MaterialRequests() {
     ],
     rowActionsExtra: (row, reload) => (
       <>
+        {row.supporter && <WhatsAppButton person={row.supporter} />}
         {canManage && (
           <select
             className="select"
@@ -103,7 +129,7 @@ export default function MaterialRequests() {
   };
 
   return (
-    <Layout title="Solicitações de material" subtitle="Faixas, adesivos, camisetas e mais — com controle anti-desperdício">
+    <Layout title="Pedidos de material" subtitle="Kits e materiais pedidos pelos voluntários. Exporte para gerar etiqueta e enviar pelo correio.">
       <ResourcePage config={config} />
 
       {historyFor && (

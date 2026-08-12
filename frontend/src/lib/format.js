@@ -9,6 +9,18 @@ export function formatDate(value) {
   return d.toLocaleDateString('pt-BR');
 }
 
+/**
+ * Data-só (nascimento, evento, publicação): formata em UTC para não "voltar"
+ * um dia no fuso do Brasil (UTC-3). Use para campos type:'date'. Para
+ * timestamps (createdAt) continue no formatDate, que mostra a hora local.
+ */
+export function formatDateOnly(value) {
+  if (!value) return '—';
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+}
+
 export function formatDateTime(value) {
   if (!value) return '—';
   const d = new Date(value);

@@ -173,6 +173,11 @@ export type InternalMember = $Result.DefaultSelection<Prisma.$InternalMemberPayl
  * 
  */
 export type InternalMessage = $Result.DefaultSelection<Prisma.$InternalMessagePayload>
+/**
+ * Model DataDeletionRequest
+ * 
+ */
+export type DataDeletionRequest = $Result.DefaultSelection<Prisma.$DataDeletionRequestPayload>
 
 /**
  * Enums
@@ -187,9 +192,19 @@ export namespace $Enums {
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
 
+export const VolunteerConfirmation: {
+  A_CONFIRMAR: 'A_CONFIRMAR',
+  CONFIRMADO: 'CONFIRMADO',
+  CANCELADO: 'CANCELADO'
+};
+
+export type VolunteerConfirmation = (typeof VolunteerConfirmation)[keyof typeof VolunteerConfirmation]
+
+
 export const SupportType: {
   VOLUNTARIO: 'VOLUNTARIO',
   FAIXA_CASA: 'FAIXA_CASA',
+  KIT_MATERIAL: 'KIT_MATERIAL',
   ADESIVO_CARRO: 'ADESIVO_CARRO',
   MATERIAL_DIGITAL: 'MATERIAL_DIGITAL',
   CAMINHADA: 'CAMINHADA',
@@ -458,6 +473,10 @@ export type InternalThreadType = (typeof InternalThreadType)[keyof typeof Intern
 export type UserRole = $Enums.UserRole
 
 export const UserRole: typeof $Enums.UserRole
+
+export type VolunteerConfirmation = $Enums.VolunteerConfirmation
+
+export const VolunteerConfirmation: typeof $Enums.VolunteerConfirmation
 
 export type SupportType = $Enums.SupportType
 
@@ -988,6 +1007,16 @@ export class PrismaClient<
     * ```
     */
   get internalMessage(): Prisma.InternalMessageDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.dataDeletionRequest`: Exposes CRUD operations for the **DataDeletionRequest** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DataDeletionRequests
+    * const dataDeletionRequests = await prisma.dataDeletionRequest.findMany()
+    * ```
+    */
+  get dataDeletionRequest(): Prisma.DataDeletionRequestDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1460,7 +1489,8 @@ export namespace Prisma {
     Setting: 'Setting',
     InternalThread: 'InternalThread',
     InternalMember: 'InternalMember',
-    InternalMessage: 'InternalMessage'
+    InternalMessage: 'InternalMessage',
+    DataDeletionRequest: 'DataDeletionRequest'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1479,7 +1509,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "role" | "user" | "region" | "city" | "supporter" | "volunteer" | "volunteerStatusHistory" | "blacklist" | "mediaKit" | "mediaDownload" | "mediaPublicationProof" | "notice" | "task" | "engagement" | "material" | "materialRequest" | "bannerLocation" | "streetAction" | "event" | "conversation" | "message" | "demand" | "broadcastCampaign" | "broadcastContact" | "automation" | "automationLog" | "score" | "auditLog" | "setting" | "internalThread" | "internalMember" | "internalMessage"
+      modelProps: "role" | "user" | "region" | "city" | "supporter" | "volunteer" | "volunteerStatusHistory" | "blacklist" | "mediaKit" | "mediaDownload" | "mediaPublicationProof" | "notice" | "task" | "engagement" | "material" | "materialRequest" | "bannerLocation" | "streetAction" | "event" | "conversation" | "message" | "demand" | "broadcastCampaign" | "broadcastContact" | "automation" | "automationLog" | "score" | "auditLog" | "setting" | "internalThread" | "internalMember" | "internalMessage" | "dataDeletionRequest"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3851,6 +3881,80 @@ export namespace Prisma {
           }
         }
       }
+      DataDeletionRequest: {
+        payload: Prisma.$DataDeletionRequestPayload<ExtArgs>
+        fields: Prisma.DataDeletionRequestFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DataDeletionRequestFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataDeletionRequestPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DataDeletionRequestFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataDeletionRequestPayload>
+          }
+          findFirst: {
+            args: Prisma.DataDeletionRequestFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataDeletionRequestPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DataDeletionRequestFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataDeletionRequestPayload>
+          }
+          findMany: {
+            args: Prisma.DataDeletionRequestFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataDeletionRequestPayload>[]
+          }
+          create: {
+            args: Prisma.DataDeletionRequestCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataDeletionRequestPayload>
+          }
+          createMany: {
+            args: Prisma.DataDeletionRequestCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DataDeletionRequestCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataDeletionRequestPayload>[]
+          }
+          delete: {
+            args: Prisma.DataDeletionRequestDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataDeletionRequestPayload>
+          }
+          update: {
+            args: Prisma.DataDeletionRequestUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataDeletionRequestPayload>
+          }
+          deleteMany: {
+            args: Prisma.DataDeletionRequestDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DataDeletionRequestUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DataDeletionRequestUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataDeletionRequestPayload>[]
+          }
+          upsert: {
+            args: Prisma.DataDeletionRequestUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataDeletionRequestPayload>
+          }
+          aggregate: {
+            args: Prisma.DataDeletionRequestAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDataDeletionRequest>
+          }
+          groupBy: {
+            args: Prisma.DataDeletionRequestGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DataDeletionRequestGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DataDeletionRequestCountArgs<ExtArgs>
+            result: $Utils.Optional<DataDeletionRequestCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -3979,6 +4083,7 @@ export namespace Prisma {
     internalThread?: InternalThreadOmit
     internalMember?: InternalMemberOmit
     internalMessage?: InternalMessageOmit
+    dataDeletionRequest?: DataDeletionRequestOmit
   }
 
   /* Types for Logging */
@@ -4408,6 +4513,7 @@ export namespace Prisma {
     conversations: number
     bannerLocations: number
     broadcastContacts: number
+    materialRequests: number
   }
 
   export type SupporterCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4415,6 +4521,7 @@ export namespace Prisma {
     conversations?: boolean | SupporterCountOutputTypeCountConversationsArgs
     bannerLocations?: boolean | SupporterCountOutputTypeCountBannerLocationsArgs
     broadcastContacts?: boolean | SupporterCountOutputTypeCountBroadcastContactsArgs
+    materialRequests?: boolean | SupporterCountOutputTypeCountMaterialRequestsArgs
   }
 
   // Custom InputTypes
@@ -4454,6 +4561,13 @@ export namespace Prisma {
    */
   export type SupporterCountOutputTypeCountBroadcastContactsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: BroadcastContactWhereInput
+  }
+
+  /**
+   * SupporterCountOutputType without action
+   */
+  export type SupporterCountOutputTypeCountMaterialRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MaterialRequestWhereInput
   }
 
 
@@ -10142,6 +10256,7 @@ export namespace Prisma {
     name: number
     phone: number
     whatsapp: number
+    tags: number
     email: number
     cpf: number
     birthDate: number
@@ -10159,6 +10274,7 @@ export namespace Prisma {
     instagram: number
     facebook: number
     supportType: number
+    supportTypes: number
     status: number
     notes: number
     flaggedReason: number
@@ -10247,6 +10363,7 @@ export namespace Prisma {
     name?: true
     phone?: true
     whatsapp?: true
+    tags?: true
     email?: true
     cpf?: true
     birthDate?: true
@@ -10264,6 +10381,7 @@ export namespace Prisma {
     instagram?: true
     facebook?: true
     supportType?: true
+    supportTypes?: true
     status?: true
     notes?: true
     flaggedReason?: true
@@ -10363,8 +10481,9 @@ export namespace Prisma {
   export type SupporterGroupByOutputType = {
     id: string
     name: string
-    phone: string
+    phone: string | null
     whatsapp: string | null
+    tags: string[]
     email: string | null
     cpf: string | null
     birthDate: Date | null
@@ -10382,6 +10501,7 @@ export namespace Prisma {
     instagram: string | null
     facebook: string | null
     supportType: $Enums.SupportType
+    supportTypes: $Enums.SupportType[]
     status: $Enums.SupporterStatus
     notes: string | null
     flaggedReason: string | null
@@ -10415,6 +10535,7 @@ export namespace Prisma {
     name?: boolean
     phone?: boolean
     whatsapp?: boolean
+    tags?: boolean
     email?: boolean
     cpf?: boolean
     birthDate?: boolean
@@ -10432,6 +10553,7 @@ export namespace Prisma {
     instagram?: boolean
     facebook?: boolean
     supportType?: boolean
+    supportTypes?: boolean
     status?: boolean
     notes?: boolean
     flaggedReason?: boolean
@@ -10448,6 +10570,7 @@ export namespace Prisma {
     conversations?: boolean | Supporter$conversationsArgs<ExtArgs>
     bannerLocations?: boolean | Supporter$bannerLocationsArgs<ExtArgs>
     broadcastContacts?: boolean | Supporter$broadcastContactsArgs<ExtArgs>
+    materialRequests?: boolean | Supporter$materialRequestsArgs<ExtArgs>
     _count?: boolean | SupporterCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["supporter"]>
 
@@ -10456,6 +10579,7 @@ export namespace Prisma {
     name?: boolean
     phone?: boolean
     whatsapp?: boolean
+    tags?: boolean
     email?: boolean
     cpf?: boolean
     birthDate?: boolean
@@ -10473,6 +10597,7 @@ export namespace Prisma {
     instagram?: boolean
     facebook?: boolean
     supportType?: boolean
+    supportTypes?: boolean
     status?: boolean
     notes?: boolean
     flaggedReason?: boolean
@@ -10491,6 +10616,7 @@ export namespace Prisma {
     name?: boolean
     phone?: boolean
     whatsapp?: boolean
+    tags?: boolean
     email?: boolean
     cpf?: boolean
     birthDate?: boolean
@@ -10508,6 +10634,7 @@ export namespace Prisma {
     instagram?: boolean
     facebook?: boolean
     supportType?: boolean
+    supportTypes?: boolean
     status?: boolean
     notes?: boolean
     flaggedReason?: boolean
@@ -10526,6 +10653,7 @@ export namespace Prisma {
     name?: boolean
     phone?: boolean
     whatsapp?: boolean
+    tags?: boolean
     email?: boolean
     cpf?: boolean
     birthDate?: boolean
@@ -10543,6 +10671,7 @@ export namespace Prisma {
     instagram?: boolean
     facebook?: boolean
     supportType?: boolean
+    supportTypes?: boolean
     status?: boolean
     notes?: boolean
     flaggedReason?: boolean
@@ -10552,7 +10681,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type SupporterOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "phone" | "whatsapp" | "email" | "cpf" | "birthDate" | "cep" | "street" | "number" | "complement" | "neighborhood" | "cityName" | "cityId" | "regionId" | "lat" | "lng" | "photoUrl" | "instagram" | "facebook" | "supportType" | "status" | "notes" | "flaggedReason" | "duplicateOfId" | "coordinatorId" | "createdAt" | "updatedAt", ExtArgs["result"]["supporter"]>
+  export type SupporterOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "phone" | "whatsapp" | "tags" | "email" | "cpf" | "birthDate" | "cep" | "street" | "number" | "complement" | "neighborhood" | "cityName" | "cityId" | "regionId" | "lat" | "lng" | "photoUrl" | "instagram" | "facebook" | "supportType" | "supportTypes" | "status" | "notes" | "flaggedReason" | "duplicateOfId" | "coordinatorId" | "createdAt" | "updatedAt", ExtArgs["result"]["supporter"]>
   export type SupporterInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     city?: boolean | Supporter$cityArgs<ExtArgs>
     region?: boolean | Supporter$regionArgs<ExtArgs>
@@ -10563,6 +10692,7 @@ export namespace Prisma {
     conversations?: boolean | Supporter$conversationsArgs<ExtArgs>
     bannerLocations?: boolean | Supporter$bannerLocationsArgs<ExtArgs>
     broadcastContacts?: boolean | Supporter$broadcastContactsArgs<ExtArgs>
+    materialRequests?: boolean | Supporter$materialRequestsArgs<ExtArgs>
     _count?: boolean | SupporterCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type SupporterIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -10590,12 +10720,14 @@ export namespace Prisma {
       conversations: Prisma.$ConversationPayload<ExtArgs>[]
       bannerLocations: Prisma.$BannerLocationPayload<ExtArgs>[]
       broadcastContacts: Prisma.$BroadcastContactPayload<ExtArgs>[]
+      materialRequests: Prisma.$MaterialRequestPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       name: string
-      phone: string
+      phone: string | null
       whatsapp: string | null
+      tags: string[]
       email: string | null
       cpf: string | null
       birthDate: Date | null
@@ -10613,6 +10745,7 @@ export namespace Prisma {
       instagram: string | null
       facebook: string | null
       supportType: $Enums.SupportType
+      supportTypes: $Enums.SupportType[]
       status: $Enums.SupporterStatus
       notes: string | null
       flaggedReason: string | null
@@ -11023,6 +11156,7 @@ export namespace Prisma {
     conversations<T extends Supporter$conversationsArgs<ExtArgs> = {}>(args?: Subset<T, Supporter$conversationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     bannerLocations<T extends Supporter$bannerLocationsArgs<ExtArgs> = {}>(args?: Subset<T, Supporter$bannerLocationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BannerLocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     broadcastContacts<T extends Supporter$broadcastContactsArgs<ExtArgs> = {}>(args?: Subset<T, Supporter$broadcastContactsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BroadcastContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    materialRequests<T extends Supporter$materialRequestsArgs<ExtArgs> = {}>(args?: Subset<T, Supporter$materialRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MaterialRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -11056,6 +11190,7 @@ export namespace Prisma {
     readonly name: FieldRef<"Supporter", 'String'>
     readonly phone: FieldRef<"Supporter", 'String'>
     readonly whatsapp: FieldRef<"Supporter", 'String'>
+    readonly tags: FieldRef<"Supporter", 'String[]'>
     readonly email: FieldRef<"Supporter", 'String'>
     readonly cpf: FieldRef<"Supporter", 'String'>
     readonly birthDate: FieldRef<"Supporter", 'DateTime'>
@@ -11073,6 +11208,7 @@ export namespace Prisma {
     readonly instagram: FieldRef<"Supporter", 'String'>
     readonly facebook: FieldRef<"Supporter", 'String'>
     readonly supportType: FieldRef<"Supporter", 'SupportType'>
+    readonly supportTypes: FieldRef<"Supporter", 'SupportType[]'>
     readonly status: FieldRef<"Supporter", 'SupporterStatus'>
     readonly notes: FieldRef<"Supporter", 'String'>
     readonly flaggedReason: FieldRef<"Supporter", 'String'>
@@ -11667,6 +11803,30 @@ export namespace Prisma {
   }
 
   /**
+   * Supporter.materialRequests
+   */
+  export type Supporter$materialRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialRequest
+     */
+    select?: MaterialRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialRequest
+     */
+    omit?: MaterialRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialRequestInclude<ExtArgs> | null
+    where?: MaterialRequestWhereInput
+    orderBy?: MaterialRequestOrderByWithRelationInput | MaterialRequestOrderByWithRelationInput[]
+    cursor?: MaterialRequestWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MaterialRequestScalarFieldEnum | MaterialRequestScalarFieldEnum[]
+  }
+
+  /**
    * Supporter without action
    */
   export type SupporterDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -11710,6 +11870,7 @@ export namespace Prisma {
     supporterId: string | null
     active: boolean | null
     totalScore: number | null
+    confirmationStatus: $Enums.VolunteerConfirmation | null
     confirmed: boolean | null
     confirmedAt: Date | null
     confirmationChannel: $Enums.Channel | null
@@ -11724,6 +11885,7 @@ export namespace Prisma {
     supporterId: string | null
     active: boolean | null
     totalScore: number | null
+    confirmationStatus: $Enums.VolunteerConfirmation | null
     confirmed: boolean | null
     confirmedAt: Date | null
     confirmationChannel: $Enums.Channel | null
@@ -11738,6 +11900,7 @@ export namespace Prisma {
     supporterId: number
     active: number
     totalScore: number
+    confirmationStatus: number
     confirmed: number
     confirmedAt: number
     confirmationChannel: number
@@ -11762,6 +11925,7 @@ export namespace Prisma {
     supporterId?: true
     active?: true
     totalScore?: true
+    confirmationStatus?: true
     confirmed?: true
     confirmedAt?: true
     confirmationChannel?: true
@@ -11776,6 +11940,7 @@ export namespace Prisma {
     supporterId?: true
     active?: true
     totalScore?: true
+    confirmationStatus?: true
     confirmed?: true
     confirmedAt?: true
     confirmationChannel?: true
@@ -11790,6 +11955,7 @@ export namespace Prisma {
     supporterId?: true
     active?: true
     totalScore?: true
+    confirmationStatus?: true
     confirmed?: true
     confirmedAt?: true
     confirmationChannel?: true
@@ -11891,6 +12057,7 @@ export namespace Prisma {
     supporterId: string
     active: boolean
     totalScore: number
+    confirmationStatus: $Enums.VolunteerConfirmation
     confirmed: boolean
     confirmedAt: Date | null
     confirmationChannel: $Enums.Channel | null
@@ -11924,6 +12091,7 @@ export namespace Prisma {
     supporterId?: boolean
     active?: boolean
     totalScore?: boolean
+    confirmationStatus?: boolean
     confirmed?: boolean
     confirmedAt?: boolean
     confirmationChannel?: boolean
@@ -11945,6 +12113,7 @@ export namespace Prisma {
     supporterId?: boolean
     active?: boolean
     totalScore?: boolean
+    confirmationStatus?: boolean
     confirmed?: boolean
     confirmedAt?: boolean
     confirmationChannel?: boolean
@@ -11961,6 +12130,7 @@ export namespace Prisma {
     supporterId?: boolean
     active?: boolean
     totalScore?: boolean
+    confirmationStatus?: boolean
     confirmed?: boolean
     confirmedAt?: boolean
     confirmationChannel?: boolean
@@ -11977,6 +12147,7 @@ export namespace Prisma {
     supporterId?: boolean
     active?: boolean
     totalScore?: boolean
+    confirmationStatus?: boolean
     confirmed?: boolean
     confirmedAt?: boolean
     confirmationChannel?: boolean
@@ -11986,7 +12157,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type VolunteerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "supporterId" | "active" | "totalScore" | "confirmed" | "confirmedAt" | "confirmationChannel" | "helpPreference" | "supervisorId" | "createdAt" | "updatedAt", ExtArgs["result"]["volunteer"]>
+  export type VolunteerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "supporterId" | "active" | "totalScore" | "confirmationStatus" | "confirmed" | "confirmedAt" | "confirmationChannel" | "helpPreference" | "supervisorId" | "createdAt" | "updatedAt", ExtArgs["result"]["volunteer"]>
   export type VolunteerInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     supporter?: boolean | SupporterDefaultArgs<ExtArgs>
     supervisor?: boolean | Volunteer$supervisorArgs<ExtArgs>
@@ -12020,6 +12191,7 @@ export namespace Prisma {
       supporterId: string
       active: boolean
       totalScore: number
+      confirmationStatus: $Enums.VolunteerConfirmation
       confirmed: boolean
       confirmedAt: Date | null
       confirmationChannel: $Enums.Channel | null
@@ -12460,6 +12632,7 @@ export namespace Prisma {
     readonly supporterId: FieldRef<"Volunteer", 'String'>
     readonly active: FieldRef<"Volunteer", 'Boolean'>
     readonly totalScore: FieldRef<"Volunteer", 'Int'>
+    readonly confirmationStatus: FieldRef<"Volunteer", 'VolunteerConfirmation'>
     readonly confirmed: FieldRef<"Volunteer", 'Boolean'>
     readonly confirmedAt: FieldRef<"Volunteer", 'DateTime'>
     readonly confirmationChannel: FieldRef<"Volunteer", 'Channel'>
@@ -23343,11 +23516,13 @@ export namespace Prisma {
     id: string | null
     materialId: string | null
     materialName: string | null
+    materialType: string | null
     quantity: number | null
     justification: string | null
     cityName: string | null
     neighborhood: string | null
     deliveryAddress: string | null
+    supporterId: string | null
     requesterId: string | null
     approverId: string | null
     status: $Enums.MaterialRequestStatus | null
@@ -23363,11 +23538,13 @@ export namespace Prisma {
     id: string | null
     materialId: string | null
     materialName: string | null
+    materialType: string | null
     quantity: number | null
     justification: string | null
     cityName: string | null
     neighborhood: string | null
     deliveryAddress: string | null
+    supporterId: string | null
     requesterId: string | null
     approverId: string | null
     status: $Enums.MaterialRequestStatus | null
@@ -23383,11 +23560,14 @@ export namespace Prisma {
     id: number
     materialId: number
     materialName: number
+    materials: number
+    materialType: number
     quantity: number
     justification: number
     cityName: number
     neighborhood: number
     deliveryAddress: number
+    supporterId: number
     requesterId: number
     approverId: number
     status: number
@@ -23413,11 +23593,13 @@ export namespace Prisma {
     id?: true
     materialId?: true
     materialName?: true
+    materialType?: true
     quantity?: true
     justification?: true
     cityName?: true
     neighborhood?: true
     deliveryAddress?: true
+    supporterId?: true
     requesterId?: true
     approverId?: true
     status?: true
@@ -23433,11 +23615,13 @@ export namespace Prisma {
     id?: true
     materialId?: true
     materialName?: true
+    materialType?: true
     quantity?: true
     justification?: true
     cityName?: true
     neighborhood?: true
     deliveryAddress?: true
+    supporterId?: true
     requesterId?: true
     approverId?: true
     status?: true
@@ -23453,11 +23637,14 @@ export namespace Prisma {
     id?: true
     materialId?: true
     materialName?: true
+    materials?: true
+    materialType?: true
     quantity?: true
     justification?: true
     cityName?: true
     neighborhood?: true
     deliveryAddress?: true
+    supporterId?: true
     requesterId?: true
     approverId?: true
     status?: true
@@ -23560,11 +23747,14 @@ export namespace Prisma {
     id: string
     materialId: string | null
     materialName: string
+    materials: string[]
+    materialType: string | null
     quantity: number
     justification: string | null
     cityName: string | null
     neighborhood: string | null
     deliveryAddress: string | null
+    supporterId: string | null
     requesterId: string | null
     approverId: string | null
     status: $Enums.MaterialRequestStatus
@@ -23599,11 +23789,14 @@ export namespace Prisma {
     id?: boolean
     materialId?: boolean
     materialName?: boolean
+    materials?: boolean
+    materialType?: boolean
     quantity?: boolean
     justification?: boolean
     cityName?: boolean
     neighborhood?: boolean
     deliveryAddress?: boolean
+    supporterId?: boolean
     requesterId?: boolean
     approverId?: boolean
     status?: boolean
@@ -23614,6 +23807,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     material?: boolean | MaterialRequest$materialArgs<ExtArgs>
+    supporter?: boolean | MaterialRequest$supporterArgs<ExtArgs>
     requester?: boolean | MaterialRequest$requesterArgs<ExtArgs>
     approver?: boolean | MaterialRequest$approverArgs<ExtArgs>
   }, ExtArgs["result"]["materialRequest"]>
@@ -23622,11 +23816,14 @@ export namespace Prisma {
     id?: boolean
     materialId?: boolean
     materialName?: boolean
+    materials?: boolean
+    materialType?: boolean
     quantity?: boolean
     justification?: boolean
     cityName?: boolean
     neighborhood?: boolean
     deliveryAddress?: boolean
+    supporterId?: boolean
     requesterId?: boolean
     approverId?: boolean
     status?: boolean
@@ -23637,6 +23834,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     material?: boolean | MaterialRequest$materialArgs<ExtArgs>
+    supporter?: boolean | MaterialRequest$supporterArgs<ExtArgs>
     requester?: boolean | MaterialRequest$requesterArgs<ExtArgs>
     approver?: boolean | MaterialRequest$approverArgs<ExtArgs>
   }, ExtArgs["result"]["materialRequest"]>
@@ -23645,11 +23843,14 @@ export namespace Prisma {
     id?: boolean
     materialId?: boolean
     materialName?: boolean
+    materials?: boolean
+    materialType?: boolean
     quantity?: boolean
     justification?: boolean
     cityName?: boolean
     neighborhood?: boolean
     deliveryAddress?: boolean
+    supporterId?: boolean
     requesterId?: boolean
     approverId?: boolean
     status?: boolean
@@ -23660,6 +23861,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     material?: boolean | MaterialRequest$materialArgs<ExtArgs>
+    supporter?: boolean | MaterialRequest$supporterArgs<ExtArgs>
     requester?: boolean | MaterialRequest$requesterArgs<ExtArgs>
     approver?: boolean | MaterialRequest$approverArgs<ExtArgs>
   }, ExtArgs["result"]["materialRequest"]>
@@ -23668,11 +23870,14 @@ export namespace Prisma {
     id?: boolean
     materialId?: boolean
     materialName?: boolean
+    materials?: boolean
+    materialType?: boolean
     quantity?: boolean
     justification?: boolean
     cityName?: boolean
     neighborhood?: boolean
     deliveryAddress?: boolean
+    supporterId?: boolean
     requesterId?: boolean
     approverId?: boolean
     status?: boolean
@@ -23684,19 +23889,22 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type MaterialRequestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "materialId" | "materialName" | "quantity" | "justification" | "cityName" | "neighborhood" | "deliveryAddress" | "requesterId" | "approverId" | "status" | "appliedPhotoUrl" | "requestedAt" | "approvedAt" | "deliveredAt" | "createdAt" | "updatedAt", ExtArgs["result"]["materialRequest"]>
+  export type MaterialRequestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "materialId" | "materialName" | "materials" | "materialType" | "quantity" | "justification" | "cityName" | "neighborhood" | "deliveryAddress" | "supporterId" | "requesterId" | "approverId" | "status" | "appliedPhotoUrl" | "requestedAt" | "approvedAt" | "deliveredAt" | "createdAt" | "updatedAt", ExtArgs["result"]["materialRequest"]>
   export type MaterialRequestInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     material?: boolean | MaterialRequest$materialArgs<ExtArgs>
+    supporter?: boolean | MaterialRequest$supporterArgs<ExtArgs>
     requester?: boolean | MaterialRequest$requesterArgs<ExtArgs>
     approver?: boolean | MaterialRequest$approverArgs<ExtArgs>
   }
   export type MaterialRequestIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     material?: boolean | MaterialRequest$materialArgs<ExtArgs>
+    supporter?: boolean | MaterialRequest$supporterArgs<ExtArgs>
     requester?: boolean | MaterialRequest$requesterArgs<ExtArgs>
     approver?: boolean | MaterialRequest$approverArgs<ExtArgs>
   }
   export type MaterialRequestIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     material?: boolean | MaterialRequest$materialArgs<ExtArgs>
+    supporter?: boolean | MaterialRequest$supporterArgs<ExtArgs>
     requester?: boolean | MaterialRequest$requesterArgs<ExtArgs>
     approver?: boolean | MaterialRequest$approverArgs<ExtArgs>
   }
@@ -23705,6 +23913,7 @@ export namespace Prisma {
     name: "MaterialRequest"
     objects: {
       material: Prisma.$MaterialPayload<ExtArgs> | null
+      supporter: Prisma.$SupporterPayload<ExtArgs> | null
       requester: Prisma.$UserPayload<ExtArgs> | null
       approver: Prisma.$UserPayload<ExtArgs> | null
     }
@@ -23712,11 +23921,14 @@ export namespace Prisma {
       id: string
       materialId: string | null
       materialName: string
+      materials: string[]
+      materialType: string | null
       quantity: number
       justification: string | null
       cityName: string | null
       neighborhood: string | null
       deliveryAddress: string | null
+      supporterId: string | null
       requesterId: string | null
       approverId: string | null
       status: $Enums.MaterialRequestStatus
@@ -24121,6 +24333,7 @@ export namespace Prisma {
   export interface Prisma__MaterialRequestClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     material<T extends MaterialRequest$materialArgs<ExtArgs> = {}>(args?: Subset<T, MaterialRequest$materialArgs<ExtArgs>>): Prisma__MaterialClient<$Result.GetResult<Prisma.$MaterialPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    supporter<T extends MaterialRequest$supporterArgs<ExtArgs> = {}>(args?: Subset<T, MaterialRequest$supporterArgs<ExtArgs>>): Prisma__SupporterClient<$Result.GetResult<Prisma.$SupporterPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     requester<T extends MaterialRequest$requesterArgs<ExtArgs> = {}>(args?: Subset<T, MaterialRequest$requesterArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     approver<T extends MaterialRequest$approverArgs<ExtArgs> = {}>(args?: Subset<T, MaterialRequest$approverArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
@@ -24155,11 +24368,14 @@ export namespace Prisma {
     readonly id: FieldRef<"MaterialRequest", 'String'>
     readonly materialId: FieldRef<"MaterialRequest", 'String'>
     readonly materialName: FieldRef<"MaterialRequest", 'String'>
+    readonly materials: FieldRef<"MaterialRequest", 'String[]'>
+    readonly materialType: FieldRef<"MaterialRequest", 'String'>
     readonly quantity: FieldRef<"MaterialRequest", 'Int'>
     readonly justification: FieldRef<"MaterialRequest", 'String'>
     readonly cityName: FieldRef<"MaterialRequest", 'String'>
     readonly neighborhood: FieldRef<"MaterialRequest", 'String'>
     readonly deliveryAddress: FieldRef<"MaterialRequest", 'String'>
+    readonly supporterId: FieldRef<"MaterialRequest", 'String'>
     readonly requesterId: FieldRef<"MaterialRequest", 'String'>
     readonly approverId: FieldRef<"MaterialRequest", 'String'>
     readonly status: FieldRef<"MaterialRequest", 'MaterialRequestStatus'>
@@ -24581,6 +24797,25 @@ export namespace Prisma {
      */
     include?: MaterialInclude<ExtArgs> | null
     where?: MaterialWhereInput
+  }
+
+  /**
+   * MaterialRequest.supporter
+   */
+  export type MaterialRequest$supporterArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Supporter
+     */
+    select?: SupporterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Supporter
+     */
+    omit?: SupporterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SupporterInclude<ExtArgs> | null
+    where?: SupporterWhereInput
   }
 
   /**
@@ -32129,6 +32364,9 @@ export namespace Prisma {
     name: string | null
     message: string | null
     channel: $Enums.Channel | null
+    templateName: string | null
+    templateLang: string | null
+    headerImageUrl: string | null
     status: $Enums.BroadcastStatus | null
     scheduledAt: Date | null
     totalContacts: number | null
@@ -32145,6 +32383,9 @@ export namespace Prisma {
     name: string | null
     message: string | null
     channel: $Enums.Channel | null
+    templateName: string | null
+    templateLang: string | null
+    headerImageUrl: string | null
     status: $Enums.BroadcastStatus | null
     scheduledAt: Date | null
     totalContacts: number | null
@@ -32161,6 +32402,9 @@ export namespace Prisma {
     name: number
     message: number
     channel: number
+    templateName: number
+    templateLang: number
+    headerImageUrl: number
     status: number
     scheduledAt: number
     totalContacts: number
@@ -32194,6 +32438,9 @@ export namespace Prisma {
     name?: true
     message?: true
     channel?: true
+    templateName?: true
+    templateLang?: true
+    headerImageUrl?: true
     status?: true
     scheduledAt?: true
     totalContacts?: true
@@ -32210,6 +32457,9 @@ export namespace Prisma {
     name?: true
     message?: true
     channel?: true
+    templateName?: true
+    templateLang?: true
+    headerImageUrl?: true
     status?: true
     scheduledAt?: true
     totalContacts?: true
@@ -32226,6 +32476,9 @@ export namespace Prisma {
     name?: true
     message?: true
     channel?: true
+    templateName?: true
+    templateLang?: true
+    headerImageUrl?: true
     status?: true
     scheduledAt?: true
     totalContacts?: true
@@ -32330,6 +32583,9 @@ export namespace Prisma {
     name: string
     message: string
     channel: $Enums.Channel
+    templateName: string | null
+    templateLang: string | null
+    headerImageUrl: string | null
     status: $Enums.BroadcastStatus
     scheduledAt: Date | null
     totalContacts: number
@@ -32366,6 +32622,9 @@ export namespace Prisma {
     name?: boolean
     message?: boolean
     channel?: boolean
+    templateName?: boolean
+    templateLang?: boolean
+    headerImageUrl?: boolean
     status?: boolean
     scheduledAt?: boolean
     totalContacts?: boolean
@@ -32386,6 +32645,9 @@ export namespace Prisma {
     name?: boolean
     message?: boolean
     channel?: boolean
+    templateName?: boolean
+    templateLang?: boolean
+    headerImageUrl?: boolean
     status?: boolean
     scheduledAt?: boolean
     totalContacts?: boolean
@@ -32404,6 +32666,9 @@ export namespace Prisma {
     name?: boolean
     message?: boolean
     channel?: boolean
+    templateName?: boolean
+    templateLang?: boolean
+    headerImageUrl?: boolean
     status?: boolean
     scheduledAt?: boolean
     totalContacts?: boolean
@@ -32422,6 +32687,9 @@ export namespace Prisma {
     name?: boolean
     message?: boolean
     channel?: boolean
+    templateName?: boolean
+    templateLang?: boolean
+    headerImageUrl?: boolean
     status?: boolean
     scheduledAt?: boolean
     totalContacts?: boolean
@@ -32434,7 +32702,7 @@ export namespace Prisma {
     logs?: boolean
   }
 
-  export type BroadcastCampaignOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "message" | "channel" | "status" | "scheduledAt" | "totalContacts" | "sentCount" | "failedCount" | "pendingCount" | "ownerId" | "createdAt" | "updatedAt" | "logs", ExtArgs["result"]["broadcastCampaign"]>
+  export type BroadcastCampaignOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "message" | "channel" | "templateName" | "templateLang" | "headerImageUrl" | "status" | "scheduledAt" | "totalContacts" | "sentCount" | "failedCount" | "pendingCount" | "ownerId" | "createdAt" | "updatedAt" | "logs", ExtArgs["result"]["broadcastCampaign"]>
   export type BroadcastCampaignInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     owner?: boolean | BroadcastCampaign$ownerArgs<ExtArgs>
     contacts?: boolean | BroadcastCampaign$contactsArgs<ExtArgs>
@@ -32458,6 +32726,9 @@ export namespace Prisma {
       name: string
       message: string
       channel: $Enums.Channel
+      templateName: string | null
+      templateLang: string | null
+      headerImageUrl: string | null
       status: $Enums.BroadcastStatus
       scheduledAt: Date | null
       totalContacts: number
@@ -32897,6 +33168,9 @@ export namespace Prisma {
     readonly name: FieldRef<"BroadcastCampaign", 'String'>
     readonly message: FieldRef<"BroadcastCampaign", 'String'>
     readonly channel: FieldRef<"BroadcastCampaign", 'Channel'>
+    readonly templateName: FieldRef<"BroadcastCampaign", 'String'>
+    readonly templateLang: FieldRef<"BroadcastCampaign", 'String'>
+    readonly headerImageUrl: FieldRef<"BroadcastCampaign", 'String'>
     readonly status: FieldRef<"BroadcastCampaign", 'BroadcastStatus'>
     readonly scheduledAt: FieldRef<"BroadcastCampaign", 'DateTime'>
     readonly totalContacts: FieldRef<"BroadcastCampaign", 'Int'>
@@ -43217,6 +43491,1092 @@ export namespace Prisma {
 
 
   /**
+   * Model DataDeletionRequest
+   */
+
+  export type AggregateDataDeletionRequest = {
+    _count: DataDeletionRequestCountAggregateOutputType | null
+    _min: DataDeletionRequestMinAggregateOutputType | null
+    _max: DataDeletionRequestMaxAggregateOutputType | null
+  }
+
+  export type DataDeletionRequestMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    email: string | null
+    phone: string | null
+    reason: string | null
+    status: string | null
+    matchedSupporterId: string | null
+    handledById: string | null
+    handledAt: Date | null
+    note: string | null
+    ip: string | null
+    createdAt: Date | null
+  }
+
+  export type DataDeletionRequestMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    email: string | null
+    phone: string | null
+    reason: string | null
+    status: string | null
+    matchedSupporterId: string | null
+    handledById: string | null
+    handledAt: Date | null
+    note: string | null
+    ip: string | null
+    createdAt: Date | null
+  }
+
+  export type DataDeletionRequestCountAggregateOutputType = {
+    id: number
+    name: number
+    email: number
+    phone: number
+    reason: number
+    status: number
+    matchedSupporterId: number
+    handledById: number
+    handledAt: number
+    note: number
+    ip: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type DataDeletionRequestMinAggregateInputType = {
+    id?: true
+    name?: true
+    email?: true
+    phone?: true
+    reason?: true
+    status?: true
+    matchedSupporterId?: true
+    handledById?: true
+    handledAt?: true
+    note?: true
+    ip?: true
+    createdAt?: true
+  }
+
+  export type DataDeletionRequestMaxAggregateInputType = {
+    id?: true
+    name?: true
+    email?: true
+    phone?: true
+    reason?: true
+    status?: true
+    matchedSupporterId?: true
+    handledById?: true
+    handledAt?: true
+    note?: true
+    ip?: true
+    createdAt?: true
+  }
+
+  export type DataDeletionRequestCountAggregateInputType = {
+    id?: true
+    name?: true
+    email?: true
+    phone?: true
+    reason?: true
+    status?: true
+    matchedSupporterId?: true
+    handledById?: true
+    handledAt?: true
+    note?: true
+    ip?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type DataDeletionRequestAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DataDeletionRequest to aggregate.
+     */
+    where?: DataDeletionRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DataDeletionRequests to fetch.
+     */
+    orderBy?: DataDeletionRequestOrderByWithRelationInput | DataDeletionRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DataDeletionRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DataDeletionRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DataDeletionRequests.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DataDeletionRequests
+    **/
+    _count?: true | DataDeletionRequestCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DataDeletionRequestMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DataDeletionRequestMaxAggregateInputType
+  }
+
+  export type GetDataDeletionRequestAggregateType<T extends DataDeletionRequestAggregateArgs> = {
+        [P in keyof T & keyof AggregateDataDeletionRequest]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDataDeletionRequest[P]>
+      : GetScalarType<T[P], AggregateDataDeletionRequest[P]>
+  }
+
+
+
+
+  export type DataDeletionRequestGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DataDeletionRequestWhereInput
+    orderBy?: DataDeletionRequestOrderByWithAggregationInput | DataDeletionRequestOrderByWithAggregationInput[]
+    by: DataDeletionRequestScalarFieldEnum[] | DataDeletionRequestScalarFieldEnum
+    having?: DataDeletionRequestScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DataDeletionRequestCountAggregateInputType | true
+    _min?: DataDeletionRequestMinAggregateInputType
+    _max?: DataDeletionRequestMaxAggregateInputType
+  }
+
+  export type DataDeletionRequestGroupByOutputType = {
+    id: string
+    name: string
+    email: string | null
+    phone: string | null
+    reason: string | null
+    status: string
+    matchedSupporterId: string | null
+    handledById: string | null
+    handledAt: Date | null
+    note: string | null
+    ip: string | null
+    createdAt: Date
+    _count: DataDeletionRequestCountAggregateOutputType | null
+    _min: DataDeletionRequestMinAggregateOutputType | null
+    _max: DataDeletionRequestMaxAggregateOutputType | null
+  }
+
+  type GetDataDeletionRequestGroupByPayload<T extends DataDeletionRequestGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DataDeletionRequestGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DataDeletionRequestGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DataDeletionRequestGroupByOutputType[P]>
+            : GetScalarType<T[P], DataDeletionRequestGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DataDeletionRequestSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    email?: boolean
+    phone?: boolean
+    reason?: boolean
+    status?: boolean
+    matchedSupporterId?: boolean
+    handledById?: boolean
+    handledAt?: boolean
+    note?: boolean
+    ip?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["dataDeletionRequest"]>
+
+  export type DataDeletionRequestSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    email?: boolean
+    phone?: boolean
+    reason?: boolean
+    status?: boolean
+    matchedSupporterId?: boolean
+    handledById?: boolean
+    handledAt?: boolean
+    note?: boolean
+    ip?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["dataDeletionRequest"]>
+
+  export type DataDeletionRequestSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    email?: boolean
+    phone?: boolean
+    reason?: boolean
+    status?: boolean
+    matchedSupporterId?: boolean
+    handledById?: boolean
+    handledAt?: boolean
+    note?: boolean
+    ip?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["dataDeletionRequest"]>
+
+  export type DataDeletionRequestSelectScalar = {
+    id?: boolean
+    name?: boolean
+    email?: boolean
+    phone?: boolean
+    reason?: boolean
+    status?: boolean
+    matchedSupporterId?: boolean
+    handledById?: boolean
+    handledAt?: boolean
+    note?: boolean
+    ip?: boolean
+    createdAt?: boolean
+  }
+
+  export type DataDeletionRequestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "phone" | "reason" | "status" | "matchedSupporterId" | "handledById" | "handledAt" | "note" | "ip" | "createdAt", ExtArgs["result"]["dataDeletionRequest"]>
+
+  export type $DataDeletionRequestPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DataDeletionRequest"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+      email: string | null
+      phone: string | null
+      reason: string | null
+      status: string
+      matchedSupporterId: string | null
+      handledById: string | null
+      handledAt: Date | null
+      note: string | null
+      ip: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["dataDeletionRequest"]>
+    composites: {}
+  }
+
+  type DataDeletionRequestGetPayload<S extends boolean | null | undefined | DataDeletionRequestDefaultArgs> = $Result.GetResult<Prisma.$DataDeletionRequestPayload, S>
+
+  type DataDeletionRequestCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DataDeletionRequestFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DataDeletionRequestCountAggregateInputType | true
+    }
+
+  export interface DataDeletionRequestDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DataDeletionRequest'], meta: { name: 'DataDeletionRequest' } }
+    /**
+     * Find zero or one DataDeletionRequest that matches the filter.
+     * @param {DataDeletionRequestFindUniqueArgs} args - Arguments to find a DataDeletionRequest
+     * @example
+     * // Get one DataDeletionRequest
+     * const dataDeletionRequest = await prisma.dataDeletionRequest.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DataDeletionRequestFindUniqueArgs>(args: SelectSubset<T, DataDeletionRequestFindUniqueArgs<ExtArgs>>): Prisma__DataDeletionRequestClient<$Result.GetResult<Prisma.$DataDeletionRequestPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one DataDeletionRequest that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DataDeletionRequestFindUniqueOrThrowArgs} args - Arguments to find a DataDeletionRequest
+     * @example
+     * // Get one DataDeletionRequest
+     * const dataDeletionRequest = await prisma.dataDeletionRequest.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DataDeletionRequestFindUniqueOrThrowArgs>(args: SelectSubset<T, DataDeletionRequestFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DataDeletionRequestClient<$Result.GetResult<Prisma.$DataDeletionRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DataDeletionRequest that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataDeletionRequestFindFirstArgs} args - Arguments to find a DataDeletionRequest
+     * @example
+     * // Get one DataDeletionRequest
+     * const dataDeletionRequest = await prisma.dataDeletionRequest.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DataDeletionRequestFindFirstArgs>(args?: SelectSubset<T, DataDeletionRequestFindFirstArgs<ExtArgs>>): Prisma__DataDeletionRequestClient<$Result.GetResult<Prisma.$DataDeletionRequestPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DataDeletionRequest that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataDeletionRequestFindFirstOrThrowArgs} args - Arguments to find a DataDeletionRequest
+     * @example
+     * // Get one DataDeletionRequest
+     * const dataDeletionRequest = await prisma.dataDeletionRequest.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DataDeletionRequestFindFirstOrThrowArgs>(args?: SelectSubset<T, DataDeletionRequestFindFirstOrThrowArgs<ExtArgs>>): Prisma__DataDeletionRequestClient<$Result.GetResult<Prisma.$DataDeletionRequestPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more DataDeletionRequests that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataDeletionRequestFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DataDeletionRequests
+     * const dataDeletionRequests = await prisma.dataDeletionRequest.findMany()
+     * 
+     * // Get first 10 DataDeletionRequests
+     * const dataDeletionRequests = await prisma.dataDeletionRequest.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const dataDeletionRequestWithIdOnly = await prisma.dataDeletionRequest.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DataDeletionRequestFindManyArgs>(args?: SelectSubset<T, DataDeletionRequestFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataDeletionRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a DataDeletionRequest.
+     * @param {DataDeletionRequestCreateArgs} args - Arguments to create a DataDeletionRequest.
+     * @example
+     * // Create one DataDeletionRequest
+     * const DataDeletionRequest = await prisma.dataDeletionRequest.create({
+     *   data: {
+     *     // ... data to create a DataDeletionRequest
+     *   }
+     * })
+     * 
+     */
+    create<T extends DataDeletionRequestCreateArgs>(args: SelectSubset<T, DataDeletionRequestCreateArgs<ExtArgs>>): Prisma__DataDeletionRequestClient<$Result.GetResult<Prisma.$DataDeletionRequestPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many DataDeletionRequests.
+     * @param {DataDeletionRequestCreateManyArgs} args - Arguments to create many DataDeletionRequests.
+     * @example
+     * // Create many DataDeletionRequests
+     * const dataDeletionRequest = await prisma.dataDeletionRequest.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DataDeletionRequestCreateManyArgs>(args?: SelectSubset<T, DataDeletionRequestCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DataDeletionRequests and returns the data saved in the database.
+     * @param {DataDeletionRequestCreateManyAndReturnArgs} args - Arguments to create many DataDeletionRequests.
+     * @example
+     * // Create many DataDeletionRequests
+     * const dataDeletionRequest = await prisma.dataDeletionRequest.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DataDeletionRequests and only return the `id`
+     * const dataDeletionRequestWithIdOnly = await prisma.dataDeletionRequest.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DataDeletionRequestCreateManyAndReturnArgs>(args?: SelectSubset<T, DataDeletionRequestCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataDeletionRequestPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a DataDeletionRequest.
+     * @param {DataDeletionRequestDeleteArgs} args - Arguments to delete one DataDeletionRequest.
+     * @example
+     * // Delete one DataDeletionRequest
+     * const DataDeletionRequest = await prisma.dataDeletionRequest.delete({
+     *   where: {
+     *     // ... filter to delete one DataDeletionRequest
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DataDeletionRequestDeleteArgs>(args: SelectSubset<T, DataDeletionRequestDeleteArgs<ExtArgs>>): Prisma__DataDeletionRequestClient<$Result.GetResult<Prisma.$DataDeletionRequestPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one DataDeletionRequest.
+     * @param {DataDeletionRequestUpdateArgs} args - Arguments to update one DataDeletionRequest.
+     * @example
+     * // Update one DataDeletionRequest
+     * const dataDeletionRequest = await prisma.dataDeletionRequest.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DataDeletionRequestUpdateArgs>(args: SelectSubset<T, DataDeletionRequestUpdateArgs<ExtArgs>>): Prisma__DataDeletionRequestClient<$Result.GetResult<Prisma.$DataDeletionRequestPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more DataDeletionRequests.
+     * @param {DataDeletionRequestDeleteManyArgs} args - Arguments to filter DataDeletionRequests to delete.
+     * @example
+     * // Delete a few DataDeletionRequests
+     * const { count } = await prisma.dataDeletionRequest.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DataDeletionRequestDeleteManyArgs>(args?: SelectSubset<T, DataDeletionRequestDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DataDeletionRequests.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataDeletionRequestUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DataDeletionRequests
+     * const dataDeletionRequest = await prisma.dataDeletionRequest.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DataDeletionRequestUpdateManyArgs>(args: SelectSubset<T, DataDeletionRequestUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DataDeletionRequests and returns the data updated in the database.
+     * @param {DataDeletionRequestUpdateManyAndReturnArgs} args - Arguments to update many DataDeletionRequests.
+     * @example
+     * // Update many DataDeletionRequests
+     * const dataDeletionRequest = await prisma.dataDeletionRequest.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more DataDeletionRequests and only return the `id`
+     * const dataDeletionRequestWithIdOnly = await prisma.dataDeletionRequest.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DataDeletionRequestUpdateManyAndReturnArgs>(args: SelectSubset<T, DataDeletionRequestUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataDeletionRequestPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one DataDeletionRequest.
+     * @param {DataDeletionRequestUpsertArgs} args - Arguments to update or create a DataDeletionRequest.
+     * @example
+     * // Update or create a DataDeletionRequest
+     * const dataDeletionRequest = await prisma.dataDeletionRequest.upsert({
+     *   create: {
+     *     // ... data to create a DataDeletionRequest
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DataDeletionRequest we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DataDeletionRequestUpsertArgs>(args: SelectSubset<T, DataDeletionRequestUpsertArgs<ExtArgs>>): Prisma__DataDeletionRequestClient<$Result.GetResult<Prisma.$DataDeletionRequestPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of DataDeletionRequests.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataDeletionRequestCountArgs} args - Arguments to filter DataDeletionRequests to count.
+     * @example
+     * // Count the number of DataDeletionRequests
+     * const count = await prisma.dataDeletionRequest.count({
+     *   where: {
+     *     // ... the filter for the DataDeletionRequests we want to count
+     *   }
+     * })
+    **/
+    count<T extends DataDeletionRequestCountArgs>(
+      args?: Subset<T, DataDeletionRequestCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DataDeletionRequestCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DataDeletionRequest.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataDeletionRequestAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DataDeletionRequestAggregateArgs>(args: Subset<T, DataDeletionRequestAggregateArgs>): Prisma.PrismaPromise<GetDataDeletionRequestAggregateType<T>>
+
+    /**
+     * Group by DataDeletionRequest.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataDeletionRequestGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DataDeletionRequestGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DataDeletionRequestGroupByArgs['orderBy'] }
+        : { orderBy?: DataDeletionRequestGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DataDeletionRequestGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDataDeletionRequestGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DataDeletionRequest model
+   */
+  readonly fields: DataDeletionRequestFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DataDeletionRequest.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DataDeletionRequestClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DataDeletionRequest model
+   */
+  interface DataDeletionRequestFieldRefs {
+    readonly id: FieldRef<"DataDeletionRequest", 'String'>
+    readonly name: FieldRef<"DataDeletionRequest", 'String'>
+    readonly email: FieldRef<"DataDeletionRequest", 'String'>
+    readonly phone: FieldRef<"DataDeletionRequest", 'String'>
+    readonly reason: FieldRef<"DataDeletionRequest", 'String'>
+    readonly status: FieldRef<"DataDeletionRequest", 'String'>
+    readonly matchedSupporterId: FieldRef<"DataDeletionRequest", 'String'>
+    readonly handledById: FieldRef<"DataDeletionRequest", 'String'>
+    readonly handledAt: FieldRef<"DataDeletionRequest", 'DateTime'>
+    readonly note: FieldRef<"DataDeletionRequest", 'String'>
+    readonly ip: FieldRef<"DataDeletionRequest", 'String'>
+    readonly createdAt: FieldRef<"DataDeletionRequest", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DataDeletionRequest findUnique
+   */
+  export type DataDeletionRequestFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataDeletionRequest
+     */
+    select?: DataDeletionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataDeletionRequest
+     */
+    omit?: DataDeletionRequestOmit<ExtArgs> | null
+    /**
+     * Filter, which DataDeletionRequest to fetch.
+     */
+    where: DataDeletionRequestWhereUniqueInput
+  }
+
+  /**
+   * DataDeletionRequest findUniqueOrThrow
+   */
+  export type DataDeletionRequestFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataDeletionRequest
+     */
+    select?: DataDeletionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataDeletionRequest
+     */
+    omit?: DataDeletionRequestOmit<ExtArgs> | null
+    /**
+     * Filter, which DataDeletionRequest to fetch.
+     */
+    where: DataDeletionRequestWhereUniqueInput
+  }
+
+  /**
+   * DataDeletionRequest findFirst
+   */
+  export type DataDeletionRequestFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataDeletionRequest
+     */
+    select?: DataDeletionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataDeletionRequest
+     */
+    omit?: DataDeletionRequestOmit<ExtArgs> | null
+    /**
+     * Filter, which DataDeletionRequest to fetch.
+     */
+    where?: DataDeletionRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DataDeletionRequests to fetch.
+     */
+    orderBy?: DataDeletionRequestOrderByWithRelationInput | DataDeletionRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DataDeletionRequests.
+     */
+    cursor?: DataDeletionRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DataDeletionRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DataDeletionRequests.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DataDeletionRequests.
+     */
+    distinct?: DataDeletionRequestScalarFieldEnum | DataDeletionRequestScalarFieldEnum[]
+  }
+
+  /**
+   * DataDeletionRequest findFirstOrThrow
+   */
+  export type DataDeletionRequestFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataDeletionRequest
+     */
+    select?: DataDeletionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataDeletionRequest
+     */
+    omit?: DataDeletionRequestOmit<ExtArgs> | null
+    /**
+     * Filter, which DataDeletionRequest to fetch.
+     */
+    where?: DataDeletionRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DataDeletionRequests to fetch.
+     */
+    orderBy?: DataDeletionRequestOrderByWithRelationInput | DataDeletionRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DataDeletionRequests.
+     */
+    cursor?: DataDeletionRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DataDeletionRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DataDeletionRequests.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DataDeletionRequests.
+     */
+    distinct?: DataDeletionRequestScalarFieldEnum | DataDeletionRequestScalarFieldEnum[]
+  }
+
+  /**
+   * DataDeletionRequest findMany
+   */
+  export type DataDeletionRequestFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataDeletionRequest
+     */
+    select?: DataDeletionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataDeletionRequest
+     */
+    omit?: DataDeletionRequestOmit<ExtArgs> | null
+    /**
+     * Filter, which DataDeletionRequests to fetch.
+     */
+    where?: DataDeletionRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DataDeletionRequests to fetch.
+     */
+    orderBy?: DataDeletionRequestOrderByWithRelationInput | DataDeletionRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DataDeletionRequests.
+     */
+    cursor?: DataDeletionRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DataDeletionRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DataDeletionRequests.
+     */
+    skip?: number
+    distinct?: DataDeletionRequestScalarFieldEnum | DataDeletionRequestScalarFieldEnum[]
+  }
+
+  /**
+   * DataDeletionRequest create
+   */
+  export type DataDeletionRequestCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataDeletionRequest
+     */
+    select?: DataDeletionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataDeletionRequest
+     */
+    omit?: DataDeletionRequestOmit<ExtArgs> | null
+    /**
+     * The data needed to create a DataDeletionRequest.
+     */
+    data: XOR<DataDeletionRequestCreateInput, DataDeletionRequestUncheckedCreateInput>
+  }
+
+  /**
+   * DataDeletionRequest createMany
+   */
+  export type DataDeletionRequestCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DataDeletionRequests.
+     */
+    data: DataDeletionRequestCreateManyInput | DataDeletionRequestCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DataDeletionRequest createManyAndReturn
+   */
+  export type DataDeletionRequestCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataDeletionRequest
+     */
+    select?: DataDeletionRequestSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataDeletionRequest
+     */
+    omit?: DataDeletionRequestOmit<ExtArgs> | null
+    /**
+     * The data used to create many DataDeletionRequests.
+     */
+    data: DataDeletionRequestCreateManyInput | DataDeletionRequestCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DataDeletionRequest update
+   */
+  export type DataDeletionRequestUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataDeletionRequest
+     */
+    select?: DataDeletionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataDeletionRequest
+     */
+    omit?: DataDeletionRequestOmit<ExtArgs> | null
+    /**
+     * The data needed to update a DataDeletionRequest.
+     */
+    data: XOR<DataDeletionRequestUpdateInput, DataDeletionRequestUncheckedUpdateInput>
+    /**
+     * Choose, which DataDeletionRequest to update.
+     */
+    where: DataDeletionRequestWhereUniqueInput
+  }
+
+  /**
+   * DataDeletionRequest updateMany
+   */
+  export type DataDeletionRequestUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DataDeletionRequests.
+     */
+    data: XOR<DataDeletionRequestUpdateManyMutationInput, DataDeletionRequestUncheckedUpdateManyInput>
+    /**
+     * Filter which DataDeletionRequests to update
+     */
+    where?: DataDeletionRequestWhereInput
+    /**
+     * Limit how many DataDeletionRequests to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DataDeletionRequest updateManyAndReturn
+   */
+  export type DataDeletionRequestUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataDeletionRequest
+     */
+    select?: DataDeletionRequestSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataDeletionRequest
+     */
+    omit?: DataDeletionRequestOmit<ExtArgs> | null
+    /**
+     * The data used to update DataDeletionRequests.
+     */
+    data: XOR<DataDeletionRequestUpdateManyMutationInput, DataDeletionRequestUncheckedUpdateManyInput>
+    /**
+     * Filter which DataDeletionRequests to update
+     */
+    where?: DataDeletionRequestWhereInput
+    /**
+     * Limit how many DataDeletionRequests to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DataDeletionRequest upsert
+   */
+  export type DataDeletionRequestUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataDeletionRequest
+     */
+    select?: DataDeletionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataDeletionRequest
+     */
+    omit?: DataDeletionRequestOmit<ExtArgs> | null
+    /**
+     * The filter to search for the DataDeletionRequest to update in case it exists.
+     */
+    where: DataDeletionRequestWhereUniqueInput
+    /**
+     * In case the DataDeletionRequest found by the `where` argument doesn't exist, create a new DataDeletionRequest with this data.
+     */
+    create: XOR<DataDeletionRequestCreateInput, DataDeletionRequestUncheckedCreateInput>
+    /**
+     * In case the DataDeletionRequest was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DataDeletionRequestUpdateInput, DataDeletionRequestUncheckedUpdateInput>
+  }
+
+  /**
+   * DataDeletionRequest delete
+   */
+  export type DataDeletionRequestDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataDeletionRequest
+     */
+    select?: DataDeletionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataDeletionRequest
+     */
+    omit?: DataDeletionRequestOmit<ExtArgs> | null
+    /**
+     * Filter which DataDeletionRequest to delete.
+     */
+    where: DataDeletionRequestWhereUniqueInput
+  }
+
+  /**
+   * DataDeletionRequest deleteMany
+   */
+  export type DataDeletionRequestDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DataDeletionRequests to delete
+     */
+    where?: DataDeletionRequestWhereInput
+    /**
+     * Limit how many DataDeletionRequests to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * DataDeletionRequest without action
+   */
+  export type DataDeletionRequestDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataDeletionRequest
+     */
+    select?: DataDeletionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataDeletionRequest
+     */
+    omit?: DataDeletionRequestOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -43294,6 +44654,7 @@ export namespace Prisma {
     name: 'name',
     phone: 'phone',
     whatsapp: 'whatsapp',
+    tags: 'tags',
     email: 'email',
     cpf: 'cpf',
     birthDate: 'birthDate',
@@ -43311,6 +44672,7 @@ export namespace Prisma {
     instagram: 'instagram',
     facebook: 'facebook',
     supportType: 'supportType',
+    supportTypes: 'supportTypes',
     status: 'status',
     notes: 'notes',
     flaggedReason: 'flaggedReason',
@@ -43328,6 +44690,7 @@ export namespace Prisma {
     supporterId: 'supporterId',
     active: 'active',
     totalScore: 'totalScore',
+    confirmationStatus: 'confirmationStatus',
     confirmed: 'confirmed',
     confirmedAt: 'confirmedAt',
     confirmationChannel: 'confirmationChannel',
@@ -43480,11 +44843,14 @@ export namespace Prisma {
     id: 'id',
     materialId: 'materialId',
     materialName: 'materialName',
+    materials: 'materials',
+    materialType: 'materialType',
     quantity: 'quantity',
     justification: 'justification',
     cityName: 'cityName',
     neighborhood: 'neighborhood',
     deliveryAddress: 'deliveryAddress',
+    supporterId: 'supporterId',
     requesterId: 'requesterId',
     approverId: 'approverId',
     status: 'status',
@@ -43626,6 +44992,9 @@ export namespace Prisma {
     name: 'name',
     message: 'message',
     channel: 'channel',
+    templateName: 'templateName',
+    templateLang: 'templateLang',
+    headerImageUrl: 'headerImageUrl',
     status: 'status',
     scheduledAt: 'scheduledAt',
     totalContacts: 'totalContacts',
@@ -43756,6 +45125,24 @@ export namespace Prisma {
   };
 
   export type InternalMessageScalarFieldEnum = (typeof InternalMessageScalarFieldEnum)[keyof typeof InternalMessageScalarFieldEnum]
+
+
+  export const DataDeletionRequestScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    email: 'email',
+    phone: 'phone',
+    reason: 'reason',
+    status: 'status',
+    matchedSupporterId: 'matchedSupporterId',
+    handledById: 'handledById',
+    handledAt: 'handledAt',
+    note: 'note',
+    ip: 'ip',
+    createdAt: 'createdAt'
+  };
+
+  export type DataDeletionRequestScalarFieldEnum = (typeof DataDeletionRequestScalarFieldEnum)[keyof typeof DataDeletionRequestScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -43927,6 +45314,20 @@ export namespace Prisma {
    * Reference to a field of type 'Int[]'
    */
   export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'VolunteerConfirmation'
+   */
+  export type EnumVolunteerConfirmationFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VolunteerConfirmation'>
+    
+
+
+  /**
+   * Reference to a field of type 'VolunteerConfirmation[]'
+   */
+  export type ListEnumVolunteerConfirmationFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VolunteerConfirmation[]'>
     
 
 
@@ -44622,8 +46023,9 @@ export namespace Prisma {
     NOT?: SupporterWhereInput | SupporterWhereInput[]
     id?: StringFilter<"Supporter"> | string
     name?: StringFilter<"Supporter"> | string
-    phone?: StringFilter<"Supporter"> | string
+    phone?: StringNullableFilter<"Supporter"> | string | null
     whatsapp?: StringNullableFilter<"Supporter"> | string | null
+    tags?: StringNullableListFilter<"Supporter">
     email?: StringNullableFilter<"Supporter"> | string | null
     cpf?: StringNullableFilter<"Supporter"> | string | null
     birthDate?: DateTimeNullableFilter<"Supporter"> | Date | string | null
@@ -44641,6 +46043,7 @@ export namespace Prisma {
     instagram?: StringNullableFilter<"Supporter"> | string | null
     facebook?: StringNullableFilter<"Supporter"> | string | null
     supportType?: EnumSupportTypeFilter<"Supporter"> | $Enums.SupportType
+    supportTypes?: EnumSupportTypeNullableListFilter<"Supporter">
     status?: EnumSupporterStatusFilter<"Supporter"> | $Enums.SupporterStatus
     notes?: StringNullableFilter<"Supporter"> | string | null
     flaggedReason?: StringNullableFilter<"Supporter"> | string | null
@@ -44657,13 +46060,15 @@ export namespace Prisma {
     conversations?: ConversationListRelationFilter
     bannerLocations?: BannerLocationListRelationFilter
     broadcastContacts?: BroadcastContactListRelationFilter
+    materialRequests?: MaterialRequestListRelationFilter
   }
 
   export type SupporterOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
-    phone?: SortOrder
+    phone?: SortOrderInput | SortOrder
     whatsapp?: SortOrderInput | SortOrder
+    tags?: SortOrder
     email?: SortOrderInput | SortOrder
     cpf?: SortOrderInput | SortOrder
     birthDate?: SortOrderInput | SortOrder
@@ -44681,6 +46086,7 @@ export namespace Prisma {
     instagram?: SortOrderInput | SortOrder
     facebook?: SortOrderInput | SortOrder
     supportType?: SortOrder
+    supportTypes?: SortOrder
     status?: SortOrder
     notes?: SortOrderInput | SortOrder
     flaggedReason?: SortOrderInput | SortOrder
@@ -44697,6 +46103,7 @@ export namespace Prisma {
     conversations?: ConversationOrderByRelationAggregateInput
     bannerLocations?: BannerLocationOrderByRelationAggregateInput
     broadcastContacts?: BroadcastContactOrderByRelationAggregateInput
+    materialRequests?: MaterialRequestOrderByRelationAggregateInput
   }
 
   export type SupporterWhereUniqueInput = Prisma.AtLeast<{
@@ -44705,8 +46112,9 @@ export namespace Prisma {
     OR?: SupporterWhereInput[]
     NOT?: SupporterWhereInput | SupporterWhereInput[]
     name?: StringFilter<"Supporter"> | string
-    phone?: StringFilter<"Supporter"> | string
+    phone?: StringNullableFilter<"Supporter"> | string | null
     whatsapp?: StringNullableFilter<"Supporter"> | string | null
+    tags?: StringNullableListFilter<"Supporter">
     email?: StringNullableFilter<"Supporter"> | string | null
     cpf?: StringNullableFilter<"Supporter"> | string | null
     birthDate?: DateTimeNullableFilter<"Supporter"> | Date | string | null
@@ -44724,6 +46132,7 @@ export namespace Prisma {
     instagram?: StringNullableFilter<"Supporter"> | string | null
     facebook?: StringNullableFilter<"Supporter"> | string | null
     supportType?: EnumSupportTypeFilter<"Supporter"> | $Enums.SupportType
+    supportTypes?: EnumSupportTypeNullableListFilter<"Supporter">
     status?: EnumSupporterStatusFilter<"Supporter"> | $Enums.SupporterStatus
     notes?: StringNullableFilter<"Supporter"> | string | null
     flaggedReason?: StringNullableFilter<"Supporter"> | string | null
@@ -44740,13 +46149,15 @@ export namespace Prisma {
     conversations?: ConversationListRelationFilter
     bannerLocations?: BannerLocationListRelationFilter
     broadcastContacts?: BroadcastContactListRelationFilter
+    materialRequests?: MaterialRequestListRelationFilter
   }, "id">
 
   export type SupporterOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
-    phone?: SortOrder
+    phone?: SortOrderInput | SortOrder
     whatsapp?: SortOrderInput | SortOrder
+    tags?: SortOrder
     email?: SortOrderInput | SortOrder
     cpf?: SortOrderInput | SortOrder
     birthDate?: SortOrderInput | SortOrder
@@ -44764,6 +46175,7 @@ export namespace Prisma {
     instagram?: SortOrderInput | SortOrder
     facebook?: SortOrderInput | SortOrder
     supportType?: SortOrder
+    supportTypes?: SortOrder
     status?: SortOrder
     notes?: SortOrderInput | SortOrder
     flaggedReason?: SortOrderInput | SortOrder
@@ -44784,8 +46196,9 @@ export namespace Prisma {
     NOT?: SupporterScalarWhereWithAggregatesInput | SupporterScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Supporter"> | string
     name?: StringWithAggregatesFilter<"Supporter"> | string
-    phone?: StringWithAggregatesFilter<"Supporter"> | string
+    phone?: StringNullableWithAggregatesFilter<"Supporter"> | string | null
     whatsapp?: StringNullableWithAggregatesFilter<"Supporter"> | string | null
+    tags?: StringNullableListFilter<"Supporter">
     email?: StringNullableWithAggregatesFilter<"Supporter"> | string | null
     cpf?: StringNullableWithAggregatesFilter<"Supporter"> | string | null
     birthDate?: DateTimeNullableWithAggregatesFilter<"Supporter"> | Date | string | null
@@ -44803,6 +46216,7 @@ export namespace Prisma {
     instagram?: StringNullableWithAggregatesFilter<"Supporter"> | string | null
     facebook?: StringNullableWithAggregatesFilter<"Supporter"> | string | null
     supportType?: EnumSupportTypeWithAggregatesFilter<"Supporter"> | $Enums.SupportType
+    supportTypes?: EnumSupportTypeNullableListFilter<"Supporter">
     status?: EnumSupporterStatusWithAggregatesFilter<"Supporter"> | $Enums.SupporterStatus
     notes?: StringNullableWithAggregatesFilter<"Supporter"> | string | null
     flaggedReason?: StringNullableWithAggregatesFilter<"Supporter"> | string | null
@@ -44820,6 +46234,7 @@ export namespace Prisma {
     supporterId?: StringFilter<"Volunteer"> | string
     active?: BoolFilter<"Volunteer"> | boolean
     totalScore?: IntFilter<"Volunteer"> | number
+    confirmationStatus?: EnumVolunteerConfirmationFilter<"Volunteer"> | $Enums.VolunteerConfirmation
     confirmed?: BoolFilter<"Volunteer"> | boolean
     confirmedAt?: DateTimeNullableFilter<"Volunteer"> | Date | string | null
     confirmationChannel?: EnumChannelNullableFilter<"Volunteer"> | $Enums.Channel | null
@@ -44840,6 +46255,7 @@ export namespace Prisma {
     supporterId?: SortOrder
     active?: SortOrder
     totalScore?: SortOrder
+    confirmationStatus?: SortOrder
     confirmed?: SortOrder
     confirmedAt?: SortOrderInput | SortOrder
     confirmationChannel?: SortOrderInput | SortOrder
@@ -44863,6 +46279,7 @@ export namespace Prisma {
     NOT?: VolunteerWhereInput | VolunteerWhereInput[]
     active?: BoolFilter<"Volunteer"> | boolean
     totalScore?: IntFilter<"Volunteer"> | number
+    confirmationStatus?: EnumVolunteerConfirmationFilter<"Volunteer"> | $Enums.VolunteerConfirmation
     confirmed?: BoolFilter<"Volunteer"> | boolean
     confirmedAt?: DateTimeNullableFilter<"Volunteer"> | Date | string | null
     confirmationChannel?: EnumChannelNullableFilter<"Volunteer"> | $Enums.Channel | null
@@ -44883,6 +46300,7 @@ export namespace Prisma {
     supporterId?: SortOrder
     active?: SortOrder
     totalScore?: SortOrder
+    confirmationStatus?: SortOrder
     confirmed?: SortOrder
     confirmedAt?: SortOrderInput | SortOrder
     confirmationChannel?: SortOrderInput | SortOrder
@@ -44905,6 +46323,7 @@ export namespace Prisma {
     supporterId?: StringWithAggregatesFilter<"Volunteer"> | string
     active?: BoolWithAggregatesFilter<"Volunteer"> | boolean
     totalScore?: IntWithAggregatesFilter<"Volunteer"> | number
+    confirmationStatus?: EnumVolunteerConfirmationWithAggregatesFilter<"Volunteer"> | $Enums.VolunteerConfirmation
     confirmed?: BoolWithAggregatesFilter<"Volunteer"> | boolean
     confirmedAt?: DateTimeNullableWithAggregatesFilter<"Volunteer"> | Date | string | null
     confirmationChannel?: EnumChannelNullableWithAggregatesFilter<"Volunteer"> | $Enums.Channel | null
@@ -45631,11 +47050,14 @@ export namespace Prisma {
     id?: StringFilter<"MaterialRequest"> | string
     materialId?: StringNullableFilter<"MaterialRequest"> | string | null
     materialName?: StringFilter<"MaterialRequest"> | string
+    materials?: StringNullableListFilter<"MaterialRequest">
+    materialType?: StringNullableFilter<"MaterialRequest"> | string | null
     quantity?: IntFilter<"MaterialRequest"> | number
     justification?: StringNullableFilter<"MaterialRequest"> | string | null
     cityName?: StringNullableFilter<"MaterialRequest"> | string | null
     neighborhood?: StringNullableFilter<"MaterialRequest"> | string | null
     deliveryAddress?: StringNullableFilter<"MaterialRequest"> | string | null
+    supporterId?: StringNullableFilter<"MaterialRequest"> | string | null
     requesterId?: StringNullableFilter<"MaterialRequest"> | string | null
     approverId?: StringNullableFilter<"MaterialRequest"> | string | null
     status?: EnumMaterialRequestStatusFilter<"MaterialRequest"> | $Enums.MaterialRequestStatus
@@ -45646,6 +47068,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"MaterialRequest"> | Date | string
     updatedAt?: DateTimeFilter<"MaterialRequest"> | Date | string
     material?: XOR<MaterialNullableScalarRelationFilter, MaterialWhereInput> | null
+    supporter?: XOR<SupporterNullableScalarRelationFilter, SupporterWhereInput> | null
     requester?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     approver?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }
@@ -45654,11 +47077,14 @@ export namespace Prisma {
     id?: SortOrder
     materialId?: SortOrderInput | SortOrder
     materialName?: SortOrder
+    materials?: SortOrder
+    materialType?: SortOrderInput | SortOrder
     quantity?: SortOrder
     justification?: SortOrderInput | SortOrder
     cityName?: SortOrderInput | SortOrder
     neighborhood?: SortOrderInput | SortOrder
     deliveryAddress?: SortOrderInput | SortOrder
+    supporterId?: SortOrderInput | SortOrder
     requesterId?: SortOrderInput | SortOrder
     approverId?: SortOrderInput | SortOrder
     status?: SortOrder
@@ -45669,6 +47095,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     material?: MaterialOrderByWithRelationInput
+    supporter?: SupporterOrderByWithRelationInput
     requester?: UserOrderByWithRelationInput
     approver?: UserOrderByWithRelationInput
   }
@@ -45680,11 +47107,14 @@ export namespace Prisma {
     NOT?: MaterialRequestWhereInput | MaterialRequestWhereInput[]
     materialId?: StringNullableFilter<"MaterialRequest"> | string | null
     materialName?: StringFilter<"MaterialRequest"> | string
+    materials?: StringNullableListFilter<"MaterialRequest">
+    materialType?: StringNullableFilter<"MaterialRequest"> | string | null
     quantity?: IntFilter<"MaterialRequest"> | number
     justification?: StringNullableFilter<"MaterialRequest"> | string | null
     cityName?: StringNullableFilter<"MaterialRequest"> | string | null
     neighborhood?: StringNullableFilter<"MaterialRequest"> | string | null
     deliveryAddress?: StringNullableFilter<"MaterialRequest"> | string | null
+    supporterId?: StringNullableFilter<"MaterialRequest"> | string | null
     requesterId?: StringNullableFilter<"MaterialRequest"> | string | null
     approverId?: StringNullableFilter<"MaterialRequest"> | string | null
     status?: EnumMaterialRequestStatusFilter<"MaterialRequest"> | $Enums.MaterialRequestStatus
@@ -45695,6 +47125,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"MaterialRequest"> | Date | string
     updatedAt?: DateTimeFilter<"MaterialRequest"> | Date | string
     material?: XOR<MaterialNullableScalarRelationFilter, MaterialWhereInput> | null
+    supporter?: XOR<SupporterNullableScalarRelationFilter, SupporterWhereInput> | null
     requester?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     approver?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }, "id">
@@ -45703,11 +47134,14 @@ export namespace Prisma {
     id?: SortOrder
     materialId?: SortOrderInput | SortOrder
     materialName?: SortOrder
+    materials?: SortOrder
+    materialType?: SortOrderInput | SortOrder
     quantity?: SortOrder
     justification?: SortOrderInput | SortOrder
     cityName?: SortOrderInput | SortOrder
     neighborhood?: SortOrderInput | SortOrder
     deliveryAddress?: SortOrderInput | SortOrder
+    supporterId?: SortOrderInput | SortOrder
     requesterId?: SortOrderInput | SortOrder
     approverId?: SortOrderInput | SortOrder
     status?: SortOrder
@@ -45731,11 +47165,14 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"MaterialRequest"> | string
     materialId?: StringNullableWithAggregatesFilter<"MaterialRequest"> | string | null
     materialName?: StringWithAggregatesFilter<"MaterialRequest"> | string
+    materials?: StringNullableListFilter<"MaterialRequest">
+    materialType?: StringNullableWithAggregatesFilter<"MaterialRequest"> | string | null
     quantity?: IntWithAggregatesFilter<"MaterialRequest"> | number
     justification?: StringNullableWithAggregatesFilter<"MaterialRequest"> | string | null
     cityName?: StringNullableWithAggregatesFilter<"MaterialRequest"> | string | null
     neighborhood?: StringNullableWithAggregatesFilter<"MaterialRequest"> | string | null
     deliveryAddress?: StringNullableWithAggregatesFilter<"MaterialRequest"> | string | null
+    supporterId?: StringNullableWithAggregatesFilter<"MaterialRequest"> | string | null
     requesterId?: StringNullableWithAggregatesFilter<"MaterialRequest"> | string | null
     approverId?: StringNullableWithAggregatesFilter<"MaterialRequest"> | string | null
     status?: EnumMaterialRequestStatusWithAggregatesFilter<"MaterialRequest"> | $Enums.MaterialRequestStatus
@@ -46393,6 +47830,9 @@ export namespace Prisma {
     name?: StringFilter<"BroadcastCampaign"> | string
     message?: StringFilter<"BroadcastCampaign"> | string
     channel?: EnumChannelFilter<"BroadcastCampaign"> | $Enums.Channel
+    templateName?: StringNullableFilter<"BroadcastCampaign"> | string | null
+    templateLang?: StringNullableFilter<"BroadcastCampaign"> | string | null
+    headerImageUrl?: StringNullableFilter<"BroadcastCampaign"> | string | null
     status?: EnumBroadcastStatusFilter<"BroadcastCampaign"> | $Enums.BroadcastStatus
     scheduledAt?: DateTimeNullableFilter<"BroadcastCampaign"> | Date | string | null
     totalContacts?: IntFilter<"BroadcastCampaign"> | number
@@ -46412,6 +47852,9 @@ export namespace Prisma {
     name?: SortOrder
     message?: SortOrder
     channel?: SortOrder
+    templateName?: SortOrderInput | SortOrder
+    templateLang?: SortOrderInput | SortOrder
+    headerImageUrl?: SortOrderInput | SortOrder
     status?: SortOrder
     scheduledAt?: SortOrderInput | SortOrder
     totalContacts?: SortOrder
@@ -46434,6 +47877,9 @@ export namespace Prisma {
     name?: StringFilter<"BroadcastCampaign"> | string
     message?: StringFilter<"BroadcastCampaign"> | string
     channel?: EnumChannelFilter<"BroadcastCampaign"> | $Enums.Channel
+    templateName?: StringNullableFilter<"BroadcastCampaign"> | string | null
+    templateLang?: StringNullableFilter<"BroadcastCampaign"> | string | null
+    headerImageUrl?: StringNullableFilter<"BroadcastCampaign"> | string | null
     status?: EnumBroadcastStatusFilter<"BroadcastCampaign"> | $Enums.BroadcastStatus
     scheduledAt?: DateTimeNullableFilter<"BroadcastCampaign"> | Date | string | null
     totalContacts?: IntFilter<"BroadcastCampaign"> | number
@@ -46453,6 +47899,9 @@ export namespace Prisma {
     name?: SortOrder
     message?: SortOrder
     channel?: SortOrder
+    templateName?: SortOrderInput | SortOrder
+    templateLang?: SortOrderInput | SortOrder
+    headerImageUrl?: SortOrderInput | SortOrder
     status?: SortOrder
     scheduledAt?: SortOrderInput | SortOrder
     totalContacts?: SortOrder
@@ -46478,6 +47927,9 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"BroadcastCampaign"> | string
     message?: StringWithAggregatesFilter<"BroadcastCampaign"> | string
     channel?: EnumChannelWithAggregatesFilter<"BroadcastCampaign"> | $Enums.Channel
+    templateName?: StringNullableWithAggregatesFilter<"BroadcastCampaign"> | string | null
+    templateLang?: StringNullableWithAggregatesFilter<"BroadcastCampaign"> | string | null
+    headerImageUrl?: StringNullableWithAggregatesFilter<"BroadcastCampaign"> | string | null
     status?: EnumBroadcastStatusWithAggregatesFilter<"BroadcastCampaign"> | $Enums.BroadcastStatus
     scheduledAt?: DateTimeNullableWithAggregatesFilter<"BroadcastCampaign"> | Date | string | null
     totalContacts?: IntWithAggregatesFilter<"BroadcastCampaign"> | number
@@ -47087,6 +48539,93 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"InternalMessage"> | Date | string
   }
 
+  export type DataDeletionRequestWhereInput = {
+    AND?: DataDeletionRequestWhereInput | DataDeletionRequestWhereInput[]
+    OR?: DataDeletionRequestWhereInput[]
+    NOT?: DataDeletionRequestWhereInput | DataDeletionRequestWhereInput[]
+    id?: StringFilter<"DataDeletionRequest"> | string
+    name?: StringFilter<"DataDeletionRequest"> | string
+    email?: StringNullableFilter<"DataDeletionRequest"> | string | null
+    phone?: StringNullableFilter<"DataDeletionRequest"> | string | null
+    reason?: StringNullableFilter<"DataDeletionRequest"> | string | null
+    status?: StringFilter<"DataDeletionRequest"> | string
+    matchedSupporterId?: StringNullableFilter<"DataDeletionRequest"> | string | null
+    handledById?: StringNullableFilter<"DataDeletionRequest"> | string | null
+    handledAt?: DateTimeNullableFilter<"DataDeletionRequest"> | Date | string | null
+    note?: StringNullableFilter<"DataDeletionRequest"> | string | null
+    ip?: StringNullableFilter<"DataDeletionRequest"> | string | null
+    createdAt?: DateTimeFilter<"DataDeletionRequest"> | Date | string
+  }
+
+  export type DataDeletionRequestOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    email?: SortOrderInput | SortOrder
+    phone?: SortOrderInput | SortOrder
+    reason?: SortOrderInput | SortOrder
+    status?: SortOrder
+    matchedSupporterId?: SortOrderInput | SortOrder
+    handledById?: SortOrderInput | SortOrder
+    handledAt?: SortOrderInput | SortOrder
+    note?: SortOrderInput | SortOrder
+    ip?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DataDeletionRequestWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: DataDeletionRequestWhereInput | DataDeletionRequestWhereInput[]
+    OR?: DataDeletionRequestWhereInput[]
+    NOT?: DataDeletionRequestWhereInput | DataDeletionRequestWhereInput[]
+    name?: StringFilter<"DataDeletionRequest"> | string
+    email?: StringNullableFilter<"DataDeletionRequest"> | string | null
+    phone?: StringNullableFilter<"DataDeletionRequest"> | string | null
+    reason?: StringNullableFilter<"DataDeletionRequest"> | string | null
+    status?: StringFilter<"DataDeletionRequest"> | string
+    matchedSupporterId?: StringNullableFilter<"DataDeletionRequest"> | string | null
+    handledById?: StringNullableFilter<"DataDeletionRequest"> | string | null
+    handledAt?: DateTimeNullableFilter<"DataDeletionRequest"> | Date | string | null
+    note?: StringNullableFilter<"DataDeletionRequest"> | string | null
+    ip?: StringNullableFilter<"DataDeletionRequest"> | string | null
+    createdAt?: DateTimeFilter<"DataDeletionRequest"> | Date | string
+  }, "id">
+
+  export type DataDeletionRequestOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    email?: SortOrderInput | SortOrder
+    phone?: SortOrderInput | SortOrder
+    reason?: SortOrderInput | SortOrder
+    status?: SortOrder
+    matchedSupporterId?: SortOrderInput | SortOrder
+    handledById?: SortOrderInput | SortOrder
+    handledAt?: SortOrderInput | SortOrder
+    note?: SortOrderInput | SortOrder
+    ip?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: DataDeletionRequestCountOrderByAggregateInput
+    _max?: DataDeletionRequestMaxOrderByAggregateInput
+    _min?: DataDeletionRequestMinOrderByAggregateInput
+  }
+
+  export type DataDeletionRequestScalarWhereWithAggregatesInput = {
+    AND?: DataDeletionRequestScalarWhereWithAggregatesInput | DataDeletionRequestScalarWhereWithAggregatesInput[]
+    OR?: DataDeletionRequestScalarWhereWithAggregatesInput[]
+    NOT?: DataDeletionRequestScalarWhereWithAggregatesInput | DataDeletionRequestScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DataDeletionRequest"> | string
+    name?: StringWithAggregatesFilter<"DataDeletionRequest"> | string
+    email?: StringNullableWithAggregatesFilter<"DataDeletionRequest"> | string | null
+    phone?: StringNullableWithAggregatesFilter<"DataDeletionRequest"> | string | null
+    reason?: StringNullableWithAggregatesFilter<"DataDeletionRequest"> | string | null
+    status?: StringWithAggregatesFilter<"DataDeletionRequest"> | string
+    matchedSupporterId?: StringNullableWithAggregatesFilter<"DataDeletionRequest"> | string | null
+    handledById?: StringNullableWithAggregatesFilter<"DataDeletionRequest"> | string | null
+    handledAt?: DateTimeNullableWithAggregatesFilter<"DataDeletionRequest"> | Date | string | null
+    note?: StringNullableWithAggregatesFilter<"DataDeletionRequest"> | string | null
+    ip?: StringNullableWithAggregatesFilter<"DataDeletionRequest"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"DataDeletionRequest"> | Date | string
+  }
+
   export type RoleCreateInput = {
     id?: string
     key: $Enums.UserRole
@@ -47539,8 +49078,9 @@ export namespace Prisma {
   export type SupporterCreateInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -47556,6 +49096,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -47570,13 +49111,15 @@ export namespace Prisma {
     conversations?: ConversationCreateNestedManyWithoutSupporterInput
     bannerLocations?: BannerLocationCreateNestedManyWithoutSupporterInput
     broadcastContacts?: BroadcastContactCreateNestedManyWithoutSupporterInput
+    materialRequests?: MaterialRequestCreateNestedManyWithoutSupporterInput
   }
 
   export type SupporterUncheckedCreateInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -47594,6 +49137,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -47606,13 +49150,15 @@ export namespace Prisma {
     conversations?: ConversationUncheckedCreateNestedManyWithoutSupporterInput
     bannerLocations?: BannerLocationUncheckedCreateNestedManyWithoutSupporterInput
     broadcastContacts?: BroadcastContactUncheckedCreateNestedManyWithoutSupporterInput
+    materialRequests?: MaterialRequestUncheckedCreateNestedManyWithoutSupporterInput
   }
 
   export type SupporterUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -47628,6 +49174,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -47642,13 +49189,15 @@ export namespace Prisma {
     conversations?: ConversationUpdateManyWithoutSupporterNestedInput
     bannerLocations?: BannerLocationUpdateManyWithoutSupporterNestedInput
     broadcastContacts?: BroadcastContactUpdateManyWithoutSupporterNestedInput
+    materialRequests?: MaterialRequestUpdateManyWithoutSupporterNestedInput
   }
 
   export type SupporterUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -47666,6 +49215,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -47678,13 +49228,15 @@ export namespace Prisma {
     conversations?: ConversationUncheckedUpdateManyWithoutSupporterNestedInput
     bannerLocations?: BannerLocationUncheckedUpdateManyWithoutSupporterNestedInput
     broadcastContacts?: BroadcastContactUncheckedUpdateManyWithoutSupporterNestedInput
+    materialRequests?: MaterialRequestUncheckedUpdateManyWithoutSupporterNestedInput
   }
 
   export type SupporterCreateManyInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -47702,6 +49254,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -47714,8 +49267,9 @@ export namespace Prisma {
   export type SupporterUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -47731,6 +49285,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -47741,8 +49296,9 @@ export namespace Prisma {
   export type SupporterUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -47760,6 +49316,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -47773,6 +49330,7 @@ export namespace Prisma {
     id?: string
     active?: boolean
     totalScore?: number
+    confirmationStatus?: $Enums.VolunteerConfirmation
     confirmed?: boolean
     confirmedAt?: Date | string | null
     confirmationChannel?: $Enums.Channel | null
@@ -47792,6 +49350,7 @@ export namespace Prisma {
     supporterId: string
     active?: boolean
     totalScore?: number
+    confirmationStatus?: $Enums.VolunteerConfirmation
     confirmed?: boolean
     confirmedAt?: Date | string | null
     confirmationChannel?: $Enums.Channel | null
@@ -47809,6 +49368,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     totalScore?: IntFieldUpdateOperationsInput | number
+    confirmationStatus?: EnumVolunteerConfirmationFieldUpdateOperationsInput | $Enums.VolunteerConfirmation
     confirmed?: BoolFieldUpdateOperationsInput | boolean
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     confirmationChannel?: NullableEnumChannelFieldUpdateOperationsInput | $Enums.Channel | null
@@ -47828,6 +49388,7 @@ export namespace Prisma {
     supporterId?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     totalScore?: IntFieldUpdateOperationsInput | number
+    confirmationStatus?: EnumVolunteerConfirmationFieldUpdateOperationsInput | $Enums.VolunteerConfirmation
     confirmed?: BoolFieldUpdateOperationsInput | boolean
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     confirmationChannel?: NullableEnumChannelFieldUpdateOperationsInput | $Enums.Channel | null
@@ -47846,6 +49407,7 @@ export namespace Prisma {
     supporterId: string
     active?: boolean
     totalScore?: number
+    confirmationStatus?: $Enums.VolunteerConfirmation
     confirmed?: boolean
     confirmedAt?: Date | string | null
     confirmationChannel?: $Enums.Channel | null
@@ -47859,6 +49421,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     totalScore?: IntFieldUpdateOperationsInput | number
+    confirmationStatus?: EnumVolunteerConfirmationFieldUpdateOperationsInput | $Enums.VolunteerConfirmation
     confirmed?: BoolFieldUpdateOperationsInput | boolean
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     confirmationChannel?: NullableEnumChannelFieldUpdateOperationsInput | $Enums.Channel | null
@@ -47872,6 +49435,7 @@ export namespace Prisma {
     supporterId?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     totalScore?: IntFieldUpdateOperationsInput | number
+    confirmationStatus?: EnumVolunteerConfirmationFieldUpdateOperationsInput | $Enums.VolunteerConfirmation
     confirmed?: BoolFieldUpdateOperationsInput | boolean
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     confirmationChannel?: NullableEnumChannelFieldUpdateOperationsInput | $Enums.Channel | null
@@ -48650,6 +50214,8 @@ export namespace Prisma {
   export type MaterialRequestCreateInput = {
     id?: string
     materialName: string
+    materials?: MaterialRequestCreatematerialsInput | string[]
+    materialType?: string | null
     quantity?: number
     justification?: string | null
     cityName?: string | null
@@ -48663,6 +50229,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     material?: MaterialCreateNestedOneWithoutRequestsInput
+    supporter?: SupporterCreateNestedOneWithoutMaterialRequestsInput
     requester?: UserCreateNestedOneWithoutRequestedMaterialsInput
     approver?: UserCreateNestedOneWithoutApprovedMaterialsInput
   }
@@ -48671,11 +50238,14 @@ export namespace Prisma {
     id?: string
     materialId?: string | null
     materialName: string
+    materials?: MaterialRequestCreatematerialsInput | string[]
+    materialType?: string | null
     quantity?: number
     justification?: string | null
     cityName?: string | null
     neighborhood?: string | null
     deliveryAddress?: string | null
+    supporterId?: string | null
     requesterId?: string | null
     approverId?: string | null
     status?: $Enums.MaterialRequestStatus
@@ -48690,6 +50260,8 @@ export namespace Prisma {
   export type MaterialRequestUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     materialName?: StringFieldUpdateOperationsInput | string
+    materials?: MaterialRequestUpdatematerialsInput | string[]
+    materialType?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     justification?: NullableStringFieldUpdateOperationsInput | string | null
     cityName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -48703,6 +50275,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     material?: MaterialUpdateOneWithoutRequestsNestedInput
+    supporter?: SupporterUpdateOneWithoutMaterialRequestsNestedInput
     requester?: UserUpdateOneWithoutRequestedMaterialsNestedInput
     approver?: UserUpdateOneWithoutApprovedMaterialsNestedInput
   }
@@ -48711,11 +50284,14 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     materialId?: NullableStringFieldUpdateOperationsInput | string | null
     materialName?: StringFieldUpdateOperationsInput | string
+    materials?: MaterialRequestUpdatematerialsInput | string[]
+    materialType?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     justification?: NullableStringFieldUpdateOperationsInput | string | null
     cityName?: NullableStringFieldUpdateOperationsInput | string | null
     neighborhood?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    supporterId?: NullableStringFieldUpdateOperationsInput | string | null
     requesterId?: NullableStringFieldUpdateOperationsInput | string | null
     approverId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumMaterialRequestStatusFieldUpdateOperationsInput | $Enums.MaterialRequestStatus
@@ -48731,11 +50307,14 @@ export namespace Prisma {
     id?: string
     materialId?: string | null
     materialName: string
+    materials?: MaterialRequestCreatematerialsInput | string[]
+    materialType?: string | null
     quantity?: number
     justification?: string | null
     cityName?: string | null
     neighborhood?: string | null
     deliveryAddress?: string | null
+    supporterId?: string | null
     requesterId?: string | null
     approverId?: string | null
     status?: $Enums.MaterialRequestStatus
@@ -48750,6 +50329,8 @@ export namespace Prisma {
   export type MaterialRequestUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     materialName?: StringFieldUpdateOperationsInput | string
+    materials?: MaterialRequestUpdatematerialsInput | string[]
+    materialType?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     justification?: NullableStringFieldUpdateOperationsInput | string | null
     cityName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -48768,11 +50349,14 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     materialId?: NullableStringFieldUpdateOperationsInput | string | null
     materialName?: StringFieldUpdateOperationsInput | string
+    materials?: MaterialRequestUpdatematerialsInput | string[]
+    materialType?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     justification?: NullableStringFieldUpdateOperationsInput | string | null
     cityName?: NullableStringFieldUpdateOperationsInput | string | null
     neighborhood?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    supporterId?: NullableStringFieldUpdateOperationsInput | string | null
     requesterId?: NullableStringFieldUpdateOperationsInput | string | null
     approverId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumMaterialRequestStatusFieldUpdateOperationsInput | $Enums.MaterialRequestStatus
@@ -49508,6 +51092,9 @@ export namespace Prisma {
     name: string
     message: string
     channel?: $Enums.Channel
+    templateName?: string | null
+    templateLang?: string | null
+    headerImageUrl?: string | null
     status?: $Enums.BroadcastStatus
     scheduledAt?: Date | string | null
     totalContacts?: number
@@ -49526,6 +51113,9 @@ export namespace Prisma {
     name: string
     message: string
     channel?: $Enums.Channel
+    templateName?: string | null
+    templateLang?: string | null
+    headerImageUrl?: string | null
     status?: $Enums.BroadcastStatus
     scheduledAt?: Date | string | null
     totalContacts?: number
@@ -49544,6 +51134,9 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     message?: StringFieldUpdateOperationsInput | string
     channel?: EnumChannelFieldUpdateOperationsInput | $Enums.Channel
+    templateName?: NullableStringFieldUpdateOperationsInput | string | null
+    templateLang?: NullableStringFieldUpdateOperationsInput | string | null
+    headerImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBroadcastStatusFieldUpdateOperationsInput | $Enums.BroadcastStatus
     scheduledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totalContacts?: IntFieldUpdateOperationsInput | number
@@ -49562,6 +51155,9 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     message?: StringFieldUpdateOperationsInput | string
     channel?: EnumChannelFieldUpdateOperationsInput | $Enums.Channel
+    templateName?: NullableStringFieldUpdateOperationsInput | string | null
+    templateLang?: NullableStringFieldUpdateOperationsInput | string | null
+    headerImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBroadcastStatusFieldUpdateOperationsInput | $Enums.BroadcastStatus
     scheduledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totalContacts?: IntFieldUpdateOperationsInput | number
@@ -49580,6 +51176,9 @@ export namespace Prisma {
     name: string
     message: string
     channel?: $Enums.Channel
+    templateName?: string | null
+    templateLang?: string | null
+    headerImageUrl?: string | null
     status?: $Enums.BroadcastStatus
     scheduledAt?: Date | string | null
     totalContacts?: number
@@ -49597,6 +51196,9 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     message?: StringFieldUpdateOperationsInput | string
     channel?: EnumChannelFieldUpdateOperationsInput | $Enums.Channel
+    templateName?: NullableStringFieldUpdateOperationsInput | string | null
+    templateLang?: NullableStringFieldUpdateOperationsInput | string | null
+    headerImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBroadcastStatusFieldUpdateOperationsInput | $Enums.BroadcastStatus
     scheduledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totalContacts?: IntFieldUpdateOperationsInput | number
@@ -49613,6 +51215,9 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     message?: StringFieldUpdateOperationsInput | string
     channel?: EnumChannelFieldUpdateOperationsInput | $Enums.Channel
+    templateName?: NullableStringFieldUpdateOperationsInput | string | null
+    templateLang?: NullableStringFieldUpdateOperationsInput | string | null
+    headerImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBroadcastStatusFieldUpdateOperationsInput | $Enums.BroadcastStatus
     scheduledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totalContacts?: IntFieldUpdateOperationsInput | number
@@ -50258,6 +51863,111 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type DataDeletionRequestCreateInput = {
+    id?: string
+    name: string
+    email?: string | null
+    phone?: string | null
+    reason?: string | null
+    status?: string
+    matchedSupporterId?: string | null
+    handledById?: string | null
+    handledAt?: Date | string | null
+    note?: string | null
+    ip?: string | null
+    createdAt?: Date | string
+  }
+
+  export type DataDeletionRequestUncheckedCreateInput = {
+    id?: string
+    name: string
+    email?: string | null
+    phone?: string | null
+    reason?: string | null
+    status?: string
+    matchedSupporterId?: string | null
+    handledById?: string | null
+    handledAt?: Date | string | null
+    note?: string | null
+    ip?: string | null
+    createdAt?: Date | string
+  }
+
+  export type DataDeletionRequestUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    matchedSupporterId?: NullableStringFieldUpdateOperationsInput | string | null
+    handledById?: NullableStringFieldUpdateOperationsInput | string | null
+    handledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    ip?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DataDeletionRequestUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    matchedSupporterId?: NullableStringFieldUpdateOperationsInput | string | null
+    handledById?: NullableStringFieldUpdateOperationsInput | string | null
+    handledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    ip?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DataDeletionRequestCreateManyInput = {
+    id?: string
+    name: string
+    email?: string | null
+    phone?: string | null
+    reason?: string | null
+    status?: string
+    matchedSupporterId?: string | null
+    handledById?: string | null
+    handledAt?: Date | string | null
+    note?: string | null
+    ip?: string | null
+    createdAt?: Date | string
+  }
+
+  export type DataDeletionRequestUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    matchedSupporterId?: NullableStringFieldUpdateOperationsInput | string | null
+    handledById?: NullableStringFieldUpdateOperationsInput | string | null
+    handledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    ip?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DataDeletionRequestUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    matchedSupporterId?: NullableStringFieldUpdateOperationsInput | string | null
+    handledById?: NullableStringFieldUpdateOperationsInput | string | null
+    handledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    ip?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -50817,6 +52527,14 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
   export type FloatNullableFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
     in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
@@ -50833,6 +52551,14 @@ export namespace Prisma {
     in?: $Enums.SupportType[] | ListEnumSupportTypeFieldRefInput<$PrismaModel>
     notIn?: $Enums.SupportType[] | ListEnumSupportTypeFieldRefInput<$PrismaModel>
     not?: NestedEnumSupportTypeFilter<$PrismaModel> | $Enums.SupportType
+  }
+
+  export type EnumSupportTypeNullableListFilter<$PrismaModel = never> = {
+    equals?: $Enums.SupportType[] | ListEnumSupportTypeFieldRefInput<$PrismaModel> | null
+    has?: $Enums.SupportType | EnumSupportTypeFieldRefInput<$PrismaModel> | null
+    hasEvery?: $Enums.SupportType[] | ListEnumSupportTypeFieldRefInput<$PrismaModel>
+    hasSome?: $Enums.SupportType[] | ListEnumSupportTypeFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
   }
 
   export type EnumSupporterStatusFilter<$PrismaModel = never> = {
@@ -50882,6 +52608,7 @@ export namespace Prisma {
     name?: SortOrder
     phone?: SortOrder
     whatsapp?: SortOrder
+    tags?: SortOrder
     email?: SortOrder
     cpf?: SortOrder
     birthDate?: SortOrder
@@ -50899,6 +52626,7 @@ export namespace Prisma {
     instagram?: SortOrder
     facebook?: SortOrder
     supportType?: SortOrder
+    supportTypes?: SortOrder
     status?: SortOrder
     notes?: SortOrder
     flaggedReason?: SortOrder
@@ -51027,6 +52755,13 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
+  export type EnumVolunteerConfirmationFilter<$PrismaModel = never> = {
+    equals?: $Enums.VolunteerConfirmation | EnumVolunteerConfirmationFieldRefInput<$PrismaModel>
+    in?: $Enums.VolunteerConfirmation[] | ListEnumVolunteerConfirmationFieldRefInput<$PrismaModel>
+    notIn?: $Enums.VolunteerConfirmation[] | ListEnumVolunteerConfirmationFieldRefInput<$PrismaModel>
+    not?: NestedEnumVolunteerConfirmationFilter<$PrismaModel> | $Enums.VolunteerConfirmation
+  }
+
   export type EnumChannelNullableFilter<$PrismaModel = never> = {
     equals?: $Enums.Channel | EnumChannelFieldRefInput<$PrismaModel> | null
     in?: $Enums.Channel[] | ListEnumChannelFieldRefInput<$PrismaModel> | null
@@ -51074,6 +52809,7 @@ export namespace Prisma {
     supporterId?: SortOrder
     active?: SortOrder
     totalScore?: SortOrder
+    confirmationStatus?: SortOrder
     confirmed?: SortOrder
     confirmedAt?: SortOrder
     confirmationChannel?: SortOrder
@@ -51092,6 +52828,7 @@ export namespace Prisma {
     supporterId?: SortOrder
     active?: SortOrder
     totalScore?: SortOrder
+    confirmationStatus?: SortOrder
     confirmed?: SortOrder
     confirmedAt?: SortOrder
     confirmationChannel?: SortOrder
@@ -51106,6 +52843,7 @@ export namespace Prisma {
     supporterId?: SortOrder
     active?: SortOrder
     totalScore?: SortOrder
+    confirmationStatus?: SortOrder
     confirmed?: SortOrder
     confirmedAt?: SortOrder
     confirmationChannel?: SortOrder
@@ -51133,6 +52871,16 @@ export namespace Prisma {
     _sum?: NestedIntFilter<$PrismaModel>
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type EnumVolunteerConfirmationWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.VolunteerConfirmation | EnumVolunteerConfirmationFieldRefInput<$PrismaModel>
+    in?: $Enums.VolunteerConfirmation[] | ListEnumVolunteerConfirmationFieldRefInput<$PrismaModel>
+    notIn?: $Enums.VolunteerConfirmation[] | ListEnumVolunteerConfirmationFieldRefInput<$PrismaModel>
+    not?: NestedEnumVolunteerConfirmationWithAggregatesFilter<$PrismaModel> | $Enums.VolunteerConfirmation
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumVolunteerConfirmationFilter<$PrismaModel>
+    _max?: NestedEnumVolunteerConfirmationFilter<$PrismaModel>
   }
 
   export type EnumChannelNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -51651,11 +53399,14 @@ export namespace Prisma {
     id?: SortOrder
     materialId?: SortOrder
     materialName?: SortOrder
+    materials?: SortOrder
+    materialType?: SortOrder
     quantity?: SortOrder
     justification?: SortOrder
     cityName?: SortOrder
     neighborhood?: SortOrder
     deliveryAddress?: SortOrder
+    supporterId?: SortOrder
     requesterId?: SortOrder
     approverId?: SortOrder
     status?: SortOrder
@@ -51675,11 +53426,13 @@ export namespace Prisma {
     id?: SortOrder
     materialId?: SortOrder
     materialName?: SortOrder
+    materialType?: SortOrder
     quantity?: SortOrder
     justification?: SortOrder
     cityName?: SortOrder
     neighborhood?: SortOrder
     deliveryAddress?: SortOrder
+    supporterId?: SortOrder
     requesterId?: SortOrder
     approverId?: SortOrder
     status?: SortOrder
@@ -51695,11 +53448,13 @@ export namespace Prisma {
     id?: SortOrder
     materialId?: SortOrder
     materialName?: SortOrder
+    materialType?: SortOrder
     quantity?: SortOrder
     justification?: SortOrder
     cityName?: SortOrder
     neighborhood?: SortOrder
     deliveryAddress?: SortOrder
+    supporterId?: SortOrder
     requesterId?: SortOrder
     approverId?: SortOrder
     status?: SortOrder
@@ -52223,6 +53978,9 @@ export namespace Prisma {
     name?: SortOrder
     message?: SortOrder
     channel?: SortOrder
+    templateName?: SortOrder
+    templateLang?: SortOrder
+    headerImageUrl?: SortOrder
     status?: SortOrder
     scheduledAt?: SortOrder
     totalContacts?: SortOrder
@@ -52247,6 +54005,9 @@ export namespace Prisma {
     name?: SortOrder
     message?: SortOrder
     channel?: SortOrder
+    templateName?: SortOrder
+    templateLang?: SortOrder
+    headerImageUrl?: SortOrder
     status?: SortOrder
     scheduledAt?: SortOrder
     totalContacts?: SortOrder
@@ -52263,6 +54024,9 @@ export namespace Prisma {
     name?: SortOrder
     message?: SortOrder
     channel?: SortOrder
+    templateName?: SortOrder
+    templateLang?: SortOrder
+    headerImageUrl?: SortOrder
     status?: SortOrder
     scheduledAt?: SortOrder
     totalContacts?: SortOrder
@@ -52726,6 +54490,51 @@ export namespace Prisma {
     senderId?: SortOrder
     body?: SortOrder
     attachmentUrl?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DataDeletionRequestCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    phone?: SortOrder
+    reason?: SortOrder
+    status?: SortOrder
+    matchedSupporterId?: SortOrder
+    handledById?: SortOrder
+    handledAt?: SortOrder
+    note?: SortOrder
+    ip?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DataDeletionRequestMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    phone?: SortOrder
+    reason?: SortOrder
+    status?: SortOrder
+    matchedSupporterId?: SortOrder
+    handledById?: SortOrder
+    handledAt?: SortOrder
+    note?: SortOrder
+    ip?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DataDeletionRequestMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    phone?: SortOrder
+    reason?: SortOrder
+    status?: SortOrder
+    matchedSupporterId?: SortOrder
+    handledById?: SortOrder
+    handledAt?: SortOrder
+    note?: SortOrder
+    ip?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -54117,6 +55926,14 @@ export namespace Prisma {
     deleteMany?: DemandScalarWhereInput | DemandScalarWhereInput[]
   }
 
+  export type SupporterCreatetagsInput = {
+    set: string[]
+  }
+
+  export type SupporterCreatesupportTypesInput = {
+    set: $Enums.SupportType[]
+  }
+
   export type CityCreateNestedOneWithoutSupportersInput = {
     create?: XOR<CityCreateWithoutSupportersInput, CityUncheckedCreateWithoutSupportersInput>
     connectOrCreate?: CityCreateOrConnectWithoutSupportersInput
@@ -54175,6 +55992,13 @@ export namespace Prisma {
     connect?: BroadcastContactWhereUniqueInput | BroadcastContactWhereUniqueInput[]
   }
 
+  export type MaterialRequestCreateNestedManyWithoutSupporterInput = {
+    create?: XOR<MaterialRequestCreateWithoutSupporterInput, MaterialRequestUncheckedCreateWithoutSupporterInput> | MaterialRequestCreateWithoutSupporterInput[] | MaterialRequestUncheckedCreateWithoutSupporterInput[]
+    connectOrCreate?: MaterialRequestCreateOrConnectWithoutSupporterInput | MaterialRequestCreateOrConnectWithoutSupporterInput[]
+    createMany?: MaterialRequestCreateManySupporterInputEnvelope
+    connect?: MaterialRequestWhereUniqueInput | MaterialRequestWhereUniqueInput[]
+  }
+
   export type SupporterUncheckedCreateNestedManyWithoutDuplicateOfInput = {
     create?: XOR<SupporterCreateWithoutDuplicateOfInput, SupporterUncheckedCreateWithoutDuplicateOfInput> | SupporterCreateWithoutDuplicateOfInput[] | SupporterUncheckedCreateWithoutDuplicateOfInput[]
     connectOrCreate?: SupporterCreateOrConnectWithoutDuplicateOfInput | SupporterCreateOrConnectWithoutDuplicateOfInput[]
@@ -54209,6 +56033,18 @@ export namespace Prisma {
     connect?: BroadcastContactWhereUniqueInput | BroadcastContactWhereUniqueInput[]
   }
 
+  export type MaterialRequestUncheckedCreateNestedManyWithoutSupporterInput = {
+    create?: XOR<MaterialRequestCreateWithoutSupporterInput, MaterialRequestUncheckedCreateWithoutSupporterInput> | MaterialRequestCreateWithoutSupporterInput[] | MaterialRequestUncheckedCreateWithoutSupporterInput[]
+    connectOrCreate?: MaterialRequestCreateOrConnectWithoutSupporterInput | MaterialRequestCreateOrConnectWithoutSupporterInput[]
+    createMany?: MaterialRequestCreateManySupporterInputEnvelope
+    connect?: MaterialRequestWhereUniqueInput | MaterialRequestWhereUniqueInput[]
+  }
+
+  export type SupporterUpdatetagsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
   export type NullableFloatFieldUpdateOperationsInput = {
     set?: number | null
     increment?: number
@@ -54219,6 +56055,11 @@ export namespace Prisma {
 
   export type EnumSupportTypeFieldUpdateOperationsInput = {
     set?: $Enums.SupportType
+  }
+
+  export type SupporterUpdatesupportTypesInput = {
+    set?: $Enums.SupportType[]
+    push?: $Enums.SupportType | $Enums.SupportType[]
   }
 
   export type EnumSupporterStatusFieldUpdateOperationsInput = {
@@ -54331,6 +56172,20 @@ export namespace Prisma {
     deleteMany?: BroadcastContactScalarWhereInput | BroadcastContactScalarWhereInput[]
   }
 
+  export type MaterialRequestUpdateManyWithoutSupporterNestedInput = {
+    create?: XOR<MaterialRequestCreateWithoutSupporterInput, MaterialRequestUncheckedCreateWithoutSupporterInput> | MaterialRequestCreateWithoutSupporterInput[] | MaterialRequestUncheckedCreateWithoutSupporterInput[]
+    connectOrCreate?: MaterialRequestCreateOrConnectWithoutSupporterInput | MaterialRequestCreateOrConnectWithoutSupporterInput[]
+    upsert?: MaterialRequestUpsertWithWhereUniqueWithoutSupporterInput | MaterialRequestUpsertWithWhereUniqueWithoutSupporterInput[]
+    createMany?: MaterialRequestCreateManySupporterInputEnvelope
+    set?: MaterialRequestWhereUniqueInput | MaterialRequestWhereUniqueInput[]
+    disconnect?: MaterialRequestWhereUniqueInput | MaterialRequestWhereUniqueInput[]
+    delete?: MaterialRequestWhereUniqueInput | MaterialRequestWhereUniqueInput[]
+    connect?: MaterialRequestWhereUniqueInput | MaterialRequestWhereUniqueInput[]
+    update?: MaterialRequestUpdateWithWhereUniqueWithoutSupporterInput | MaterialRequestUpdateWithWhereUniqueWithoutSupporterInput[]
+    updateMany?: MaterialRequestUpdateManyWithWhereWithoutSupporterInput | MaterialRequestUpdateManyWithWhereWithoutSupporterInput[]
+    deleteMany?: MaterialRequestScalarWhereInput | MaterialRequestScalarWhereInput[]
+  }
+
   export type SupporterUncheckedUpdateManyWithoutDuplicateOfNestedInput = {
     create?: XOR<SupporterCreateWithoutDuplicateOfInput, SupporterUncheckedCreateWithoutDuplicateOfInput> | SupporterCreateWithoutDuplicateOfInput[] | SupporterUncheckedCreateWithoutDuplicateOfInput[]
     connectOrCreate?: SupporterCreateOrConnectWithoutDuplicateOfInput | SupporterCreateOrConnectWithoutDuplicateOfInput[]
@@ -54395,6 +56250,20 @@ export namespace Prisma {
     update?: BroadcastContactUpdateWithWhereUniqueWithoutSupporterInput | BroadcastContactUpdateWithWhereUniqueWithoutSupporterInput[]
     updateMany?: BroadcastContactUpdateManyWithWhereWithoutSupporterInput | BroadcastContactUpdateManyWithWhereWithoutSupporterInput[]
     deleteMany?: BroadcastContactScalarWhereInput | BroadcastContactScalarWhereInput[]
+  }
+
+  export type MaterialRequestUncheckedUpdateManyWithoutSupporterNestedInput = {
+    create?: XOR<MaterialRequestCreateWithoutSupporterInput, MaterialRequestUncheckedCreateWithoutSupporterInput> | MaterialRequestCreateWithoutSupporterInput[] | MaterialRequestUncheckedCreateWithoutSupporterInput[]
+    connectOrCreate?: MaterialRequestCreateOrConnectWithoutSupporterInput | MaterialRequestCreateOrConnectWithoutSupporterInput[]
+    upsert?: MaterialRequestUpsertWithWhereUniqueWithoutSupporterInput | MaterialRequestUpsertWithWhereUniqueWithoutSupporterInput[]
+    createMany?: MaterialRequestCreateManySupporterInputEnvelope
+    set?: MaterialRequestWhereUniqueInput | MaterialRequestWhereUniqueInput[]
+    disconnect?: MaterialRequestWhereUniqueInput | MaterialRequestWhereUniqueInput[]
+    delete?: MaterialRequestWhereUniqueInput | MaterialRequestWhereUniqueInput[]
+    connect?: MaterialRequestWhereUniqueInput | MaterialRequestWhereUniqueInput[]
+    update?: MaterialRequestUpdateWithWhereUniqueWithoutSupporterInput | MaterialRequestUpdateWithWhereUniqueWithoutSupporterInput[]
+    updateMany?: MaterialRequestUpdateManyWithWhereWithoutSupporterInput | MaterialRequestUpdateManyWithWhereWithoutSupporterInput[]
+    deleteMany?: MaterialRequestScalarWhereInput | MaterialRequestScalarWhereInput[]
   }
 
   export type SupporterCreateNestedOneWithoutVolunteerInput = {
@@ -54471,6 +56340,10 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type EnumVolunteerConfirmationFieldUpdateOperationsInput = {
+    set?: $Enums.VolunteerConfirmation
   }
 
   export type NullableEnumChannelFieldUpdateOperationsInput = {
@@ -54999,10 +56872,20 @@ export namespace Prisma {
     deleteMany?: MaterialRequestScalarWhereInput | MaterialRequestScalarWhereInput[]
   }
 
+  export type MaterialRequestCreatematerialsInput = {
+    set: string[]
+  }
+
   export type MaterialCreateNestedOneWithoutRequestsInput = {
     create?: XOR<MaterialCreateWithoutRequestsInput, MaterialUncheckedCreateWithoutRequestsInput>
     connectOrCreate?: MaterialCreateOrConnectWithoutRequestsInput
     connect?: MaterialWhereUniqueInput
+  }
+
+  export type SupporterCreateNestedOneWithoutMaterialRequestsInput = {
+    create?: XOR<SupporterCreateWithoutMaterialRequestsInput, SupporterUncheckedCreateWithoutMaterialRequestsInput>
+    connectOrCreate?: SupporterCreateOrConnectWithoutMaterialRequestsInput
+    connect?: SupporterWhereUniqueInput
   }
 
   export type UserCreateNestedOneWithoutRequestedMaterialsInput = {
@@ -55017,6 +56900,11 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type MaterialRequestUpdatematerialsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
   export type EnumMaterialRequestStatusFieldUpdateOperationsInput = {
     set?: $Enums.MaterialRequestStatus
   }
@@ -55029,6 +56917,16 @@ export namespace Prisma {
     delete?: MaterialWhereInput | boolean
     connect?: MaterialWhereUniqueInput
     update?: XOR<XOR<MaterialUpdateToOneWithWhereWithoutRequestsInput, MaterialUpdateWithoutRequestsInput>, MaterialUncheckedUpdateWithoutRequestsInput>
+  }
+
+  export type SupporterUpdateOneWithoutMaterialRequestsNestedInput = {
+    create?: XOR<SupporterCreateWithoutMaterialRequestsInput, SupporterUncheckedCreateWithoutMaterialRequestsInput>
+    connectOrCreate?: SupporterCreateOrConnectWithoutMaterialRequestsInput
+    upsert?: SupporterUpsertWithoutMaterialRequestsInput
+    disconnect?: SupporterWhereInput | boolean
+    delete?: SupporterWhereInput | boolean
+    connect?: SupporterWhereUniqueInput
+    update?: XOR<XOR<SupporterUpdateToOneWithWhereWithoutMaterialRequestsInput, SupporterUpdateWithoutMaterialRequestsInput>, SupporterUncheckedUpdateWithoutMaterialRequestsInput>
   }
 
   export type UserUpdateOneWithoutRequestedMaterialsNestedInput = {
@@ -55923,6 +57821,13 @@ export namespace Prisma {
     _max?: NestedEnumSupporterStatusFilter<$PrismaModel>
   }
 
+  export type NestedEnumVolunteerConfirmationFilter<$PrismaModel = never> = {
+    equals?: $Enums.VolunteerConfirmation | EnumVolunteerConfirmationFieldRefInput<$PrismaModel>
+    in?: $Enums.VolunteerConfirmation[] | ListEnumVolunteerConfirmationFieldRefInput<$PrismaModel>
+    notIn?: $Enums.VolunteerConfirmation[] | ListEnumVolunteerConfirmationFieldRefInput<$PrismaModel>
+    not?: NestedEnumVolunteerConfirmationFilter<$PrismaModel> | $Enums.VolunteerConfirmation
+  }
+
   export type NestedEnumChannelNullableFilter<$PrismaModel = never> = {
     equals?: $Enums.Channel | EnumChannelFieldRefInput<$PrismaModel> | null
     in?: $Enums.Channel[] | ListEnumChannelFieldRefInput<$PrismaModel> | null
@@ -55955,6 +57860,16 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type NestedEnumVolunteerConfirmationWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.VolunteerConfirmation | EnumVolunteerConfirmationFieldRefInput<$PrismaModel>
+    in?: $Enums.VolunteerConfirmation[] | ListEnumVolunteerConfirmationFieldRefInput<$PrismaModel>
+    notIn?: $Enums.VolunteerConfirmation[] | ListEnumVolunteerConfirmationFieldRefInput<$PrismaModel>
+    not?: NestedEnumVolunteerConfirmationWithAggregatesFilter<$PrismaModel> | $Enums.VolunteerConfirmation
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumVolunteerConfirmationFilter<$PrismaModel>
+    _max?: NestedEnumVolunteerConfirmationFilter<$PrismaModel>
   }
 
   export type NestedEnumChannelNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -56626,8 +58541,9 @@ export namespace Prisma {
   export type SupporterCreateWithoutCoordinatorInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -56643,6 +58559,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -56656,13 +58573,15 @@ export namespace Prisma {
     conversations?: ConversationCreateNestedManyWithoutSupporterInput
     bannerLocations?: BannerLocationCreateNestedManyWithoutSupporterInput
     broadcastContacts?: BroadcastContactCreateNestedManyWithoutSupporterInput
+    materialRequests?: MaterialRequestCreateNestedManyWithoutSupporterInput
   }
 
   export type SupporterUncheckedCreateWithoutCoordinatorInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -56680,6 +58599,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -56691,6 +58611,7 @@ export namespace Prisma {
     conversations?: ConversationUncheckedCreateNestedManyWithoutSupporterInput
     bannerLocations?: BannerLocationUncheckedCreateNestedManyWithoutSupporterInput
     broadcastContacts?: BroadcastContactUncheckedCreateNestedManyWithoutSupporterInput
+    materialRequests?: MaterialRequestUncheckedCreateNestedManyWithoutSupporterInput
   }
 
   export type SupporterCreateOrConnectWithoutCoordinatorInput = {
@@ -56707,6 +58628,7 @@ export namespace Prisma {
     id?: string
     active?: boolean
     totalScore?: number
+    confirmationStatus?: $Enums.VolunteerConfirmation
     confirmed?: boolean
     confirmedAt?: Date | string | null
     confirmationChannel?: $Enums.Channel | null
@@ -56725,6 +58647,7 @@ export namespace Prisma {
     supporterId: string
     active?: boolean
     totalScore?: number
+    confirmationStatus?: $Enums.VolunteerConfirmation
     confirmed?: boolean
     confirmedAt?: Date | string | null
     confirmationChannel?: $Enums.Channel | null
@@ -56966,6 +58889,8 @@ export namespace Prisma {
   export type MaterialRequestCreateWithoutRequesterInput = {
     id?: string
     materialName: string
+    materials?: MaterialRequestCreatematerialsInput | string[]
+    materialType?: string | null
     quantity?: number
     justification?: string | null
     cityName?: string | null
@@ -56979,6 +58904,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     material?: MaterialCreateNestedOneWithoutRequestsInput
+    supporter?: SupporterCreateNestedOneWithoutMaterialRequestsInput
     approver?: UserCreateNestedOneWithoutApprovedMaterialsInput
   }
 
@@ -56986,11 +58912,14 @@ export namespace Prisma {
     id?: string
     materialId?: string | null
     materialName: string
+    materials?: MaterialRequestCreatematerialsInput | string[]
+    materialType?: string | null
     quantity?: number
     justification?: string | null
     cityName?: string | null
     neighborhood?: string | null
     deliveryAddress?: string | null
+    supporterId?: string | null
     approverId?: string | null
     status?: $Enums.MaterialRequestStatus
     appliedPhotoUrl?: string | null
@@ -57014,6 +58943,8 @@ export namespace Prisma {
   export type MaterialRequestCreateWithoutApproverInput = {
     id?: string
     materialName: string
+    materials?: MaterialRequestCreatematerialsInput | string[]
+    materialType?: string | null
     quantity?: number
     justification?: string | null
     cityName?: string | null
@@ -57027,6 +58958,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     material?: MaterialCreateNestedOneWithoutRequestsInput
+    supporter?: SupporterCreateNestedOneWithoutMaterialRequestsInput
     requester?: UserCreateNestedOneWithoutRequestedMaterialsInput
   }
 
@@ -57034,11 +58966,14 @@ export namespace Prisma {
     id?: string
     materialId?: string | null
     materialName: string
+    materials?: MaterialRequestCreatematerialsInput | string[]
+    materialType?: string | null
     quantity?: number
     justification?: string | null
     cityName?: string | null
     neighborhood?: string | null
     deliveryAddress?: string | null
+    supporterId?: string | null
     requesterId?: string | null
     status?: $Enums.MaterialRequestStatus
     appliedPhotoUrl?: string | null
@@ -57204,6 +59139,9 @@ export namespace Prisma {
     name: string
     message: string
     channel?: $Enums.Channel
+    templateName?: string | null
+    templateLang?: string | null
+    headerImageUrl?: string | null
     status?: $Enums.BroadcastStatus
     scheduledAt?: Date | string | null
     totalContacts?: number
@@ -57221,6 +59159,9 @@ export namespace Prisma {
     name: string
     message: string
     channel?: $Enums.Channel
+    templateName?: string | null
+    templateLang?: string | null
+    headerImageUrl?: string | null
     status?: $Enums.BroadcastStatus
     scheduledAt?: Date | string | null
     totalContacts?: number
@@ -57567,8 +59508,9 @@ export namespace Prisma {
     NOT?: SupporterScalarWhereInput | SupporterScalarWhereInput[]
     id?: StringFilter<"Supporter"> | string
     name?: StringFilter<"Supporter"> | string
-    phone?: StringFilter<"Supporter"> | string
+    phone?: StringNullableFilter<"Supporter"> | string | null
     whatsapp?: StringNullableFilter<"Supporter"> | string | null
+    tags?: StringNullableListFilter<"Supporter">
     email?: StringNullableFilter<"Supporter"> | string | null
     cpf?: StringNullableFilter<"Supporter"> | string | null
     birthDate?: DateTimeNullableFilter<"Supporter"> | Date | string | null
@@ -57586,6 +59528,7 @@ export namespace Prisma {
     instagram?: StringNullableFilter<"Supporter"> | string | null
     facebook?: StringNullableFilter<"Supporter"> | string | null
     supportType?: EnumSupportTypeFilter<"Supporter"> | $Enums.SupportType
+    supportTypes?: EnumSupportTypeNullableListFilter<"Supporter">
     status?: EnumSupporterStatusFilter<"Supporter"> | $Enums.SupporterStatus
     notes?: StringNullableFilter<"Supporter"> | string | null
     flaggedReason?: StringNullableFilter<"Supporter"> | string | null
@@ -57619,6 +59562,7 @@ export namespace Prisma {
     supporterId?: StringFilter<"Volunteer"> | string
     active?: BoolFilter<"Volunteer"> | boolean
     totalScore?: IntFilter<"Volunteer"> | number
+    confirmationStatus?: EnumVolunteerConfirmationFilter<"Volunteer"> | $Enums.VolunteerConfirmation
     confirmed?: BoolFilter<"Volunteer"> | boolean
     confirmedAt?: DateTimeNullableFilter<"Volunteer"> | Date | string | null
     confirmationChannel?: EnumChannelNullableFilter<"Volunteer"> | $Enums.Channel | null
@@ -57846,11 +59790,14 @@ export namespace Prisma {
     id?: StringFilter<"MaterialRequest"> | string
     materialId?: StringNullableFilter<"MaterialRequest"> | string | null
     materialName?: StringFilter<"MaterialRequest"> | string
+    materials?: StringNullableListFilter<"MaterialRequest">
+    materialType?: StringNullableFilter<"MaterialRequest"> | string | null
     quantity?: IntFilter<"MaterialRequest"> | number
     justification?: StringNullableFilter<"MaterialRequest"> | string | null
     cityName?: StringNullableFilter<"MaterialRequest"> | string | null
     neighborhood?: StringNullableFilter<"MaterialRequest"> | string | null
     deliveryAddress?: StringNullableFilter<"MaterialRequest"> | string | null
+    supporterId?: StringNullableFilter<"MaterialRequest"> | string | null
     requesterId?: StringNullableFilter<"MaterialRequest"> | string | null
     approverId?: StringNullableFilter<"MaterialRequest"> | string | null
     status?: EnumMaterialRequestStatusFilter<"MaterialRequest"> | $Enums.MaterialRequestStatus
@@ -58017,6 +59964,9 @@ export namespace Prisma {
     name?: StringFilter<"BroadcastCampaign"> | string
     message?: StringFilter<"BroadcastCampaign"> | string
     channel?: EnumChannelFilter<"BroadcastCampaign"> | $Enums.Channel
+    templateName?: StringNullableFilter<"BroadcastCampaign"> | string | null
+    templateLang?: StringNullableFilter<"BroadcastCampaign"> | string | null
+    headerImageUrl?: StringNullableFilter<"BroadcastCampaign"> | string | null
     status?: EnumBroadcastStatusFilter<"BroadcastCampaign"> | $Enums.BroadcastStatus
     scheduledAt?: DateTimeNullableFilter<"BroadcastCampaign"> | Date | string | null
     totalContacts?: IntFilter<"BroadcastCampaign"> | number
@@ -58343,8 +60293,9 @@ export namespace Prisma {
   export type SupporterCreateWithoutRegionInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -58360,6 +60311,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -58373,13 +60325,15 @@ export namespace Prisma {
     conversations?: ConversationCreateNestedManyWithoutSupporterInput
     bannerLocations?: BannerLocationCreateNestedManyWithoutSupporterInput
     broadcastContacts?: BroadcastContactCreateNestedManyWithoutSupporterInput
+    materialRequests?: MaterialRequestCreateNestedManyWithoutSupporterInput
   }
 
   export type SupporterUncheckedCreateWithoutRegionInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -58396,6 +60350,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -58408,6 +60363,7 @@ export namespace Prisma {
     conversations?: ConversationUncheckedCreateNestedManyWithoutSupporterInput
     bannerLocations?: BannerLocationUncheckedCreateNestedManyWithoutSupporterInput
     broadcastContacts?: BroadcastContactUncheckedCreateNestedManyWithoutSupporterInput
+    materialRequests?: MaterialRequestUncheckedCreateNestedManyWithoutSupporterInput
   }
 
   export type SupporterCreateOrConnectWithoutRegionInput = {
@@ -58859,8 +60815,9 @@ export namespace Prisma {
   export type SupporterCreateWithoutCityInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -58876,6 +60833,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -58889,13 +60847,15 @@ export namespace Prisma {
     conversations?: ConversationCreateNestedManyWithoutSupporterInput
     bannerLocations?: BannerLocationCreateNestedManyWithoutSupporterInput
     broadcastContacts?: BroadcastContactCreateNestedManyWithoutSupporterInput
+    materialRequests?: MaterialRequestCreateNestedManyWithoutSupporterInput
   }
 
   export type SupporterUncheckedCreateWithoutCityInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -58912,6 +60872,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -58924,6 +60885,7 @@ export namespace Prisma {
     conversations?: ConversationUncheckedCreateNestedManyWithoutSupporterInput
     bannerLocations?: BannerLocationUncheckedCreateNestedManyWithoutSupporterInput
     broadcastContacts?: BroadcastContactUncheckedCreateNestedManyWithoutSupporterInput
+    materialRequests?: MaterialRequestUncheckedCreateNestedManyWithoutSupporterInput
   }
 
   export type SupporterCreateOrConnectWithoutCityInput = {
@@ -59252,8 +61214,9 @@ export namespace Prisma {
   export type SupporterCreateWithoutDuplicatesInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -59269,6 +61232,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -59282,13 +61246,15 @@ export namespace Prisma {
     conversations?: ConversationCreateNestedManyWithoutSupporterInput
     bannerLocations?: BannerLocationCreateNestedManyWithoutSupporterInput
     broadcastContacts?: BroadcastContactCreateNestedManyWithoutSupporterInput
+    materialRequests?: MaterialRequestCreateNestedManyWithoutSupporterInput
   }
 
   export type SupporterUncheckedCreateWithoutDuplicatesInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -59306,6 +61272,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -59317,6 +61284,7 @@ export namespace Prisma {
     conversations?: ConversationUncheckedCreateNestedManyWithoutSupporterInput
     bannerLocations?: BannerLocationUncheckedCreateNestedManyWithoutSupporterInput
     broadcastContacts?: BroadcastContactUncheckedCreateNestedManyWithoutSupporterInput
+    materialRequests?: MaterialRequestUncheckedCreateNestedManyWithoutSupporterInput
   }
 
   export type SupporterCreateOrConnectWithoutDuplicatesInput = {
@@ -59327,8 +61295,9 @@ export namespace Prisma {
   export type SupporterCreateWithoutDuplicateOfInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -59344,6 +61313,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -59357,13 +61327,15 @@ export namespace Prisma {
     conversations?: ConversationCreateNestedManyWithoutSupporterInput
     bannerLocations?: BannerLocationCreateNestedManyWithoutSupporterInput
     broadcastContacts?: BroadcastContactCreateNestedManyWithoutSupporterInput
+    materialRequests?: MaterialRequestCreateNestedManyWithoutSupporterInput
   }
 
   export type SupporterUncheckedCreateWithoutDuplicateOfInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -59381,6 +61353,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -59392,6 +61365,7 @@ export namespace Prisma {
     conversations?: ConversationUncheckedCreateNestedManyWithoutSupporterInput
     bannerLocations?: BannerLocationUncheckedCreateNestedManyWithoutSupporterInput
     broadcastContacts?: BroadcastContactUncheckedCreateNestedManyWithoutSupporterInput
+    materialRequests?: MaterialRequestUncheckedCreateNestedManyWithoutSupporterInput
   }
 
   export type SupporterCreateOrConnectWithoutDuplicateOfInput = {
@@ -59487,6 +61461,7 @@ export namespace Prisma {
     id?: string
     active?: boolean
     totalScore?: number
+    confirmationStatus?: $Enums.VolunteerConfirmation
     confirmed?: boolean
     confirmedAt?: Date | string | null
     confirmationChannel?: $Enums.Channel | null
@@ -59504,6 +61479,7 @@ export namespace Prisma {
     id?: string
     active?: boolean
     totalScore?: number
+    confirmationStatus?: $Enums.VolunteerConfirmation
     confirmed?: boolean
     confirmedAt?: Date | string | null
     confirmationChannel?: $Enums.Channel | null
@@ -59648,6 +61624,60 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type MaterialRequestCreateWithoutSupporterInput = {
+    id?: string
+    materialName: string
+    materials?: MaterialRequestCreatematerialsInput | string[]
+    materialType?: string | null
+    quantity?: number
+    justification?: string | null
+    cityName?: string | null
+    neighborhood?: string | null
+    deliveryAddress?: string | null
+    status?: $Enums.MaterialRequestStatus
+    appliedPhotoUrl?: string | null
+    requestedAt?: Date | string
+    approvedAt?: Date | string | null
+    deliveredAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    material?: MaterialCreateNestedOneWithoutRequestsInput
+    requester?: UserCreateNestedOneWithoutRequestedMaterialsInput
+    approver?: UserCreateNestedOneWithoutApprovedMaterialsInput
+  }
+
+  export type MaterialRequestUncheckedCreateWithoutSupporterInput = {
+    id?: string
+    materialId?: string | null
+    materialName: string
+    materials?: MaterialRequestCreatematerialsInput | string[]
+    materialType?: string | null
+    quantity?: number
+    justification?: string | null
+    cityName?: string | null
+    neighborhood?: string | null
+    deliveryAddress?: string | null
+    requesterId?: string | null
+    approverId?: string | null
+    status?: $Enums.MaterialRequestStatus
+    appliedPhotoUrl?: string | null
+    requestedAt?: Date | string
+    approvedAt?: Date | string | null
+    deliveredAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MaterialRequestCreateOrConnectWithoutSupporterInput = {
+    where: MaterialRequestWhereUniqueInput
+    create: XOR<MaterialRequestCreateWithoutSupporterInput, MaterialRequestUncheckedCreateWithoutSupporterInput>
+  }
+
+  export type MaterialRequestCreateManySupporterInputEnvelope = {
+    data: MaterialRequestCreateManySupporterInput | MaterialRequestCreateManySupporterInput[]
+    skipDuplicates?: boolean
+  }
+
   export type CityUpsertWithoutSupportersInput = {
     update: XOR<CityUpdateWithoutSupportersInput, CityUncheckedUpdateWithoutSupportersInput>
     create: XOR<CityCreateWithoutSupportersInput, CityUncheckedCreateWithoutSupportersInput>
@@ -59740,8 +61770,9 @@ export namespace Prisma {
   export type SupporterUpdateWithoutDuplicatesInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -59757,6 +61788,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -59770,13 +61802,15 @@ export namespace Prisma {
     conversations?: ConversationUpdateManyWithoutSupporterNestedInput
     bannerLocations?: BannerLocationUpdateManyWithoutSupporterNestedInput
     broadcastContacts?: BroadcastContactUpdateManyWithoutSupporterNestedInput
+    materialRequests?: MaterialRequestUpdateManyWithoutSupporterNestedInput
   }
 
   export type SupporterUncheckedUpdateWithoutDuplicatesInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -59794,6 +61828,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -59805,6 +61840,7 @@ export namespace Prisma {
     conversations?: ConversationUncheckedUpdateManyWithoutSupporterNestedInput
     bannerLocations?: BannerLocationUncheckedUpdateManyWithoutSupporterNestedInput
     broadcastContacts?: BroadcastContactUncheckedUpdateManyWithoutSupporterNestedInput
+    materialRequests?: MaterialRequestUncheckedUpdateManyWithoutSupporterNestedInput
   }
 
   export type SupporterUpsertWithWhereUniqueWithoutDuplicateOfInput = {
@@ -59923,6 +61959,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     totalScore?: IntFieldUpdateOperationsInput | number
+    confirmationStatus?: EnumVolunteerConfirmationFieldUpdateOperationsInput | $Enums.VolunteerConfirmation
     confirmed?: BoolFieldUpdateOperationsInput | boolean
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     confirmationChannel?: NullableEnumChannelFieldUpdateOperationsInput | $Enums.Channel | null
@@ -59940,6 +61977,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     totalScore?: IntFieldUpdateOperationsInput | number
+    confirmationStatus?: EnumVolunteerConfirmationFieldUpdateOperationsInput | $Enums.VolunteerConfirmation
     confirmed?: BoolFieldUpdateOperationsInput | boolean
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     confirmationChannel?: NullableEnumChannelFieldUpdateOperationsInput | $Enums.Channel | null
@@ -60042,11 +62080,28 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"BroadcastContact"> | Date | string
   }
 
+  export type MaterialRequestUpsertWithWhereUniqueWithoutSupporterInput = {
+    where: MaterialRequestWhereUniqueInput
+    update: XOR<MaterialRequestUpdateWithoutSupporterInput, MaterialRequestUncheckedUpdateWithoutSupporterInput>
+    create: XOR<MaterialRequestCreateWithoutSupporterInput, MaterialRequestUncheckedCreateWithoutSupporterInput>
+  }
+
+  export type MaterialRequestUpdateWithWhereUniqueWithoutSupporterInput = {
+    where: MaterialRequestWhereUniqueInput
+    data: XOR<MaterialRequestUpdateWithoutSupporterInput, MaterialRequestUncheckedUpdateWithoutSupporterInput>
+  }
+
+  export type MaterialRequestUpdateManyWithWhereWithoutSupporterInput = {
+    where: MaterialRequestScalarWhereInput
+    data: XOR<MaterialRequestUpdateManyMutationInput, MaterialRequestUncheckedUpdateManyWithoutSupporterInput>
+  }
+
   export type SupporterCreateWithoutVolunteerInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -60062,6 +62117,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -60075,13 +62131,15 @@ export namespace Prisma {
     conversations?: ConversationCreateNestedManyWithoutSupporterInput
     bannerLocations?: BannerLocationCreateNestedManyWithoutSupporterInput
     broadcastContacts?: BroadcastContactCreateNestedManyWithoutSupporterInput
+    materialRequests?: MaterialRequestCreateNestedManyWithoutSupporterInput
   }
 
   export type SupporterUncheckedCreateWithoutVolunteerInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -60099,6 +62157,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -60110,6 +62169,7 @@ export namespace Prisma {
     conversations?: ConversationUncheckedCreateNestedManyWithoutSupporterInput
     bannerLocations?: BannerLocationUncheckedCreateNestedManyWithoutSupporterInput
     broadcastContacts?: BroadcastContactUncheckedCreateNestedManyWithoutSupporterInput
+    materialRequests?: MaterialRequestUncheckedCreateNestedManyWithoutSupporterInput
   }
 
   export type SupporterCreateOrConnectWithoutVolunteerInput = {
@@ -60332,8 +62392,9 @@ export namespace Prisma {
   export type SupporterUpdateWithoutVolunteerInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -60349,6 +62410,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -60362,13 +62424,15 @@ export namespace Prisma {
     conversations?: ConversationUpdateManyWithoutSupporterNestedInput
     bannerLocations?: BannerLocationUpdateManyWithoutSupporterNestedInput
     broadcastContacts?: BroadcastContactUpdateManyWithoutSupporterNestedInput
+    materialRequests?: MaterialRequestUpdateManyWithoutSupporterNestedInput
   }
 
   export type SupporterUncheckedUpdateWithoutVolunteerInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -60386,6 +62450,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -60397,6 +62462,7 @@ export namespace Prisma {
     conversations?: ConversationUncheckedUpdateManyWithoutSupporterNestedInput
     bannerLocations?: BannerLocationUncheckedUpdateManyWithoutSupporterNestedInput
     broadcastContacts?: BroadcastContactUncheckedUpdateManyWithoutSupporterNestedInput
+    materialRequests?: MaterialRequestUncheckedUpdateManyWithoutSupporterNestedInput
   }
 
   export type UserUpsertWithoutSupervisedVolunteersInput = {
@@ -60592,6 +62658,7 @@ export namespace Prisma {
     id?: string
     active?: boolean
     totalScore?: number
+    confirmationStatus?: $Enums.VolunteerConfirmation
     confirmed?: boolean
     confirmedAt?: Date | string | null
     confirmationChannel?: $Enums.Channel | null
@@ -60610,6 +62677,7 @@ export namespace Prisma {
     supporterId: string
     active?: boolean
     totalScore?: number
+    confirmationStatus?: $Enums.VolunteerConfirmation
     confirmed?: boolean
     confirmedAt?: Date | string | null
     confirmationChannel?: $Enums.Channel | null
@@ -60642,6 +62710,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     totalScore?: IntFieldUpdateOperationsInput | number
+    confirmationStatus?: EnumVolunteerConfirmationFieldUpdateOperationsInput | $Enums.VolunteerConfirmation
     confirmed?: BoolFieldUpdateOperationsInput | boolean
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     confirmationChannel?: NullableEnumChannelFieldUpdateOperationsInput | $Enums.Channel | null
@@ -60660,6 +62729,7 @@ export namespace Prisma {
     supporterId?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     totalScore?: IntFieldUpdateOperationsInput | number
+    confirmationStatus?: EnumVolunteerConfirmationFieldUpdateOperationsInput | $Enums.VolunteerConfirmation
     confirmed?: BoolFieldUpdateOperationsInput | boolean
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     confirmationChannel?: NullableEnumChannelFieldUpdateOperationsInput | $Enums.Channel | null
@@ -61774,6 +63844,7 @@ export namespace Prisma {
     id?: string
     active?: boolean
     totalScore?: number
+    confirmationStatus?: $Enums.VolunteerConfirmation
     confirmed?: boolean
     confirmedAt?: Date | string | null
     confirmationChannel?: $Enums.Channel | null
@@ -61792,6 +63863,7 @@ export namespace Prisma {
     supporterId: string
     active?: boolean
     totalScore?: number
+    confirmationStatus?: $Enums.VolunteerConfirmation
     confirmed?: boolean
     confirmedAt?: Date | string | null
     confirmationChannel?: $Enums.Channel | null
@@ -61858,6 +63930,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     totalScore?: IntFieldUpdateOperationsInput | number
+    confirmationStatus?: EnumVolunteerConfirmationFieldUpdateOperationsInput | $Enums.VolunteerConfirmation
     confirmed?: BoolFieldUpdateOperationsInput | boolean
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     confirmationChannel?: NullableEnumChannelFieldUpdateOperationsInput | $Enums.Channel | null
@@ -61876,6 +63949,7 @@ export namespace Prisma {
     supporterId?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     totalScore?: IntFieldUpdateOperationsInput | number
+    confirmationStatus?: EnumVolunteerConfirmationFieldUpdateOperationsInput | $Enums.VolunteerConfirmation
     confirmed?: BoolFieldUpdateOperationsInput | boolean
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     confirmationChannel?: NullableEnumChannelFieldUpdateOperationsInput | $Enums.Channel | null
@@ -61908,6 +63982,7 @@ export namespace Prisma {
     id?: string
     active?: boolean
     totalScore?: number
+    confirmationStatus?: $Enums.VolunteerConfirmation
     confirmed?: boolean
     confirmedAt?: Date | string | null
     confirmationChannel?: $Enums.Channel | null
@@ -61926,6 +64001,7 @@ export namespace Prisma {
     supporterId: string
     active?: boolean
     totalScore?: number
+    confirmationStatus?: $Enums.VolunteerConfirmation
     confirmed?: boolean
     confirmedAt?: Date | string | null
     confirmationChannel?: $Enums.Channel | null
@@ -62066,6 +64142,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     totalScore?: IntFieldUpdateOperationsInput | number
+    confirmationStatus?: EnumVolunteerConfirmationFieldUpdateOperationsInput | $Enums.VolunteerConfirmation
     confirmed?: BoolFieldUpdateOperationsInput | boolean
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     confirmationChannel?: NullableEnumChannelFieldUpdateOperationsInput | $Enums.Channel | null
@@ -62084,6 +64161,7 @@ export namespace Prisma {
     supporterId?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     totalScore?: IntFieldUpdateOperationsInput | number
+    confirmationStatus?: EnumVolunteerConfirmationFieldUpdateOperationsInput | $Enums.VolunteerConfirmation
     confirmed?: BoolFieldUpdateOperationsInput | boolean
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     confirmationChannel?: NullableEnumChannelFieldUpdateOperationsInput | $Enums.Channel | null
@@ -62219,6 +64297,8 @@ export namespace Prisma {
   export type MaterialRequestCreateWithoutMaterialInput = {
     id?: string
     materialName: string
+    materials?: MaterialRequestCreatematerialsInput | string[]
+    materialType?: string | null
     quantity?: number
     justification?: string | null
     cityName?: string | null
@@ -62231,6 +64311,7 @@ export namespace Prisma {
     deliveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    supporter?: SupporterCreateNestedOneWithoutMaterialRequestsInput
     requester?: UserCreateNestedOneWithoutRequestedMaterialsInput
     approver?: UserCreateNestedOneWithoutApprovedMaterialsInput
   }
@@ -62238,11 +64319,14 @@ export namespace Prisma {
   export type MaterialRequestUncheckedCreateWithoutMaterialInput = {
     id?: string
     materialName: string
+    materials?: MaterialRequestCreatematerialsInput | string[]
+    materialType?: string | null
     quantity?: number
     justification?: string | null
     cityName?: string | null
     neighborhood?: string | null
     deliveryAddress?: string | null
+    supporterId?: string | null
     requesterId?: string | null
     approverId?: string | null
     status?: $Enums.MaterialRequestStatus
@@ -62305,6 +64389,87 @@ export namespace Prisma {
   export type MaterialCreateOrConnectWithoutRequestsInput = {
     where: MaterialWhereUniqueInput
     create: XOR<MaterialCreateWithoutRequestsInput, MaterialUncheckedCreateWithoutRequestsInput>
+  }
+
+  export type SupporterCreateWithoutMaterialRequestsInput = {
+    id?: string
+    name: string
+    phone?: string | null
+    whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
+    email?: string | null
+    cpf?: string | null
+    birthDate?: Date | string | null
+    cep?: string | null
+    street?: string | null
+    number?: string | null
+    complement?: string | null
+    neighborhood?: string | null
+    cityName?: string | null
+    lat?: number | null
+    lng?: number | null
+    photoUrl?: string | null
+    instagram?: string | null
+    facebook?: string | null
+    supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
+    status?: $Enums.SupporterStatus
+    notes?: string | null
+    flaggedReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    city?: CityCreateNestedOneWithoutSupportersInput
+    region?: RegionCreateNestedOneWithoutSupportersInput
+    duplicateOf?: SupporterCreateNestedOneWithoutDuplicatesInput
+    duplicates?: SupporterCreateNestedManyWithoutDuplicateOfInput
+    coordinator?: UserCreateNestedOneWithoutCoordinatedSupportersInput
+    volunteer?: VolunteerCreateNestedOneWithoutSupporterInput
+    conversations?: ConversationCreateNestedManyWithoutSupporterInput
+    bannerLocations?: BannerLocationCreateNestedManyWithoutSupporterInput
+    broadcastContacts?: BroadcastContactCreateNestedManyWithoutSupporterInput
+  }
+
+  export type SupporterUncheckedCreateWithoutMaterialRequestsInput = {
+    id?: string
+    name: string
+    phone?: string | null
+    whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
+    email?: string | null
+    cpf?: string | null
+    birthDate?: Date | string | null
+    cep?: string | null
+    street?: string | null
+    number?: string | null
+    complement?: string | null
+    neighborhood?: string | null
+    cityName?: string | null
+    cityId?: string | null
+    regionId?: string | null
+    lat?: number | null
+    lng?: number | null
+    photoUrl?: string | null
+    instagram?: string | null
+    facebook?: string | null
+    supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
+    status?: $Enums.SupporterStatus
+    notes?: string | null
+    flaggedReason?: string | null
+    duplicateOfId?: string | null
+    coordinatorId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    duplicates?: SupporterUncheckedCreateNestedManyWithoutDuplicateOfInput
+    volunteer?: VolunteerUncheckedCreateNestedOneWithoutSupporterInput
+    conversations?: ConversationUncheckedCreateNestedManyWithoutSupporterInput
+    bannerLocations?: BannerLocationUncheckedCreateNestedManyWithoutSupporterInput
+    broadcastContacts?: BroadcastContactUncheckedCreateNestedManyWithoutSupporterInput
+  }
+
+  export type SupporterCreateOrConnectWithoutMaterialRequestsInput = {
+    where: SupporterWhereUniqueInput
+    create: XOR<SupporterCreateWithoutMaterialRequestsInput, SupporterUncheckedCreateWithoutMaterialRequestsInput>
   }
 
   export type UserCreateWithoutRequestedMaterialsInput = {
@@ -62498,6 +64663,93 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type SupporterUpsertWithoutMaterialRequestsInput = {
+    update: XOR<SupporterUpdateWithoutMaterialRequestsInput, SupporterUncheckedUpdateWithoutMaterialRequestsInput>
+    create: XOR<SupporterCreateWithoutMaterialRequestsInput, SupporterUncheckedCreateWithoutMaterialRequestsInput>
+    where?: SupporterWhereInput
+  }
+
+  export type SupporterUpdateToOneWithWhereWithoutMaterialRequestsInput = {
+    where?: SupporterWhereInput
+    data: XOR<SupporterUpdateWithoutMaterialRequestsInput, SupporterUncheckedUpdateWithoutMaterialRequestsInput>
+  }
+
+  export type SupporterUpdateWithoutMaterialRequestsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    cpf?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cep?: NullableStringFieldUpdateOperationsInput | string | null
+    street?: NullableStringFieldUpdateOperationsInput | string | null
+    number?: NullableStringFieldUpdateOperationsInput | string | null
+    complement?: NullableStringFieldUpdateOperationsInput | string | null
+    neighborhood?: NullableStringFieldUpdateOperationsInput | string | null
+    cityName?: NullableStringFieldUpdateOperationsInput | string | null
+    lat?: NullableFloatFieldUpdateOperationsInput | number | null
+    lng?: NullableFloatFieldUpdateOperationsInput | number | null
+    photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    facebook?: NullableStringFieldUpdateOperationsInput | string | null
+    supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
+    status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    city?: CityUpdateOneWithoutSupportersNestedInput
+    region?: RegionUpdateOneWithoutSupportersNestedInput
+    duplicateOf?: SupporterUpdateOneWithoutDuplicatesNestedInput
+    duplicates?: SupporterUpdateManyWithoutDuplicateOfNestedInput
+    coordinator?: UserUpdateOneWithoutCoordinatedSupportersNestedInput
+    volunteer?: VolunteerUpdateOneWithoutSupporterNestedInput
+    conversations?: ConversationUpdateManyWithoutSupporterNestedInput
+    bannerLocations?: BannerLocationUpdateManyWithoutSupporterNestedInput
+    broadcastContacts?: BroadcastContactUpdateManyWithoutSupporterNestedInput
+  }
+
+  export type SupporterUncheckedUpdateWithoutMaterialRequestsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    cpf?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cep?: NullableStringFieldUpdateOperationsInput | string | null
+    street?: NullableStringFieldUpdateOperationsInput | string | null
+    number?: NullableStringFieldUpdateOperationsInput | string | null
+    complement?: NullableStringFieldUpdateOperationsInput | string | null
+    neighborhood?: NullableStringFieldUpdateOperationsInput | string | null
+    cityName?: NullableStringFieldUpdateOperationsInput | string | null
+    cityId?: NullableStringFieldUpdateOperationsInput | string | null
+    regionId?: NullableStringFieldUpdateOperationsInput | string | null
+    lat?: NullableFloatFieldUpdateOperationsInput | number | null
+    lng?: NullableFloatFieldUpdateOperationsInput | number | null
+    photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    facebook?: NullableStringFieldUpdateOperationsInput | string | null
+    supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
+    status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
+    duplicateOfId?: NullableStringFieldUpdateOperationsInput | string | null
+    coordinatorId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    duplicates?: SupporterUncheckedUpdateManyWithoutDuplicateOfNestedInput
+    volunteer?: VolunteerUncheckedUpdateOneWithoutSupporterNestedInput
+    conversations?: ConversationUncheckedUpdateManyWithoutSupporterNestedInput
+    bannerLocations?: BannerLocationUncheckedUpdateManyWithoutSupporterNestedInput
+    broadcastContacts?: BroadcastContactUncheckedUpdateManyWithoutSupporterNestedInput
+  }
+
   export type UserUpsertWithoutRequestedMaterialsInput = {
     update: XOR<UserUpdateWithoutRequestedMaterialsInput, UserUncheckedUpdateWithoutRequestedMaterialsInput>
     create: XOR<UserCreateWithoutRequestedMaterialsInput, UserUncheckedCreateWithoutRequestedMaterialsInput>
@@ -62671,8 +64923,9 @@ export namespace Prisma {
   export type SupporterCreateWithoutBannerLocationsInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -62688,6 +64941,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -62701,13 +64955,15 @@ export namespace Prisma {
     volunteer?: VolunteerCreateNestedOneWithoutSupporterInput
     conversations?: ConversationCreateNestedManyWithoutSupporterInput
     broadcastContacts?: BroadcastContactCreateNestedManyWithoutSupporterInput
+    materialRequests?: MaterialRequestCreateNestedManyWithoutSupporterInput
   }
 
   export type SupporterUncheckedCreateWithoutBannerLocationsInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -62725,6 +64981,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -62736,6 +64993,7 @@ export namespace Prisma {
     volunteer?: VolunteerUncheckedCreateNestedOneWithoutSupporterInput
     conversations?: ConversationUncheckedCreateNestedManyWithoutSupporterInput
     broadcastContacts?: BroadcastContactUncheckedCreateNestedManyWithoutSupporterInput
+    materialRequests?: MaterialRequestUncheckedCreateNestedManyWithoutSupporterInput
   }
 
   export type SupporterCreateOrConnectWithoutBannerLocationsInput = {
@@ -62757,8 +65015,9 @@ export namespace Prisma {
   export type SupporterUpdateWithoutBannerLocationsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -62774,6 +65033,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -62787,13 +65047,15 @@ export namespace Prisma {
     volunteer?: VolunteerUpdateOneWithoutSupporterNestedInput
     conversations?: ConversationUpdateManyWithoutSupporterNestedInput
     broadcastContacts?: BroadcastContactUpdateManyWithoutSupporterNestedInput
+    materialRequests?: MaterialRequestUpdateManyWithoutSupporterNestedInput
   }
 
   export type SupporterUncheckedUpdateWithoutBannerLocationsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -62811,6 +65073,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -62822,6 +65085,7 @@ export namespace Prisma {
     volunteer?: VolunteerUncheckedUpdateOneWithoutSupporterNestedInput
     conversations?: ConversationUncheckedUpdateManyWithoutSupporterNestedInput
     broadcastContacts?: BroadcastContactUncheckedUpdateManyWithoutSupporterNestedInput
+    materialRequests?: MaterialRequestUncheckedUpdateManyWithoutSupporterNestedInput
   }
 
   export type CityCreateWithoutStreetActionsInput = {
@@ -63443,8 +65707,9 @@ export namespace Prisma {
   export type SupporterCreateWithoutConversationsInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -63460,6 +65725,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -63473,13 +65739,15 @@ export namespace Prisma {
     volunteer?: VolunteerCreateNestedOneWithoutSupporterInput
     bannerLocations?: BannerLocationCreateNestedManyWithoutSupporterInput
     broadcastContacts?: BroadcastContactCreateNestedManyWithoutSupporterInput
+    materialRequests?: MaterialRequestCreateNestedManyWithoutSupporterInput
   }
 
   export type SupporterUncheckedCreateWithoutConversationsInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -63497,6 +65765,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -63508,6 +65777,7 @@ export namespace Prisma {
     volunteer?: VolunteerUncheckedCreateNestedOneWithoutSupporterInput
     bannerLocations?: BannerLocationUncheckedCreateNestedManyWithoutSupporterInput
     broadcastContacts?: BroadcastContactUncheckedCreateNestedManyWithoutSupporterInput
+    materialRequests?: MaterialRequestUncheckedCreateNestedManyWithoutSupporterInput
   }
 
   export type SupporterCreateOrConnectWithoutConversationsInput = {
@@ -63638,8 +65908,9 @@ export namespace Prisma {
   export type SupporterUpdateWithoutConversationsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -63655,6 +65926,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -63668,13 +65940,15 @@ export namespace Prisma {
     volunteer?: VolunteerUpdateOneWithoutSupporterNestedInput
     bannerLocations?: BannerLocationUpdateManyWithoutSupporterNestedInput
     broadcastContacts?: BroadcastContactUpdateManyWithoutSupporterNestedInput
+    materialRequests?: MaterialRequestUpdateManyWithoutSupporterNestedInput
   }
 
   export type SupporterUncheckedUpdateWithoutConversationsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -63692,6 +65966,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -63703,6 +65978,7 @@ export namespace Prisma {
     volunteer?: VolunteerUncheckedUpdateOneWithoutSupporterNestedInput
     bannerLocations?: BannerLocationUncheckedUpdateManyWithoutSupporterNestedInput
     broadcastContacts?: BroadcastContactUncheckedUpdateManyWithoutSupporterNestedInput
+    materialRequests?: MaterialRequestUncheckedUpdateManyWithoutSupporterNestedInput
   }
 
   export type UserUpsertWithoutAssignedConversationsInput = {
@@ -64497,6 +66773,9 @@ export namespace Prisma {
     name: string
     message: string
     channel?: $Enums.Channel
+    templateName?: string | null
+    templateLang?: string | null
+    headerImageUrl?: string | null
     status?: $Enums.BroadcastStatus
     scheduledAt?: Date | string | null
     totalContacts?: number
@@ -64514,6 +66793,9 @@ export namespace Prisma {
     name: string
     message: string
     channel?: $Enums.Channel
+    templateName?: string | null
+    templateLang?: string | null
+    headerImageUrl?: string | null
     status?: $Enums.BroadcastStatus
     scheduledAt?: Date | string | null
     totalContacts?: number
@@ -64534,8 +66816,9 @@ export namespace Prisma {
   export type SupporterCreateWithoutBroadcastContactsInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -64551,6 +66834,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -64564,13 +66848,15 @@ export namespace Prisma {
     volunteer?: VolunteerCreateNestedOneWithoutSupporterInput
     conversations?: ConversationCreateNestedManyWithoutSupporterInput
     bannerLocations?: BannerLocationCreateNestedManyWithoutSupporterInput
+    materialRequests?: MaterialRequestCreateNestedManyWithoutSupporterInput
   }
 
   export type SupporterUncheckedCreateWithoutBroadcastContactsInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -64588,6 +66874,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -64599,6 +66886,7 @@ export namespace Prisma {
     volunteer?: VolunteerUncheckedCreateNestedOneWithoutSupporterInput
     conversations?: ConversationUncheckedCreateNestedManyWithoutSupporterInput
     bannerLocations?: BannerLocationUncheckedCreateNestedManyWithoutSupporterInput
+    materialRequests?: MaterialRequestUncheckedCreateNestedManyWithoutSupporterInput
   }
 
   export type SupporterCreateOrConnectWithoutBroadcastContactsInput = {
@@ -64622,6 +66910,9 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     message?: StringFieldUpdateOperationsInput | string
     channel?: EnumChannelFieldUpdateOperationsInput | $Enums.Channel
+    templateName?: NullableStringFieldUpdateOperationsInput | string | null
+    templateLang?: NullableStringFieldUpdateOperationsInput | string | null
+    headerImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBroadcastStatusFieldUpdateOperationsInput | $Enums.BroadcastStatus
     scheduledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totalContacts?: IntFieldUpdateOperationsInput | number
@@ -64639,6 +66930,9 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     message?: StringFieldUpdateOperationsInput | string
     channel?: EnumChannelFieldUpdateOperationsInput | $Enums.Channel
+    templateName?: NullableStringFieldUpdateOperationsInput | string | null
+    templateLang?: NullableStringFieldUpdateOperationsInput | string | null
+    headerImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBroadcastStatusFieldUpdateOperationsInput | $Enums.BroadcastStatus
     scheduledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totalContacts?: IntFieldUpdateOperationsInput | number
@@ -64665,8 +66959,9 @@ export namespace Prisma {
   export type SupporterUpdateWithoutBroadcastContactsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -64682,6 +66977,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -64695,13 +66991,15 @@ export namespace Prisma {
     volunteer?: VolunteerUpdateOneWithoutSupporterNestedInput
     conversations?: ConversationUpdateManyWithoutSupporterNestedInput
     bannerLocations?: BannerLocationUpdateManyWithoutSupporterNestedInput
+    materialRequests?: MaterialRequestUpdateManyWithoutSupporterNestedInput
   }
 
   export type SupporterUncheckedUpdateWithoutBroadcastContactsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -64719,6 +67017,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -64730,6 +67029,7 @@ export namespace Prisma {
     volunteer?: VolunteerUncheckedUpdateOneWithoutSupporterNestedInput
     conversations?: ConversationUncheckedUpdateManyWithoutSupporterNestedInput
     bannerLocations?: BannerLocationUncheckedUpdateManyWithoutSupporterNestedInput
+    materialRequests?: MaterialRequestUncheckedUpdateManyWithoutSupporterNestedInput
   }
 
   export type AutomationLogCreateWithoutAutomationInput = {
@@ -64857,6 +67157,7 @@ export namespace Prisma {
     id?: string
     active?: boolean
     totalScore?: number
+    confirmationStatus?: $Enums.VolunteerConfirmation
     confirmed?: boolean
     confirmedAt?: Date | string | null
     confirmationChannel?: $Enums.Channel | null
@@ -64875,6 +67176,7 @@ export namespace Prisma {
     supporterId: string
     active?: boolean
     totalScore?: number
+    confirmationStatus?: $Enums.VolunteerConfirmation
     confirmed?: boolean
     confirmedAt?: Date | string | null
     confirmationChannel?: $Enums.Channel | null
@@ -64907,6 +67209,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     totalScore?: IntFieldUpdateOperationsInput | number
+    confirmationStatus?: EnumVolunteerConfirmationFieldUpdateOperationsInput | $Enums.VolunteerConfirmation
     confirmed?: BoolFieldUpdateOperationsInput | boolean
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     confirmationChannel?: NullableEnumChannelFieldUpdateOperationsInput | $Enums.Channel | null
@@ -64925,6 +67228,7 @@ export namespace Prisma {
     supporterId?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     totalScore?: IntFieldUpdateOperationsInput | number
+    confirmationStatus?: EnumVolunteerConfirmationFieldUpdateOperationsInput | $Enums.VolunteerConfirmation
     confirmed?: BoolFieldUpdateOperationsInput | boolean
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     confirmationChannel?: NullableEnumChannelFieldUpdateOperationsInput | $Enums.Channel | null
@@ -65658,8 +67962,9 @@ export namespace Prisma {
   export type SupporterCreateManyCoordinatorInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -65677,6 +67982,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -65690,6 +67996,7 @@ export namespace Prisma {
     supporterId: string
     active?: boolean
     totalScore?: number
+    confirmationStatus?: $Enums.VolunteerConfirmation
     confirmed?: boolean
     confirmedAt?: Date | string | null
     confirmationChannel?: $Enums.Channel | null
@@ -65777,11 +68084,14 @@ export namespace Prisma {
     id?: string
     materialId?: string | null
     materialName: string
+    materials?: MaterialRequestCreatematerialsInput | string[]
+    materialType?: string | null
     quantity?: number
     justification?: string | null
     cityName?: string | null
     neighborhood?: string | null
     deliveryAddress?: string | null
+    supporterId?: string | null
     approverId?: string | null
     status?: $Enums.MaterialRequestStatus
     appliedPhotoUrl?: string | null
@@ -65796,11 +68106,14 @@ export namespace Prisma {
     id?: string
     materialId?: string | null
     materialName: string
+    materials?: MaterialRequestCreatematerialsInput | string[]
+    materialType?: string | null
     quantity?: number
     justification?: string | null
     cityName?: string | null
     neighborhood?: string | null
     deliveryAddress?: string | null
+    supporterId?: string | null
     requesterId?: string | null
     status?: $Enums.MaterialRequestStatus
     appliedPhotoUrl?: string | null
@@ -65871,6 +68184,9 @@ export namespace Prisma {
     name: string
     message: string
     channel?: $Enums.Channel
+    templateName?: string | null
+    templateLang?: string | null
+    headerImageUrl?: string | null
     status?: $Enums.BroadcastStatus
     scheduledAt?: Date | string | null
     totalContacts?: number
@@ -66051,8 +68367,9 @@ export namespace Prisma {
   export type SupporterUpdateWithoutCoordinatorInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -66068,6 +68385,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -66081,13 +68399,15 @@ export namespace Prisma {
     conversations?: ConversationUpdateManyWithoutSupporterNestedInput
     bannerLocations?: BannerLocationUpdateManyWithoutSupporterNestedInput
     broadcastContacts?: BroadcastContactUpdateManyWithoutSupporterNestedInput
+    materialRequests?: MaterialRequestUpdateManyWithoutSupporterNestedInput
   }
 
   export type SupporterUncheckedUpdateWithoutCoordinatorInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -66105,6 +68425,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -66116,13 +68437,15 @@ export namespace Prisma {
     conversations?: ConversationUncheckedUpdateManyWithoutSupporterNestedInput
     bannerLocations?: BannerLocationUncheckedUpdateManyWithoutSupporterNestedInput
     broadcastContacts?: BroadcastContactUncheckedUpdateManyWithoutSupporterNestedInput
+    materialRequests?: MaterialRequestUncheckedUpdateManyWithoutSupporterNestedInput
   }
 
   export type SupporterUncheckedUpdateManyWithoutCoordinatorInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -66140,6 +68463,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -66152,6 +68476,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     totalScore?: IntFieldUpdateOperationsInput | number
+    confirmationStatus?: EnumVolunteerConfirmationFieldUpdateOperationsInput | $Enums.VolunteerConfirmation
     confirmed?: BoolFieldUpdateOperationsInput | boolean
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     confirmationChannel?: NullableEnumChannelFieldUpdateOperationsInput | $Enums.Channel | null
@@ -66170,6 +68495,7 @@ export namespace Prisma {
     supporterId?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     totalScore?: IntFieldUpdateOperationsInput | number
+    confirmationStatus?: EnumVolunteerConfirmationFieldUpdateOperationsInput | $Enums.VolunteerConfirmation
     confirmed?: BoolFieldUpdateOperationsInput | boolean
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     confirmationChannel?: NullableEnumChannelFieldUpdateOperationsInput | $Enums.Channel | null
@@ -66187,6 +68513,7 @@ export namespace Prisma {
     supporterId?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
     totalScore?: IntFieldUpdateOperationsInput | number
+    confirmationStatus?: EnumVolunteerConfirmationFieldUpdateOperationsInput | $Enums.VolunteerConfirmation
     confirmed?: BoolFieldUpdateOperationsInput | boolean
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     confirmationChannel?: NullableEnumChannelFieldUpdateOperationsInput | $Enums.Channel | null
@@ -66429,6 +68756,8 @@ export namespace Prisma {
   export type MaterialRequestUpdateWithoutRequesterInput = {
     id?: StringFieldUpdateOperationsInput | string
     materialName?: StringFieldUpdateOperationsInput | string
+    materials?: MaterialRequestUpdatematerialsInput | string[]
+    materialType?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     justification?: NullableStringFieldUpdateOperationsInput | string | null
     cityName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -66442,6 +68771,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     material?: MaterialUpdateOneWithoutRequestsNestedInput
+    supporter?: SupporterUpdateOneWithoutMaterialRequestsNestedInput
     approver?: UserUpdateOneWithoutApprovedMaterialsNestedInput
   }
 
@@ -66449,11 +68779,14 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     materialId?: NullableStringFieldUpdateOperationsInput | string | null
     materialName?: StringFieldUpdateOperationsInput | string
+    materials?: MaterialRequestUpdatematerialsInput | string[]
+    materialType?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     justification?: NullableStringFieldUpdateOperationsInput | string | null
     cityName?: NullableStringFieldUpdateOperationsInput | string | null
     neighborhood?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    supporterId?: NullableStringFieldUpdateOperationsInput | string | null
     approverId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumMaterialRequestStatusFieldUpdateOperationsInput | $Enums.MaterialRequestStatus
     appliedPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -66468,11 +68801,14 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     materialId?: NullableStringFieldUpdateOperationsInput | string | null
     materialName?: StringFieldUpdateOperationsInput | string
+    materials?: MaterialRequestUpdatematerialsInput | string[]
+    materialType?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     justification?: NullableStringFieldUpdateOperationsInput | string | null
     cityName?: NullableStringFieldUpdateOperationsInput | string | null
     neighborhood?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    supporterId?: NullableStringFieldUpdateOperationsInput | string | null
     approverId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumMaterialRequestStatusFieldUpdateOperationsInput | $Enums.MaterialRequestStatus
     appliedPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -66486,6 +68822,8 @@ export namespace Prisma {
   export type MaterialRequestUpdateWithoutApproverInput = {
     id?: StringFieldUpdateOperationsInput | string
     materialName?: StringFieldUpdateOperationsInput | string
+    materials?: MaterialRequestUpdatematerialsInput | string[]
+    materialType?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     justification?: NullableStringFieldUpdateOperationsInput | string | null
     cityName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -66499,6 +68837,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     material?: MaterialUpdateOneWithoutRequestsNestedInput
+    supporter?: SupporterUpdateOneWithoutMaterialRequestsNestedInput
     requester?: UserUpdateOneWithoutRequestedMaterialsNestedInput
   }
 
@@ -66506,11 +68845,14 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     materialId?: NullableStringFieldUpdateOperationsInput | string | null
     materialName?: StringFieldUpdateOperationsInput | string
+    materials?: MaterialRequestUpdatematerialsInput | string[]
+    materialType?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     justification?: NullableStringFieldUpdateOperationsInput | string | null
     cityName?: NullableStringFieldUpdateOperationsInput | string | null
     neighborhood?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    supporterId?: NullableStringFieldUpdateOperationsInput | string | null
     requesterId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumMaterialRequestStatusFieldUpdateOperationsInput | $Enums.MaterialRequestStatus
     appliedPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -66525,11 +68867,14 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     materialId?: NullableStringFieldUpdateOperationsInput | string | null
     materialName?: StringFieldUpdateOperationsInput | string
+    materials?: MaterialRequestUpdatematerialsInput | string[]
+    materialType?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     justification?: NullableStringFieldUpdateOperationsInput | string | null
     cityName?: NullableStringFieldUpdateOperationsInput | string | null
     neighborhood?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    supporterId?: NullableStringFieldUpdateOperationsInput | string | null
     requesterId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumMaterialRequestStatusFieldUpdateOperationsInput | $Enums.MaterialRequestStatus
     appliedPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -66710,6 +69055,9 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     message?: StringFieldUpdateOperationsInput | string
     channel?: EnumChannelFieldUpdateOperationsInput | $Enums.Channel
+    templateName?: NullableStringFieldUpdateOperationsInput | string | null
+    templateLang?: NullableStringFieldUpdateOperationsInput | string | null
+    headerImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBroadcastStatusFieldUpdateOperationsInput | $Enums.BroadcastStatus
     scheduledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totalContacts?: IntFieldUpdateOperationsInput | number
@@ -66727,6 +69075,9 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     message?: StringFieldUpdateOperationsInput | string
     channel?: EnumChannelFieldUpdateOperationsInput | $Enums.Channel
+    templateName?: NullableStringFieldUpdateOperationsInput | string | null
+    templateLang?: NullableStringFieldUpdateOperationsInput | string | null
+    headerImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBroadcastStatusFieldUpdateOperationsInput | $Enums.BroadcastStatus
     scheduledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totalContacts?: IntFieldUpdateOperationsInput | number
@@ -66744,6 +69095,9 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     message?: StringFieldUpdateOperationsInput | string
     channel?: EnumChannelFieldUpdateOperationsInput | $Enums.Channel
+    templateName?: NullableStringFieldUpdateOperationsInput | string | null
+    templateLang?: NullableStringFieldUpdateOperationsInput | string | null
+    headerImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBroadcastStatusFieldUpdateOperationsInput | $Enums.BroadcastStatus
     scheduledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totalContacts?: IntFieldUpdateOperationsInput | number
@@ -66885,8 +69239,9 @@ export namespace Prisma {
   export type SupporterCreateManyRegionInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -66903,6 +69258,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -67111,8 +69467,9 @@ export namespace Prisma {
   export type SupporterUpdateWithoutRegionInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -67128,6 +69485,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -67141,13 +69499,15 @@ export namespace Prisma {
     conversations?: ConversationUpdateManyWithoutSupporterNestedInput
     bannerLocations?: BannerLocationUpdateManyWithoutSupporterNestedInput
     broadcastContacts?: BroadcastContactUpdateManyWithoutSupporterNestedInput
+    materialRequests?: MaterialRequestUpdateManyWithoutSupporterNestedInput
   }
 
   export type SupporterUncheckedUpdateWithoutRegionInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -67164,6 +69524,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -67176,13 +69537,15 @@ export namespace Prisma {
     conversations?: ConversationUncheckedUpdateManyWithoutSupporterNestedInput
     bannerLocations?: BannerLocationUncheckedUpdateManyWithoutSupporterNestedInput
     broadcastContacts?: BroadcastContactUncheckedUpdateManyWithoutSupporterNestedInput
+    materialRequests?: MaterialRequestUncheckedUpdateManyWithoutSupporterNestedInput
   }
 
   export type SupporterUncheckedUpdateManyWithoutRegionInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -67199,6 +69562,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -67434,8 +69798,9 @@ export namespace Prisma {
   export type SupporterCreateManyCityInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -67452,6 +69817,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -67519,8 +69885,9 @@ export namespace Prisma {
   export type SupporterUpdateWithoutCityInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -67536,6 +69903,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -67549,13 +69917,15 @@ export namespace Prisma {
     conversations?: ConversationUpdateManyWithoutSupporterNestedInput
     bannerLocations?: BannerLocationUpdateManyWithoutSupporterNestedInput
     broadcastContacts?: BroadcastContactUpdateManyWithoutSupporterNestedInput
+    materialRequests?: MaterialRequestUpdateManyWithoutSupporterNestedInput
   }
 
   export type SupporterUncheckedUpdateWithoutCityInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -67572,6 +69942,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -67584,13 +69955,15 @@ export namespace Prisma {
     conversations?: ConversationUncheckedUpdateManyWithoutSupporterNestedInput
     bannerLocations?: BannerLocationUncheckedUpdateManyWithoutSupporterNestedInput
     broadcastContacts?: BroadcastContactUncheckedUpdateManyWithoutSupporterNestedInput
+    materialRequests?: MaterialRequestUncheckedUpdateManyWithoutSupporterNestedInput
   }
 
   export type SupporterUncheckedUpdateManyWithoutCityInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -67607,6 +69980,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -67784,8 +70158,9 @@ export namespace Prisma {
   export type SupporterCreateManyDuplicateOfInput = {
     id?: string
     name: string
-    phone: string
+    phone?: string | null
     whatsapp?: string | null
+    tags?: SupporterCreatetagsInput | string[]
     email?: string | null
     cpf?: string | null
     birthDate?: Date | string | null
@@ -67803,6 +70178,7 @@ export namespace Prisma {
     instagram?: string | null
     facebook?: string | null
     supportType?: $Enums.SupportType
+    supportTypes?: SupporterCreatesupportTypesInput | $Enums.SupportType[]
     status?: $Enums.SupporterStatus
     notes?: string | null
     flaggedReason?: string | null
@@ -67858,11 +70234,34 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type MaterialRequestCreateManySupporterInput = {
+    id?: string
+    materialId?: string | null
+    materialName: string
+    materials?: MaterialRequestCreatematerialsInput | string[]
+    materialType?: string | null
+    quantity?: number
+    justification?: string | null
+    cityName?: string | null
+    neighborhood?: string | null
+    deliveryAddress?: string | null
+    requesterId?: string | null
+    approverId?: string | null
+    status?: $Enums.MaterialRequestStatus
+    appliedPhotoUrl?: string | null
+    requestedAt?: Date | string
+    approvedAt?: Date | string | null
+    deliveredAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type SupporterUpdateWithoutDuplicateOfInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -67878,6 +70277,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -67891,13 +70291,15 @@ export namespace Prisma {
     conversations?: ConversationUpdateManyWithoutSupporterNestedInput
     bannerLocations?: BannerLocationUpdateManyWithoutSupporterNestedInput
     broadcastContacts?: BroadcastContactUpdateManyWithoutSupporterNestedInput
+    materialRequests?: MaterialRequestUpdateManyWithoutSupporterNestedInput
   }
 
   export type SupporterUncheckedUpdateWithoutDuplicateOfInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -67915,6 +70317,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -67926,13 +70329,15 @@ export namespace Prisma {
     conversations?: ConversationUncheckedUpdateManyWithoutSupporterNestedInput
     bannerLocations?: BannerLocationUncheckedUpdateManyWithoutSupporterNestedInput
     broadcastContacts?: BroadcastContactUncheckedUpdateManyWithoutSupporterNestedInput
+    materialRequests?: MaterialRequestUncheckedUpdateManyWithoutSupporterNestedInput
   }
 
   export type SupporterUncheckedUpdateManyWithoutDuplicateOfInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     whatsapp?: NullableStringFieldUpdateOperationsInput | string | null
+    tags?: SupporterUpdatetagsInput | string[]
     email?: NullableStringFieldUpdateOperationsInput | string | null
     cpf?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -67950,6 +70355,7 @@ export namespace Prisma {
     instagram?: NullableStringFieldUpdateOperationsInput | string | null
     facebook?: NullableStringFieldUpdateOperationsInput | string | null
     supportType?: EnumSupportTypeFieldUpdateOperationsInput | $Enums.SupportType
+    supportTypes?: SupporterUpdatesupportTypesInput | $Enums.SupportType[]
     status?: EnumSupporterStatusFieldUpdateOperationsInput | $Enums.SupporterStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     flaggedReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -68099,6 +70505,72 @@ export namespace Prisma {
     error?: NullableStringFieldUpdateOperationsInput | string | null
     sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MaterialRequestUpdateWithoutSupporterInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    materialName?: StringFieldUpdateOperationsInput | string
+    materials?: MaterialRequestUpdatematerialsInput | string[]
+    materialType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: IntFieldUpdateOperationsInput | number
+    justification?: NullableStringFieldUpdateOperationsInput | string | null
+    cityName?: NullableStringFieldUpdateOperationsInput | string | null
+    neighborhood?: NullableStringFieldUpdateOperationsInput | string | null
+    deliveryAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumMaterialRequestStatusFieldUpdateOperationsInput | $Enums.MaterialRequestStatus
+    appliedPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    material?: MaterialUpdateOneWithoutRequestsNestedInput
+    requester?: UserUpdateOneWithoutRequestedMaterialsNestedInput
+    approver?: UserUpdateOneWithoutApprovedMaterialsNestedInput
+  }
+
+  export type MaterialRequestUncheckedUpdateWithoutSupporterInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    materialId?: NullableStringFieldUpdateOperationsInput | string | null
+    materialName?: StringFieldUpdateOperationsInput | string
+    materials?: MaterialRequestUpdatematerialsInput | string[]
+    materialType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: IntFieldUpdateOperationsInput | number
+    justification?: NullableStringFieldUpdateOperationsInput | string | null
+    cityName?: NullableStringFieldUpdateOperationsInput | string | null
+    neighborhood?: NullableStringFieldUpdateOperationsInput | string | null
+    deliveryAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    requesterId?: NullableStringFieldUpdateOperationsInput | string | null
+    approverId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumMaterialRequestStatusFieldUpdateOperationsInput | $Enums.MaterialRequestStatus
+    appliedPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MaterialRequestUncheckedUpdateManyWithoutSupporterInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    materialId?: NullableStringFieldUpdateOperationsInput | string | null
+    materialName?: StringFieldUpdateOperationsInput | string
+    materials?: MaterialRequestUpdatematerialsInput | string[]
+    materialType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: IntFieldUpdateOperationsInput | number
+    justification?: NullableStringFieldUpdateOperationsInput | string | null
+    cityName?: NullableStringFieldUpdateOperationsInput | string | null
+    neighborhood?: NullableStringFieldUpdateOperationsInput | string | null
+    deliveryAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    requesterId?: NullableStringFieldUpdateOperationsInput | string | null
+    approverId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumMaterialRequestStatusFieldUpdateOperationsInput | $Enums.MaterialRequestStatus
+    appliedPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type VolunteerStatusHistoryCreateManyVolunteerInput = {
@@ -68374,11 +70846,14 @@ export namespace Prisma {
   export type MaterialRequestCreateManyMaterialInput = {
     id?: string
     materialName: string
+    materials?: MaterialRequestCreatematerialsInput | string[]
+    materialType?: string | null
     quantity?: number
     justification?: string | null
     cityName?: string | null
     neighborhood?: string | null
     deliveryAddress?: string | null
+    supporterId?: string | null
     requesterId?: string | null
     approverId?: string | null
     status?: $Enums.MaterialRequestStatus
@@ -68393,6 +70868,8 @@ export namespace Prisma {
   export type MaterialRequestUpdateWithoutMaterialInput = {
     id?: StringFieldUpdateOperationsInput | string
     materialName?: StringFieldUpdateOperationsInput | string
+    materials?: MaterialRequestUpdatematerialsInput | string[]
+    materialType?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     justification?: NullableStringFieldUpdateOperationsInput | string | null
     cityName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -68405,6 +70882,7 @@ export namespace Prisma {
     deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    supporter?: SupporterUpdateOneWithoutMaterialRequestsNestedInput
     requester?: UserUpdateOneWithoutRequestedMaterialsNestedInput
     approver?: UserUpdateOneWithoutApprovedMaterialsNestedInput
   }
@@ -68412,11 +70890,14 @@ export namespace Prisma {
   export type MaterialRequestUncheckedUpdateWithoutMaterialInput = {
     id?: StringFieldUpdateOperationsInput | string
     materialName?: StringFieldUpdateOperationsInput | string
+    materials?: MaterialRequestUpdatematerialsInput | string[]
+    materialType?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     justification?: NullableStringFieldUpdateOperationsInput | string | null
     cityName?: NullableStringFieldUpdateOperationsInput | string | null
     neighborhood?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    supporterId?: NullableStringFieldUpdateOperationsInput | string | null
     requesterId?: NullableStringFieldUpdateOperationsInput | string | null
     approverId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumMaterialRequestStatusFieldUpdateOperationsInput | $Enums.MaterialRequestStatus
@@ -68431,11 +70912,14 @@ export namespace Prisma {
   export type MaterialRequestUncheckedUpdateManyWithoutMaterialInput = {
     id?: StringFieldUpdateOperationsInput | string
     materialName?: StringFieldUpdateOperationsInput | string
+    materials?: MaterialRequestUpdatematerialsInput | string[]
+    materialType?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     justification?: NullableStringFieldUpdateOperationsInput | string | null
     cityName?: NullableStringFieldUpdateOperationsInput | string | null
     neighborhood?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    supporterId?: NullableStringFieldUpdateOperationsInput | string | null
     requesterId?: NullableStringFieldUpdateOperationsInput | string | null
     approverId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumMaterialRequestStatusFieldUpdateOperationsInput | $Enums.MaterialRequestStatus

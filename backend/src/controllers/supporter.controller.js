@@ -20,13 +20,19 @@ const include = {
 const factory = crudFactory('supporter', {
   include,
   scope: supporterScope,
+  // A lista de APOIADORES esconde quem já virou voluntário (tem registro em
+  // Volunteer): ao ser classificado, a pessoa "sobe" para a tela de Voluntários.
+  baseWhere: { volunteer: { is: null } },
   // Ordem alfabética: com 33 mil cadastros, ordenar por data de criação
   // deixava a lista sem lógica de navegação.
   orderBy: { name: 'asc' },
   searchFields: ['name', 'phone', 'email', 'cityName', 'neighborhood'],
   allowedFilters: ['status', 'supportType', 'regionId', 'cityId', 'coordinatorId'],
-  arrayFilters: ['tags'],
+  arrayFilters: ['tags', 'supportTypes'],
 });
+
+// Tipos de apoio que classificam a pessoa como VOLUNTÁRIO da campanha.
+const TIPOS_VOLUNTARIO = ['VOLUNTARIO', 'FAIXA_CASA', 'KIT_MATERIAL'];
 
 export const { list, get } = factory;
 
@@ -64,6 +70,7 @@ const createSchema = z.object({
   instagram: z.string().nullable().optional(),
   facebook: z.string().nullable().optional(),
   supportType: z.enum(SUPPORT_TYPES).optional(),
+  supportTypes: z.array(z.enum(SUPPORT_TYPES)).optional(),
   status: z.enum(SUPPORTER_STATUS).optional(),
   notes: z.string().nullable().optional(),
   coordinatorId: z.string().uuid().nullable().optional(),
@@ -101,6 +108,64 @@ function montarTags({ grupos, indicante, tagsExistentes = [] }) {
   return [...new Set([...gruposLimpos, ...internas, ...(indicacao ? [indicacao] : [])])];
 }
 
+/**
+ * Aplica a "corrente" do tipo de apoio: se marcou Voluntário / Faixa / Kit, a
+ * pessoa vira VOLUNTÁRIO (sai de Apoiadores) e cada item gera seu destino —
+ * Faixa → lista de Faixas; Kit → Pedidos de Material. Idempotente (não duplica).
+ */
+export async function sincronizarDestinos(supporterId, { confirmar = false, userId = null } = {}) {
+  const s = await prisma.supporter.findUnique({ where: { id: supporterId }, include: { volunteer: true } });
+  if (!s || s.status === 'BLACKLIST') return;
+  const tipos = Array.isArray(s.supportTypes) ? s.supportTypes : [];
+  if (!tipos.some((t) => TIPOS_VOLUNTARIO.includes(t))) return;
+
+  let vol = s.volunteer;
+  if (!vol) vol = await prisma.volunteer.create({ data: { supporterId } });
+  if (confirmar && !vol.confirmed) {
+    await prisma.volunteer.update({
+      where: { id: vol.id },
+      data: { confirmed: true, active: true, confirmationStatus: 'CONFIRMADO', confirmedAt: new Date() },
+    });
+    await prisma.supporter.update({ where: { id: supporterId }, data: { status: 'CONFIRMADO' } });
+  }
+
+  if (tipos.includes('FAIXA_CASA')) {
+    const existe = await prisma.bannerLocation.findFirst({ where: { supporterId } });
+    if (!existe) {
+      await prisma.bannerLocation.create({
+        data: {
+          supporterId, responsibleName: s.name, phone: s.whatsapp || s.phone || null,
+          address: [s.street, s.number].filter(Boolean).join(', ') || null,
+          neighborhood: s.neighborhood, cityName: s.cityName, lat: s.lat, lng: s.lng,
+          authorized: true, authorizedAt: new Date(), status: 'AGUARDANDO_INSTALACAO',
+          notes: 'Marcou "Faixa na minha casa" no tipo de apoio.',
+        },
+      });
+    }
+  }
+
+  if (tipos.includes('KIT_MATERIAL')) {
+    const existe = await prisma.materialRequest.findFirst({ where: { supporterId, materialName: 'Kit de material' } });
+    if (!existe) {
+      await prisma.materialRequest.create({
+        data: {
+          materialName: 'Kit de material', materials: ['Kit de material'], quantity: 1, status: 'SOLICITADO',
+          supporterId, requesterId: userId || null,
+          cityName: s.cityName, neighborhood: s.neighborhood,
+          deliveryAddress: [s.street, s.number, s.complement].filter(Boolean).join(', ') || null,
+          justification: `${s.name} pediu o kit de material (tipo de apoio).`,
+        },
+      });
+    }
+  }
+}
+
+/** Deriva o tipo principal (legado) a partir da multi-seleção. */
+function tipoPrincipal(tipos) {
+  if (!Array.isArray(tipos) || !tipos.length) return null;
+  return tipos.includes('VOLUNTARIO') ? 'VOLUNTARIO' : tipos[0];
+}
+
 export const create = asyncHandler(async (req, res) => {
   const data = createSchema.parse(nullifyEmpty(req.body));
   const phone = onlyDigits(data.phone);
@@ -109,6 +174,9 @@ export const create = asyncHandler(async (req, res) => {
     data.tags = montarTags({ grupos: data.tags, indicante: data.indicante });
   }
   delete data.indicante;
+
+  // Multi-seleção do tipo de apoio: define o principal (legado) p/ coluna e relatórios.
+  if (data.supportTypes?.length) data.supportType = tipoPrincipal(data.supportTypes);
 
   const [black, existing] = await Promise.all([
     prisma.blacklist.findFirst({ where: { phone } }),
@@ -160,9 +228,10 @@ export const create = asyncHandler(async (req, res) => {
     include,
   });
 
-  if (supporter.supportType === 'VOLUNTARIO' && status !== 'BLACKLIST') {
-    await prisma.volunteer.create({ data: { supporterId: supporter.id } });
-    await sendConfirmation(supporter);
+  // Corrente: se marcou Voluntário/Faixa/Kit, vira voluntário + gera destinos.
+  if (status !== 'BLACKLIST') {
+    await sincronizarDestinos(supporter.id, { confirmar: true, userId: req.user?.id });
+    if ((supporter.supportTypes || []).includes('VOLUNTARIO')) await sendConfirmation(supporter);
   }
 
   await audit({
@@ -181,6 +250,7 @@ export const update = asyncHandler(async (req, res) => {
   const data = nullifyEmpty(req.body);
   if (data.birthDate) data.birthDate = new Date(data.birthDate);
   if (data.phone) data.phone = onlyDigits(data.phone);
+  if (Array.isArray(data.supportTypes) && data.supportTypes.length) data.supportType = tipoPrincipal(data.supportTypes);
 
   // Grupos (campo Grupos) + quem indicou (campo dedicado) + marcadores
   // internos (preservados). Só busca o estado atual quando algum dos dois veio.
@@ -202,8 +272,11 @@ export const update = asyncHandler(async (req, res) => {
   delete data.city;
   delete data.coordinator;
   const supporter = await prisma.supporter.update({ where: { id: req.params.id }, data, include });
+  // Corrente: marcar Voluntário/Faixa/Kit e salvar → vira voluntário + destinos.
+  await sincronizarDestinos(supporter.id, { confirmar: true, userId: req.user?.id });
+  const atualizado = await prisma.supporter.findUnique({ where: { id: supporter.id }, include });
   await audit({ userId: req.user?.id, action: 'UPDATE', entity: 'Supporter', entityId: supporter.id, ip: req.ip });
-  res.json(supporter);
+  res.json(atualizado);
 });
 
 export const remove = asyncHandler(async (req, res) => {

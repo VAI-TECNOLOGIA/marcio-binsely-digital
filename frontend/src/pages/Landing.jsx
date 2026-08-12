@@ -478,6 +478,10 @@ export default function Landing() {
           </div>
           <div className="mlp-foot-bottom">
             © {new Date().getFullYear()} Márcio Bins Ely · Vereador · Porto Alegre/RS · PDT
+            <span style={{ margin: '0 8px', opacity: 0.5 }}>·</span>
+            <a href="/privacidade" style={{ color: 'inherit', textDecoration: 'underline' }}>Política de Privacidade</a>
+            <span style={{ margin: '0 8px', opacity: 0.5 }}>·</span>
+            <a href="/excluir-dados" style={{ color: 'inherit', textDecoration: 'underline' }}>Excluir meus dados</a>
           </div>
         </div>
       </footer>

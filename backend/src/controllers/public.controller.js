@@ -6,6 +6,7 @@ import { SUPPORT_TYPES } from '../utils/enums.js';
 import { nullifyEmpty, onlyDigits } from '../utils/helpers.js';
 import { fallbackLatLng, linkCityByName } from '../utils/geo.js';
 import { zonaDoBairro, ehPortoAlegre } from '../utils/zonasPoa.js';
+import { sincronizarDestinos } from './supporter.controller.js';
 
 /**
  * Região do cadastro. Em Porto Alegre a zona vem do BAIRRO (a cidade é uma
@@ -126,6 +127,10 @@ export const siteJoin = asyncHandler(async (req, res) => {
         ...(existente.status === 'BLACKLIST' ? {} : { status: 'PENDENTE' }),
       },
     });
+    // Quem preencheu o formulário é voluntário (a confirmar).
+    if (atualizado.status !== 'BLACKLIST') {
+      await prisma.volunteer.upsert({ where: { supporterId: atualizado.id }, create: { supporterId: atualizado.id }, update: {} });
+    }
     return res.status(200).json({ ok: true, duplicado: true, id: atualizado.id, message: 'Cadastro atualizado!' });
   }
 
@@ -176,6 +181,11 @@ export const siteJoin = asyncHandler(async (req, res) => {
         notes: `Autorizou no formulário de cadastro. Resposta: ${respPropaganda}`,
       },
     });
+  }
+
+  // Quem preencheu o formulário é voluntário (a confirmar).
+  if (!black) {
+    await prisma.volunteer.upsert({ where: { supporterId: apoiador.id }, create: { supporterId: apoiador.id }, update: {} });
   }
 
   res.status(201).json({ ok: true, id: apoiador.id, message: 'Cadastro recebido!' });
@@ -237,14 +247,17 @@ export const join = asyncHandler(async (req, res) => {
       lat: geo.lat,
       lng: geo.lng,
       supportType: data.supportType || 'NOTICIAS',
+      supportTypes: data.supportType ? [data.supportType] : [],
       status,
       flaggedReason,
       duplicateOfId,
     },
   });
 
-  if (supporter.supportType === 'VOLUNTARIO' && status !== 'BLACKLIST') {
+  // Todo mundo que preenche o formulário entra como VOLUNTÁRIO (a confirmar).
+  if (status !== 'BLACKLIST') {
     await prisma.volunteer.create({ data: { supporterId: supporter.id } });
+    await sincronizarDestinos(supporter.id, { confirmar: false });
     const body = `Olá ${supporter.name}! 👋 Recebemos seu cadastro na campanha do Márcio Bins Ely. Responda *SIM* para confirmar sua participação. 💪`;
     const r = await sendWhatsApp({ to: phone, body });
     await prisma.conversation.create({

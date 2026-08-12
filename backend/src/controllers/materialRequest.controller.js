@@ -9,6 +9,14 @@ const include = {
   material: true,
   requester: { select: { id: true, name: true } },
   approver: { select: { id: true, name: true } },
+  // Pedidos que nasceram de um apoiador (ao virar voluntário) apontam para ele.
+  // Campos de endereço entram para a exportação gerar etiqueta de correio.
+  supporter: {
+    select: {
+      id: true, name: true, phone: true, whatsapp: true,
+      cep: true, street: true, number: true, complement: true, neighborhood: true, cityName: true,
+    },
+  },
 };
 
 export const list = asyncHandler(async (req, res) => {
