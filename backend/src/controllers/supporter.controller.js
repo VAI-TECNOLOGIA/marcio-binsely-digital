@@ -259,6 +259,9 @@ export async function sincronizarBlacklist(supporter, { entrar, reason, userId }
         data: { phone: supporter.phone, cpf: supporter.cpf, name: supporter.name, reason: reason || 'Marcado na base de apoiadores', createdById: userId || null },
       });
     }
+    // Quem entra na blacklist SAI de Voluntários (o cadastro segue na base,
+    // marcado). A corrente de destinos ignora BLACKLIST, então não volta.
+    await prisma.volunteer.deleteMany({ where: { supporterId: supporter.id } });
   } else {
     await prisma.blacklist.deleteMany({ where: porTelefone });
   }

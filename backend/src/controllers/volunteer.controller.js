@@ -15,7 +15,8 @@ const include = {
 
 export const list = asyncHandler(async (req, res) => {
   const u = req.user;
-  const where = {};
+  // Blacklist nunca aparece entre voluntários (defesa extra para registros legados).
+  const where = { supporter: { status: { not: 'BLACKLIST' } } };
   // Hierarquia: LÍDER e MEMBRO (equipe interna) enxergam todos os voluntários.
   if (req.query.active === 'true' || req.query.active === 'false') where.active = req.query.active === 'true';
   if (req.query.confirmed === 'true' || req.query.confirmed === 'false') where.confirmed = req.query.confirmed === 'true';

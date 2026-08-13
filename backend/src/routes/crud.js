@@ -220,6 +220,8 @@ const blacklistCreate = asyncHandler(async (req, res) => {
       where: { phone, status: { not: 'BLACKLIST' } },
       data: { status: 'BLACKLIST', flaggedReason: `Incluído na blacklist: ${reason}` },
     });
+    // Bloqueado sai de Voluntários (o cadastro segue na base, marcado).
+    await prisma.volunteer.deleteMany({ where: { supporter: { phone } } });
   }
   res.status(201).json(row);
 });
