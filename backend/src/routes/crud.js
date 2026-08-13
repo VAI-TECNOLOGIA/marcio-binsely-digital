@@ -2,6 +2,8 @@ import { crudFactory } from '../utils/crudFactory.js';
 import { resourceRouter } from './resourceRouter.js';
 import { regionScopeWithGlobal } from '../utils/scope.js';
 import prisma from '../config/prisma.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
+import { AppError } from '../utils/AppError.js';
 
 // Hierarquia: LIDER (total) · MEMBRO (equipe interna) · PARCEIRO (externo).
 // As antigas siglas viram aliases dos novos níveis para preservar a lógica.
@@ -196,14 +198,49 @@ export const cities = resourceRouter(
   { writeRoles: [A] }
 );
 
-// Blacklist
+// Blacklist — create/remove customizados para manter o STATUS do apoiador em
+// espelho com a tabela (a tela, o card do dashboard e o bloqueio de disparos
+// leem a mesma fonte).
+const blacklistFactory = crudFactory('blacklist', {
+  orderBy: { name: 'asc' },
+  searchFields: ['name', 'phone', 'cpf', 'reason'],
+  writableFields: ['phone', 'cpf', 'name', 'reason', 'createdById'],
+  transformIn: (d, req) => ({ ...d, createdById: d.createdById || req.user?.id }),
+});
+
+const blacklistCreate = asyncHandler(async (req, res) => {
+  const { name, cpf, reason } = req.body || {};
+  if (!reason || String(reason).trim().length < 2) throw new AppError('Informe o motivo.', 400);
+  const phone = req.body?.phone ? String(req.body.phone).replace(/\D/g, '') : null;
+  const row = await prisma.blacklist.create({
+    data: { phone: phone || null, cpf: cpf || null, name: name || null, reason, createdById: req.user?.id || null },
+  });
+  if (phone) {
+    await prisma.supporter.updateMany({
+      where: { phone, status: { not: 'BLACKLIST' } },
+      data: { status: 'BLACKLIST', flaggedReason: `Incluído na blacklist: ${reason}` },
+    });
+  }
+  res.status(201).json(row);
+});
+
+const blacklistRemove = asyncHandler(async (req, res) => {
+  const row = await prisma.blacklist.findUnique({ where: { id: req.params.id } });
+  if (!row) throw new AppError('Registro não encontrado', 404);
+  await prisma.blacklist.delete({ where: { id: row.id } });
+  // Libera o(s) apoiador(es) correspondente(s) — sem isso o dashboard seguiria contando.
+  const alvo = row.phone ? { phone: row.phone } : row.name ? { name: row.name, phone: null } : null;
+  if (alvo) {
+    await prisma.supporter.updateMany({
+      where: { ...alvo, status: 'BLACKLIST' },
+      data: { status: 'ATIVO', flaggedReason: null },
+    });
+  }
+  res.status(204).send();
+});
+
 export const blacklist = resourceRouter(
-  crudFactory('blacklist', {
-    orderBy: { name: 'asc' },
-    searchFields: ['name', 'phone', 'cpf', 'reason'],
-    writableFields: ['phone', 'cpf', 'name', 'reason', 'createdById'],
-    transformIn: (d, req) => ({ ...d, createdById: d.createdById || req.user?.id }),
-  }),
+  { ...blacklistFactory, create: blacklistCreate, remove: blacklistRemove },
   { writeRoles: [A] } // Blacklist: somente LÍDER
 );
 

@@ -86,7 +86,7 @@ export default function Broadcasts() {
   async function importContacts() {
     try {
       const { data } = await api.post(`/broadcasts/${detail.id}/contacts`, { csv });
-      toast.success(`${data.imported} contatos importados.`);
+      toast.success(`${data.imported} contatos importados.${data.skippedBlacklist ? ` ${data.skippedBlacklist} na blacklist foram ignorados.` : ''}`);
       openDetail(detail);
       load();
     } catch (e) {

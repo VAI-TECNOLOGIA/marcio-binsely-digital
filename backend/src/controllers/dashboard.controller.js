@@ -28,7 +28,8 @@ export const getStats = asyncHandler(async (req, res) => {
     }),
     prisma.streetAction.count({ where: { status: 'REALIZADA' } }),
     prisma.supporter.count({ where: { status: 'SUSPEITO' } }),
-    prisma.supporter.count({ where: { status: 'BLACKLIST' } }),
+    // Mesma fonte da tela Blacklist (tabela) — o card e a lista sempre batem.
+    prisma.blacklist.count(),
     prisma.demand.count({ where: { status: { in: ['NOVA', 'EM_ANALISE', 'EM_ANDAMENTO'] } } }),
     prisma.conversation.count({ where: { status: { in: ['ABERTA', 'EM_ATENDIMENTO', 'AGUARDANDO'] } } }),
   ]);

@@ -64,6 +64,20 @@ export const create = asyncHandler(async (req, res) => {
   res.status(201).json(c);
 });
 
+// Núcleo do telefone para comparação (dígitos, sem o DDI 55) — a blacklist
+// guarda "51981145570" e o import costuma trazer "5551981145570".
+function nucleoFone(v) {
+  let d = String(v || '').replace(/\D/g, '');
+  if (d.startsWith('55') && d.length >= 12) d = d.slice(2);
+  return d;
+}
+
+/** Conjunto de telefones bloqueados (tabela Blacklist), já normalizados. */
+async function fonesBloqueados() {
+  const rows = await prisma.blacklist.findMany({ where: { phone: { not: null } }, select: { phone: true } });
+  return new Set(rows.map((r) => nucleoFone(r.phone)).filter(Boolean));
+}
+
 export const importContacts = asyncHandler(async (req, res) => {
   const { contacts, csv } = req.body;
   let rows = [];
@@ -72,7 +86,11 @@ export const importContacts = asyncHandler(async (req, res) => {
   else throw new AppError('Envie "contacts" (array) ou "csv" (string).', 400);
 
   const campaignId = req.params.id;
-  const valid = rows.filter((r) => r.telefone || r.phone);
+  const comFone = rows.filter((r) => r.telefone || r.phone);
+  // Quem está na blacklist não entra na campanha.
+  const bloqueados = await fonesBloqueados();
+  const valid = comFone.filter((r) => !bloqueados.has(nucleoFone(r.telefone || r.phone)));
+  const skippedBlacklist = comFone.length - valid.length;
   await prisma.broadcastContact.createMany({
     data: valid.map((r) => ({
       campaignId,
@@ -86,7 +104,7 @@ export const importContacts = asyncHandler(async (req, res) => {
 
   const total = await prisma.broadcastContact.count({ where: { campaignId } });
   await prisma.broadcastCampaign.update({ where: { id: campaignId }, data: { totalContacts: total, pendingCount: total } });
-  res.status(201).json({ imported: valid.length, total });
+  res.status(201).json({ imported: valid.length, skippedBlacklist, total });
 });
 
 // Bug 2: envio em LOTES. Cada chamada processa até BATCH pendentes e responde
@@ -115,9 +133,17 @@ export const send = asyncHandler(async (req, res) => {
     throw new AppError(`Template "${campaign.templateName}" não encontrado ou não aprovado na conta.`, 400);
   }
 
+  // Rede de segurança: contatos importados antes de um bloqueio também não saem.
+  const bloqueados = batch.length ? await fonesBloqueados() : new Set();
+
   let sent = 0;
   let failed = 0;
   for (const c of batch) {
+    if (bloqueados.has(nucleoFone(c.phone))) {
+      await prisma.broadcastContact.update({ where: { id: c.id }, data: { status: 'FALHA', error: 'Número na blacklist — envio bloqueado.' } });
+      failed++;
+      continue;
+    }
     try {
       let result;
       if (tpl) {

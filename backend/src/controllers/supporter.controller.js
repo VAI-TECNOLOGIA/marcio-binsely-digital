@@ -246,11 +246,32 @@ export const create = asyncHandler(async (req, res) => {
   res.status(201).json({ supporter, warning: flaggedReason });
 });
 
+/**
+ * Mantém a tabela Blacklist (a tela) espelhando o status do apoiador — o card
+ * do dashboard, a tela e o bloqueio de disparos leem a MESMA fonte.
+ */
+export async function sincronizarBlacklist(supporter, { entrar, reason, userId }) {
+  const porTelefone = supporter.phone ? { phone: supporter.phone } : { phone: null, name: supporter.name };
+  if (entrar) {
+    const ja = await prisma.blacklist.findFirst({ where: porTelefone });
+    if (!ja) {
+      await prisma.blacklist.create({
+        data: { phone: supporter.phone, cpf: supporter.cpf, name: supporter.name, reason: reason || 'Marcado na base de apoiadores', createdById: userId || null },
+      });
+    }
+  } else {
+    await prisma.blacklist.deleteMany({ where: porTelefone });
+  }
+}
+
 export const update = asyncHandler(async (req, res) => {
   const data = nullifyEmpty(req.body);
   if (data.birthDate) data.birthDate = new Date(data.birthDate);
   if (data.phone) data.phone = onlyDigits(data.phone);
   if (Array.isArray(data.supportTypes) && data.supportTypes.length) data.supportType = tipoPrincipal(data.supportTypes);
+  const anterior = data.status !== undefined
+    ? await prisma.supporter.findUnique({ where: { id: req.params.id }, select: { status: true } })
+    : null;
 
   // Grupos (campo Grupos) + quem indicou (campo dedicado) + marcadores
   // internos (preservados). Só busca o estado atual quando algum dos dois veio.
@@ -272,6 +293,14 @@ export const update = asyncHandler(async (req, res) => {
   delete data.city;
   delete data.coordinator;
   const supporter = await prisma.supporter.update({ where: { id: req.params.id }, data, include });
+  // Status mudou de/para BLACKLIST na edição comum → espelha na tabela da tela.
+  if (anterior && data.status && data.status !== anterior.status) {
+    if (data.status === 'BLACKLIST') {
+      await sincronizarBlacklist(supporter, { entrar: true, reason: data.flaggedReason, userId: req.user?.id });
+    } else if (anterior.status === 'BLACKLIST') {
+      await sincronizarBlacklist(supporter, { entrar: false });
+    }
+  }
   // Corrente: marcar Voluntário/Faixa/Kit e salvar → vira voluntário + destinos.
   await sincronizarDestinos(supporter.id, { confirmar: true, userId: req.user?.id });
   const atualizado = await prisma.supporter.findUnique({ where: { id: supporter.id }, include });
@@ -341,9 +370,7 @@ export const toBlacklist = asyncHandler(async (req, res) => {
   const s = await prisma.supporter.findUnique({ where: { id } });
   if (!s) throw new AppError('Apoiador não encontrado', 404);
 
-  await prisma.blacklist.create({
-    data: { phone: s.phone, cpf: s.cpf, name: s.name, reason: reason || 'Marcado manualmente', createdById: req.user?.id },
-  });
+  await sincronizarBlacklist(s, { entrar: true, reason: reason || 'Marcado manualmente', userId: req.user?.id });
   const updated = await prisma.supporter.update({
     where: { id },
     data: { status: 'BLACKLIST', flaggedReason: reason || 'Movido para blacklist' },
