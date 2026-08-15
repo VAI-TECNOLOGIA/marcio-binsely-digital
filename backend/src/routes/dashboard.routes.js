@@ -1,7 +1,11 @@
 import { Router } from 'express';
 import * as dash from '../controllers/dashboard.controller.js';
+import { authorize } from '../middlewares/rbac.js';
 
 const r = Router();
+
+// Números gerais + mapa georreferenciado: só equipe (apoiador tem painel próprio).
+r.use(authorize('LIDER', 'MEMBRO'));
 
 r.get('/stats', dash.getStats);
 r.get('/charts', dash.getCharts);

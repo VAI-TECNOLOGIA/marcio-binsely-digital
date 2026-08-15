@@ -6,6 +6,8 @@ import { TASK_TYPES } from '../utils/enums.js';
 import { nullifyEmpty } from '../utils/helpers.js';
 
 export const list = asyncHandler(async (req, res) => {
+  // Apoiador não puxa a lista global de engajamentos (nomes de voluntários).
+  if (req.user?.role === 'PARCEIRO' && !req.query.volunteerId) return res.json({ data: [] });
   const where = {};
   if (req.query.volunteerId) where.volunteerId = req.query.volunteerId;
   if (req.query.type) where.type = req.query.type;

@@ -86,7 +86,7 @@ export const banners = resourceRouter(
     dateFields: ['authorizedAt'],
     writableFields: ['responsibleName', 'phone', 'address', 'cityName', 'neighborhood', 'lat', 'lng', 'housePhotoUrl', 'bannerPhotoUrl', 'authorized', 'authorizedAt', 'status', 'notes', 'supporterId'],
   }),
-  { writeRoles: [A, C, S] }
+  { writeRoles: [A, C, S], readRoles: [A, C] } // endereços de apoiadores — não expor a apoiador
 );
 
 // 12 — Ações de rua
@@ -104,7 +104,7 @@ export const streetActions = resourceRouter(
     writableFields: ['type', 'title', 'cityName', 'cityId', 'neighborhood', 'address', 'lat', 'lng', 'date', 'description', 'team', 'peopleReached', 'photos', 'notes', 'status', 'regionId', 'coordinatorId'],
     transformIn: (d, req) => ({ ...d, coordinatorId: d.coordinatorId || req.user?.id }),
   }),
-  { writeRoles: [A, C, S] }
+  { writeRoles: [A, C, S], readRoles: [A, C] } // planejamento de campo — só equipe
 );
 
 // 13 — Agenda / eventos
@@ -157,7 +157,7 @@ export const demands = resourceRouter(
       return d;
     },
   }),
-  { writeRoles: [A, SP, C] }
+  { writeRoles: [A, SP, C], readRoles: [A, C] } // demandas de cidadãos (dados pessoais) — só equipe
 );
 
 // 15 — Automações de relacionamento
@@ -169,7 +169,7 @@ export const automations = resourceRouter(
     dateFields: ['triggerDate'],
     writableFields: ['name', 'type', 'message', 'audience', 'triggerDate', 'status'],
   }),
-  { writeRoles: [A, MK] }
+  { writeRoles: [A, MK], readRoles: [A, C] } // configuração interna — só equipe
 );
 
 // Regiões
@@ -183,7 +183,7 @@ export const regions = resourceRouter(
     orderBy: { name: 'asc' },
     writableFields: ['name', 'uf', 'color', 'coordinatorId'],
   }),
-  { writeRoles: [A] }
+  { writeRoles: [A], readRoles: [A, C] } // expõe coordenadores — só equipe
 );
 
 // Cidades
@@ -195,7 +195,7 @@ export const cities = resourceRouter(
     orderBy: { name: 'asc' },
     writableFields: ['name', 'uf', 'regionId'],
   }),
-  { writeRoles: [A] }
+  { writeRoles: [A], readRoles: [A, C] }
 );
 
 // Blacklist — create/remove customizados para manter o STATUS do apoiador em
@@ -243,11 +243,11 @@ const blacklistRemove = asyncHandler(async (req, res) => {
 
 export const blacklist = resourceRouter(
   { ...blacklistFactory, create: blacklistCreate, remove: blacklistRemove },
-  { writeRoles: [A] } // Blacklist: somente LÍDER
+  { writeRoles: [A], readRoles: [A] } // Blacklist: somente LÍDER (lê e escreve)
 );
 
 // Perfis / Roles
 export const roles = resourceRouter(
   crudFactory('role', { orderBy: { name: 'asc' }, writableFields: ['name', 'description', 'permissions'] }),
-  { writeRoles: [A] }
+  { writeRoles: [A], readRoles: [A] }
 );
