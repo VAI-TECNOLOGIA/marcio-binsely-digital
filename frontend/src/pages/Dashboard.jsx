@@ -9,11 +9,16 @@ import { LoadingBox } from '../components/ui/Spinner.jsx';
 import { BarChartCard, PieChartCard, LineChartCard } from '../components/charts/Charts.jsx';
 import api from '../api/client.js';
 import { label } from '../config/enums.js';
+import { useAuth } from '../context/AuthContext.jsx';
+import PainelApoiador from './PainelApoiador.jsx';
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  const isApoiador = user?.role === 'PARCEIRO';
   const [data, setData] = useState(null);
 
   useEffect(() => {
+    if (isApoiador) return; // apoiador tem painel próprio — não puxa os números gerais
     Promise.all([
       api.get('/dashboard/stats'),
       api.get('/dashboard/charts'),
@@ -25,7 +30,9 @@ export default function Dashboard() {
         setData({ stats: s.data, charts: c.data, rankings: r.data, growth: g.data.series, diarios: d.data })
       )
       .catch(() => setData({ error: true }));
-  }, []);
+  }, [isApoiador]);
+
+  if (isApoiador) return <PainelApoiador user={user} />;
 
   if (!data) {
     return (

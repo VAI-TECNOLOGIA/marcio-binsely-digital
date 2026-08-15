@@ -927,6 +927,28 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
   flex-wrap: wrap;
 }
 .auth-links .auth-back { display: inline-flex; }
+.signup-steps { display: flex; gap: 8px; margin-bottom: 18px; }
+.signup-steps span { flex: 1; font-size: 11.5px; font-weight: 600; color: var(--muted); padding: 7px 10px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--border); text-align: center; }
+.signup-steps span.on { color: #fff; background: var(--brand); border-color: var(--brand); }
+
+/* Painel do Apoiador */
+.ap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 20px; }
+.ap-atalho { display: flex; align-items: center; gap: 12px; padding: 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); text-decoration: none; color: var(--ink); transition: transform .12s, box-shadow .12s, border-color .12s; }
+.ap-atalho:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,62,157,.12); border-color: var(--brand); }
+.ap-atalho-ic { width: 44px; height: 44px; border-radius: 11px; background: var(--brand-soft); color: var(--brand); display: grid; place-items: center; flex-shrink: 0; }
+.ap-atalho-tx { flex: 1; min-width: 0; }
+.ap-atalho-tx strong { display: block; font-size: 14px; }
+.ap-atalho-tx span { font-size: 12px; color: var(--muted); }
+.ap-atalho-seta { color: var(--muted); flex-shrink: 0; }
+.ap-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 820px) { .ap-cols { grid-template-columns: 1fr; } }
+.ap-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.ap-lista li { padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.ap-lista li:last-child { border-bottom: none; padding-bottom: 0; }
+.ap-data { font-size: 12px; font-weight: 600; color: var(--brand); margin-bottom: 2px; }
+.ap-evt strong { font-size: 14px; }
+.ap-corte { font-size: 12.5px; margin-top: 3px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ap-vermais { display: inline-flex; align-items: center; gap: 5px; margin-top: 14px; font-size: 13px; font-weight: 600; color: var(--brand); text-decoration: none; }
 
 /* ============================================================
    ENVIO DE ACESSO (modal "Copiar acesso" — Usuários)

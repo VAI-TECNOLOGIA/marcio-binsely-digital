@@ -64,6 +64,40 @@ export const register = asyncHandler(async (req, res) => {
   res.status(201).json(publicUser(user));
 });
 
+const signupSchema = z.object({
+  name: z.string().min(2, 'Informe o seu nome'),
+  email: z.string().email('E-mail inválido'),
+  password: z.string().min(6, 'A senha deve ter ao menos 6 caracteres'),
+  phone: z.string().nullable().optional(),
+});
+
+/**
+ * Auto-cadastro público: qualquer pessoa cria a própria conta e já entra logada
+ * como APOIADOR (role PARCEIRO — forçado no servidor, nunca aceito do cliente).
+ * A promoção para voluntário/equipe/líder é feita depois por um administrador.
+ */
+export const signup = asyncHandler(async (req, res) => {
+  const data = signupSchema.parse(nullifyEmpty(req.body));
+  const email = data.email.toLowerCase();
+  const exists = await prisma.user.findUnique({ where: { email } });
+  if (exists) throw new AppError('Este e-mail já tem acesso. Tente entrar ou usar "Esqueci minha senha".', 409);
+
+  const user = await prisma.user.create({
+    data: {
+      name: data.name,
+      email,
+      phone: data.phone ? onlyDigits(data.phone) : null,
+      password: await hashPassword(data.password),
+      role: 'PARCEIRO', // apoiador — sempre; ignora qualquer role enviado
+      active: true,
+    },
+    include: { region: true },
+  });
+  const token = signToken({ sub: user.id, role: user.role });
+  await audit({ userId: user.id, action: 'SIGNUP', entity: 'User', entityId: user.id, ip: req.ip });
+  res.status(201).json({ token, user: publicUser(user) });
+});
+
 export const me = asyncHandler(async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id: req.user.id },

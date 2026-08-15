@@ -81,6 +81,10 @@ export default function Login() {
             {submitting ? 'Entrando...' : 'Entrar'}
           </button>
 
+          <Link to="/criar-conta" className="btn btn-block" style={{ marginTop: 10 }}>
+            Criar meu acesso
+          </Link>
+
           <div className="auth-links">
             <Link to="/esqueci-senha" className="auth-back">Esqueci minha senha</Link>
             <Link to="/lp" className="auth-back">

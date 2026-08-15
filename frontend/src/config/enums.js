@@ -4,7 +4,7 @@ export const LABELS = {
   UserRole: {
     LIDER: 'Líder de Campanha',
     MEMBRO: 'Membro da Equipe',
-    PARCEIRO: 'Parceiro',
+    PARCEIRO: 'Apoiador',
   },
   SupportType: {
     VOLUNTARIO: 'Quero ser voluntário',

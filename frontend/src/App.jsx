@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './routes/ProtectedRoute.jsx';
 
 import Login from './pages/Login.jsx';
+import Signup from './pages/Signup.jsx';
 import ForgotPassword from './pages/ForgotPassword.jsx';
 import ResetPassword from './pages/ResetPassword.jsx';
 import Dashboard from './pages/Dashboard.jsx';
@@ -65,6 +66,7 @@ export default function App() {
     <Suspense fallback={lazyFallback}>
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/criar-conta" element={<Signup />} />
       <Route path="/esqueci-senha" element={<ForgotPassword />} />
       <Route path="/redefinir-senha" element={<ResetPassword />} />
       <Route path="/lp" element={<Landing />} />

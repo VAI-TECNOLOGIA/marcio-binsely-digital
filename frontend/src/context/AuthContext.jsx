@@ -28,13 +28,21 @@ export function AuthProvider({ children }) {
     return data.user;
   };
 
+  // Auto-cadastro: cria a conta (apoiador) e já entra logado.
+  const signup = async (payload) => {
+    const { data } = await api.post('/auth/signup', payload);
+    localStorage.setItem('mbd_token', data.token);
+    setUser(data.user);
+    return data.user;
+  };
+
   const logout = () => {
     localStorage.removeItem('mbd_token');
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, setUser }}>
+    <AuthContext.Provider value={{ user, loading, login, signup, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   );
