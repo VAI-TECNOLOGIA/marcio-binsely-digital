@@ -336,6 +336,7 @@ model Supporter {
   email       String?
   cpf         String?
   birthDate   DateTime?
+  lastBirthdayYear Int?     // ano do último "feliz aniversário" enviado (evita reenvio)
   cep         String?
   street      String?
   number      String?

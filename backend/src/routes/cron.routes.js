@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { AppError } from '../utils/AppError.js';
 import { runAutomations } from '../services/automation.service.js';
+import { enviarAniversarios } from '../services/aniversario.service.js';
 
 // ============================================================
 //  Rotas de cron (Vercel Cron Jobs).
@@ -22,6 +23,14 @@ r.get('/automations', asyncHandler(async (req, res) => {
   requireCronSecret(req);
   const result = await runAutomations();
   console.log('[cron:automations]', JSON.stringify(result));
+  res.json({ ok: true, ...result });
+}));
+
+// Feliz aniversário (template) para a base engajada — 1x/dia via crontab do VPS.
+r.get('/aniversarios', asyncHandler(async (req, res) => {
+  requireCronSecret(req);
+  const result = await enviarAniversarios();
+  console.log('[cron:aniversarios]', JSON.stringify(result));
   res.json({ ok: true, ...result });
 }));
 
