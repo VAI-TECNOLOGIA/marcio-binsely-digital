@@ -53,6 +53,12 @@ const EDIT_FIELDS = [
   { name: 'phone', label: 'Telefone', type: 'tel' },
   { name: 'whatsapp', label: 'WhatsApp', type: 'tel' },
   { name: 'email', label: 'E-mail', type: 'email' },
+  { name: 'cpf', label: 'CPF' },
+  { name: 'birthDate', label: 'Data de nascimento', type: 'date' },
+  { name: 'cep', label: 'CEP', hint: 'Digite o CEP para preencher o endereço' },
+  { name: 'street', label: 'Endereço (rua)', full: true },
+  { name: 'number', label: 'Número' },
+  { name: 'complement', label: 'Complemento' },
   { name: 'neighborhood', label: 'Bairro' },
   { name: 'cityName', label: 'Cidade' },
   { name: 'supportTypes', label: 'Tipo de apoio', type: 'checklist', full: true, options: [
@@ -138,6 +144,12 @@ export default function Volunteers() {
         phone: data.phone || '',
         whatsapp: data.whatsapp || '',
         email: data.email || '',
+        cpf: data.cpf || '',
+        birthDate: data.birthDate ? String(data.birthDate).slice(0, 10) : '',
+        cep: data.cep || '',
+        street: data.street || '',
+        number: data.number || '',
+        complement: data.complement || '',
         neighborhood: data.neighborhood || '',
         cityName: data.cityName || '',
         supportTypes: Array.isArray(data.supportTypes) ? data.supportTypes : [],
@@ -149,7 +161,27 @@ export default function Volunteers() {
     }
   }
 
-  const setCampo = (name, value) => setEditForm((f) => ({ ...f, [name]: value }));
+  const setCampo = (name, value) => {
+    setEditForm((f) => ({ ...f, [name]: value }));
+    // CEP completo preenche rua/bairro/cidade (ViaCEP) — facilita corrigir o endereço.
+    if (name === 'cep') {
+      const cep = String(value).replace(/\D/g, '');
+      if (cep.length === 8) {
+        fetch(`https://viacep.com.br/ws/${cep}/json/`)
+          .then((r) => r.json())
+          .then((d) => {
+            if (d.erro) return;
+            setEditForm((f) => ({
+              ...f,
+              street: d.logradouro || f.street,
+              neighborhood: d.bairro || f.neighborhood,
+              cityName: d.localidade || f.cityName,
+            }));
+          })
+          .catch(() => {});
+      }
+    }
+  };
 
   async function salvarEdicao() {
     if (!editing) return;
