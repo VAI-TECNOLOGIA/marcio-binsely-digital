@@ -119,7 +119,8 @@
 }
 .cad-campo label b { color: #F3083E; font-weight: 700; }
 
-.cad-campo input {
+.cad-campo input,
+.cad-campo textarea {
   width: 100%;
   padding: 12px 14px;
   font-size: 16px; /* 16px evita o zoom automático do iOS ao focar */
@@ -129,12 +130,16 @@
   border-radius: 11px;
   transition: border-color 0.14s, box-shadow 0.14s;
 }
-.cad-campo input::placeholder { color: #9aa7bd; }
-.cad-campo input:focus {
+.cad-campo textarea { resize: vertical; min-height: 76px; }
+.cad-campo input::placeholder,
+.cad-campo textarea::placeholder { color: #9aa7bd; }
+.cad-campo input:focus,
+.cad-campo textarea:focus {
   outline: none;
   border-color: #003E9D;
   box-shadow: 0 0 0 3px rgba(0, 62, 157, 0.14);
 }
+.cad-opcional { font-weight: 400; color: #9aa7bd; font-size: 0.86em; }
 
 /* Duas colunas no desktop, empilhado no celular. */
 .cad-linha { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
@@ -226,7 +231,7 @@
   .cad-head h1, .cad-ok h1 { color: #eaf1ff; }
   .cad-head p, .cad-ok p { color: #9fb0cc; }
   .cad-campo label, .cad-radio legend, .cad-opcoes label { color: #dbe5f6; }
-  .cad-campo input, .cad-opcoes label { background: #0e1727; border-color: rgba(255, 255, 255, 0.14); color: #eaf1ff; }
+  .cad-campo input, .cad-campo textarea, .cad-opcoes label { background: #0e1727; border-color: rgba(255, 255, 255, 0.14); color: #eaf1ff; }
   .cad-aceite { background: #0e1727; border-color: rgba(255, 255, 255, 0.09); color: #a9b8d2; }
   .cad-tag { background: rgba(120, 165, 255, 0.15); color: #9dc0ff; }
 }

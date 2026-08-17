@@ -18,7 +18,7 @@ const VAZIO = {
   nome: '', whatsapp: '', email: '', social: '',
   nascimento: '',
   cep: '', endereco: '', bairro: '', cidade: '',
-  propaganda: '', indicacao: '', aceite: false,
+  propaganda: '', indicacao: '', observacao: '', aceite: false,
 };
 
 // (51) 99999-9999
@@ -38,6 +38,13 @@ const mascaraCep = (v) => {
   const d = v.replace(/\D/g, '').slice(0, 8);
   return d.length > 5 ? `${d.slice(0, 5)}-${d.slice(5)}` : d;
 };
+// DD/MM/AAAA — digitar a data é bem mais rápido no celular que o seletor nativo.
+function mascaraData(v) {
+  const d = v.replace(/\D/g, '').slice(0, 8);
+  if (d.length <= 2) return d;
+  if (d.length <= 4) return `${d.slice(0, 2)}/${d.slice(2)}`;
+  return `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}`;
+}
 
 export default function Cadastro() {
   const [f, setF] = useState(VAZIO);
@@ -80,6 +87,7 @@ export default function Cadastro() {
     if (f.nome.trim().split(/\s+/).length < 2) e.nome = 'Informe nome e sobrenome.';
     if (f.whatsapp.replace(/\D/g, '').length < 10) e.whatsapp = 'Informe um WhatsApp válido com DDD.';
     if (f.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) e.email = 'E-mail inválido.';
+    if (f.nascimento && !/^\d{2}\/\d{2}\/\d{4}$/.test(f.nascimento)) e.nascimento = 'Use o formato DD/MM/AAAA.';
     if (!f.aceite) e.aceite = 'É preciso aceitar para continuar.';
     setErros(e);
     return Object.keys(e).length === 0;
@@ -107,6 +115,7 @@ export default function Cadastro() {
         input_cidade: f.cidade || undefined,
         input_propaganda: f.propaganda || undefined,
         input_indicacao: f.indicacao || undefined,
+        input_observacao: f.observacao || undefined,
       });
       setPronto(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -211,8 +220,10 @@ export default function Cadastro() {
         <div className="cad-linha">
           <div className="cad-campo">
             <label htmlFor="nasc">Data de nascimento</label>
-            <input id="nasc" type="date" value={f.nascimento} onChange={set('nascimento')}
-              max={new Date().toISOString().slice(0, 10)} />
+            <input id="nasc" inputMode="numeric" placeholder="DD/MM/AAAA" maxLength={10}
+              value={f.nascimento}
+              onChange={(e) => setF((s) => ({ ...s, nascimento: mascaraData(e.target.value) }))} />
+            {erros.nascimento && <span className="cad-erro-campo">{erros.nascimento}</span>}
           </div>
           <div className="cad-campo" aria-hidden="true" />
         </div>
@@ -257,6 +268,12 @@ export default function Cadastro() {
         <div className="cad-campo">
           <label htmlFor="indicacao">Quem te indicou?</label>
           <input id="indicacao" value={f.indicacao} onChange={set('indicacao')} placeholder="Primeiro e último nome" />
+        </div>
+
+        <div className="cad-campo">
+          <label htmlFor="observacao">Observação <span className="cad-opcional">(opcional)</span></label>
+          <textarea id="observacao" rows={3} value={f.observacao} onChange={set('observacao')}
+            placeholder="Algo que você queira nos contar" />
         </div>
 
         <label className={`cad-aceite ${erros.aceite ? 'cad-erro-campo' : ''}`}>

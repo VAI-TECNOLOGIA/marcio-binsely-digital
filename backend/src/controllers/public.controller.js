@@ -105,12 +105,20 @@ export const siteJoin = asyncHandler(async (req, res) => {
 
   const cidade = campo(b, 'input_cidade', 'cidade', 'cityName') || 'Porto Alegre';
   const bairro = campo(b, 'input_bairro', 'bairro');
-  // Data de nascimento (opcional) — alimenta o relatório de aniversariantes.
-  const nascRaw = campo(b, 'input_nascimento', 'nascimento', 'birthDate');
-  const nascimento = /^\d{4}-\d{2}-\d{2}$/.test(nascRaw) ? new Date(nascRaw) : null;
+  // Data de nascimento (opcional) — aceita DD/MM/AAAA (digitado no celular) ou
+  // YYYY-MM-DD. Meio-dia UTC evita o "-1 dia" no fuso do Brasil.
+  const nascRaw = (campo(b, 'input_nascimento', 'nascimento', 'birthDate') || '').trim();
+  let nascimento = null;
+  const brData = nascRaw.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (brData) nascimento = new Date(`${brData[3]}-${brData[2]}-${brData[1]}T12:00:00Z`);
+  else if (/^\d{4}-\d{2}-\d{2}$/.test(nascRaw)) nascimento = new Date(`${nascRaw}T12:00:00Z`);
+  if (nascimento && isNaN(nascimento.getTime())) nascimento = null;
+
+  const observacao = campo(b, 'input_observacao', 'observacao');
   const notas = [
     indicacao && `Indicado por: ${indicacao}`,
     campo(b, 'input_propaganda') && `Propaganda: ${campo(b, 'input_propaganda')}`,
+    observacao && `Observação: ${observacao}`,
     'Origem: formulário do site marciobinsely.site',
   ].filter(Boolean).join('\n');
 
