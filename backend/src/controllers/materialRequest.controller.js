@@ -4,6 +4,11 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { audit } from '../utils/audit.js';
 import { MATERIAL_REQUEST_STATUS } from '../utils/enums.js';
 import { nullifyEmpty } from '../utils/helpers.js';
+import { dispararJornada } from '../services/whatsapp.service.js';
+
+// Telefone e nome do destinatário de um pedido (apoiador que pediu, ou solicitante).
+const foneDe = (r) => r.supporter?.whatsapp || r.supporter?.phone || null;
+const nomeDe = (r) => r.supporter?.name || r.requester?.name || 'apoiador(a)';
 
 const include = {
   material: true,
@@ -69,6 +74,8 @@ export const create = asyncHandler(async (req, res) => {
   }
 
   const request = await prisma.materialRequest.create({ data: { ...data, requesterId: req.user?.id }, include });
+  // Só avisa quando há um destinatário-apoiador (pedido feito PARA alguém).
+  if (request.supporterId) dispararJornada('material_recebido', foneDe(request), [nomeDe(request)]);
   res.status(201).json(request);
 });
 
@@ -90,6 +97,7 @@ export const requesterHistory = asyncHandler(async (req, res) => {
 
 export const updateStatus = asyncHandler(async (req, res) => {
   const { status } = z.object({ status: z.enum(MATERIAL_REQUEST_STATUS) }).parse(req.body);
+  const anterior = await prisma.materialRequest.findUnique({ where: { id: req.params.id }, select: { status: true } });
   const data = { status };
   if (status === 'APROVADO') {
     data.approvedAt = new Date();
@@ -99,6 +107,11 @@ export const updateStatus = asyncHandler(async (req, res) => {
 
   const r = await prisma.materialRequest.update({ where: { id: req.params.id }, data, include });
   await audit({ userId: req.user?.id, action: `STATUS:${status}`, entity: 'MaterialRequest', entityId: r.id, ip: req.ip });
+  // Jornada: só na transição (evita reenvio ao salvar o mesmo status).
+  if (r.supporterId && status !== anterior?.status) {
+    if (status === 'SEPARADO') dispararJornada('material_pronto', foneDe(r), [nomeDe(r)]);
+    else if (status === 'ENTREGUE') dispararJornada('material_entregue', foneDe(r), [nomeDe(r)]);
+  }
   res.json(r);
 });
 

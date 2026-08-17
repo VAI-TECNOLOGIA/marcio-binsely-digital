@@ -1,4 +1,6 @@
 import env from '../config/env.js';
+import prisma from '../config/prisma.js';
+import { onlyDigits } from '../utils/helpers.js';
 
 // ============================================================
 //  Serviço WhatsApp — arquitetura preparada para a API Oficial
@@ -104,6 +106,34 @@ export async function enviarAcessoLiberado({ to, nome, email, token }) {
     ],
   };
   return sendWhatsApp({ to, template });
+}
+
+/**
+ * Dispara um template de JORNADA (notificação automática: voluntário, faixa,
+ * material, demanda). Regras de ouro:
+ *  - nunca lança — erro é logado e engolido (a operação principal, ex. salvar o
+ *    pedido, jamais pode quebrar porque o WhatsApp falhou);
+ *  - pula números na blacklist;
+ *  - o número é normalizado (DDI 55) dentro do sendWhatsApp.
+ * params = variáveis do corpo na ordem ({{1}}, {{2}}...).
+ */
+export async function dispararJornada(name, to, params = []) {
+  try {
+    const phone = onlyDigits(to || '');
+    if (!phone) return { success: false, error: 'sem telefone' };
+    const nucleo = phone.startsWith('55') && phone.length >= 12 ? phone.slice(2) : phone;
+    const bloqueado = await prisma.blacklist.findFirst({ where: { phone: { in: [phone, nucleo, '55' + nucleo] } } });
+    if (bloqueado) return { success: false, error: 'blacklist' };
+    const components = params.length
+      ? [{ type: 'body', parameters: params.map((p) => ({ type: 'text', text: String(p ?? '—').slice(0, 300) })) }]
+      : [];
+    const r = await sendWhatsApp({ to: phone, template: { name, language: { code: 'pt_BR' }, components } });
+    if (r?.success === false) console.warn(`[jornada:${name}] falhou p/ ${phone}: ${r.error}`);
+    return r;
+  } catch (e) {
+    console.warn(`[jornada:${name}] erro:`, e.message);
+    return { success: false, error: e.message };
+  }
 }
 
 /** Utilitário 2 — Esqueci a senha: envia o link de redefinição (token no botão). */

@@ -29,6 +29,9 @@ export function crudFactory(modelKey, options = {}) {
     numberFields = [],
     boolFields = [],
     transformIn = (data) => data,
+    // Gancho pós-gravação (fire-and-forget): afterChange(item, req, 'create'|'update', before).
+    // Usado para disparos automáticos de WhatsApp. Nunca deve lançar.
+    afterChange = null,
     label = modelKey,
   } = options;
 
@@ -110,13 +113,17 @@ export function crudFactory(modelKey, options = {}) {
     const data = await transformIn(coerce(pick(req.body, writableFields)), req);
     const item = await model().create({ data, include });
     await audit({ userId: req.user?.id, action: 'CREATE', entity: modelKey, entityId: item.id, changes: data, ip: req.ip });
+    if (afterChange) Promise.resolve(afterChange(item, req, 'create', null)).catch(() => {});
     res.status(201).json(item);
   });
 
   const update = asyncHandler(async (req, res) => {
     const data = await transformIn(coerce(pick(req.body, writableFields)), req);
+    // Estado anterior só é lido quando há afterChange (para comparar transições de status).
+    const before = afterChange ? await model().findUnique({ where: { id: req.params.id } }) : null;
     const item = await model().update({ where: { id: req.params.id }, data, include });
     await audit({ userId: req.user?.id, action: 'UPDATE', entity: modelKey, entityId: item.id, changes: data, ip: req.ip });
+    if (afterChange) Promise.resolve(afterChange(item, req, 'update', before)).catch(() => {});
     res.json(item);
   });
 

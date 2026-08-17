@@ -5,7 +5,7 @@ import { AppError } from '../utils/AppError.js';
 import { audit } from '../utils/audit.js';
 import { crudFactory } from '../utils/crudFactory.js';
 import { supporterScope } from '../utils/scope.js';
-import { sendWhatsApp } from '../services/whatsapp.service.js';
+import { sendWhatsApp, dispararJornada } from '../services/whatsapp.service.js';
 import { SUPPORT_TYPES, SUPPORTER_STATUS } from '../utils/enums.js';
 import { nullifyEmpty, onlyDigits } from '../utils/helpers.js';
 import { fallbackLatLng, linkCityByName } from '../utils/geo.js';
@@ -119,14 +119,20 @@ export async function sincronizarDestinos(supporterId, { confirmar = false, user
   const tipos = Array.isArray(s.supportTypes) ? s.supportTypes : [];
   if (!tipos.some((t) => TIPOS_VOLUNTARIO.includes(t))) return;
 
+  const fone = s.whatsapp || s.phone;
   let vol = s.volunteer;
-  if (!vol) vol = await prisma.volunteer.create({ data: { supporterId } });
+  if (!vol) {
+    vol = await prisma.volunteer.create({ data: { supporterId } });
+    // Só pede confirmação quando NÃO vai confirmar agora (senão manda "confirme?" e "confirmado!" juntos).
+    if (!confirmar) dispararJornada('voluntario_confirmacao', fone, [s.name]);
+  }
   if (confirmar && !vol.confirmed) {
     await prisma.volunteer.update({
       where: { id: vol.id },
       data: { confirmed: true, active: true, confirmationStatus: 'CONFIRMADO', confirmedAt: new Date() },
     });
     await prisma.supporter.update({ where: { id: supporterId }, data: { status: 'CONFIRMADO' } });
+    dispararJornada('voluntario_bem_vindo', fone, [s.name]); // jornada: participação confirmada
   }
 
   if (tipos.includes('FAIXA_CASA')) {
@@ -141,6 +147,7 @@ export async function sincronizarDestinos(supporterId, { confirmar = false, user
           notes: 'Marcou "Faixa na minha casa" no tipo de apoio.',
         },
       });
+      dispararJornada('faixa_recebida', fone, [s.name, [s.street, s.number].filter(Boolean).join(', ') || s.neighborhood || 'seu endereço']);
     }
   }
 
@@ -156,6 +163,7 @@ export async function sincronizarDestinos(supporterId, { confirmar = false, user
           justification: `${s.name} pediu o kit de material (tipo de apoio).`,
         },
       });
+      dispararJornada('material_recebido', fone, [s.name]);
     }
   }
 }
@@ -229,9 +237,10 @@ export const create = asyncHandler(async (req, res) => {
   });
 
   // Corrente: se marcou Voluntário/Faixa/Kit, vira voluntário + gera destinos.
+  // Os avisos (voluntário/faixa/material) saem por template dentro de sincronizarDestinos
+  // — não usar mais o texto livre, que falha fora da janela de 24h.
   if (status !== 'BLACKLIST') {
     await sincronizarDestinos(supporter.id, { confirmar: true, userId: req.user?.id });
-    if ((supporter.supportTypes || []).includes('VOLUNTARIO')) await sendConfirmation(supporter);
   }
 
   await audit({

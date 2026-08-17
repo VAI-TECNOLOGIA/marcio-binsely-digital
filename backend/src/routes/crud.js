@@ -4,6 +4,14 @@ import { regionScopeWithGlobal } from '../utils/scope.js';
 import prisma from '../config/prisma.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { AppError } from '../utils/AppError.js';
+import { dispararJornada } from '../services/whatsapp.service.js';
+
+// Assunto legível da demanda (variável {{2}} dos templates de demanda).
+const ASSUNTO_DEMANDA = {
+  SAUDE: 'saúde', EDUCACAO: 'educação', INFRAESTRUTURA: 'infraestrutura',
+  SEGURANCA: 'segurança', EMPREGO: 'emprego', TRANSPORTE: 'transporte', OUTROS: 'sua solicitação',
+};
+const assuntoDemanda = (d) => ASSUNTO_DEMANDA[d.category] || 'sua solicitação';
 
 // Hierarquia: LIDER (total) · MEMBRO (equipe interna) · PARCEIRO (externo).
 // As antigas siglas viram aliases dos novos níveis para preservar a lógica.
@@ -85,6 +93,12 @@ export const banners = resourceRouter(
     boolFields: ['authorized'],
     dateFields: ['authorizedAt'],
     writableFields: ['responsibleName', 'phone', 'address', 'cityName', 'neighborhood', 'lat', 'lng', 'housePhotoUrl', 'bannerPhotoUrl', 'authorized', 'authorizedAt', 'status', 'notes', 'supporterId'],
+    // Jornada: avisa quando a faixa é instalada.
+    afterChange: (item, req, action, before) => {
+      if (item.status === 'INSTALADO' && before?.status !== 'INSTALADO') {
+        dispararJornada('faixa_instalada', item.phone, [item.responsibleName || 'apoiador(a)', item.address || item.neighborhood || 'seu endereço']);
+      }
+    },
   }),
   { writeRoles: [A, C, S], readRoles: [A, C] } // endereços de apoiadores — não expor a apoiador
 );
@@ -155,6 +169,11 @@ export const demands = resourceRouter(
         }
       }
       return d;
+    },
+    // Jornada: cidadão recebe aviso ao registrar e ao resolver a demanda.
+    afterChange: (item, req, action, before) => {
+      if (action === 'create') dispararJornada('demanda_recebida', item.phone, [item.citizenName, assuntoDemanda(item)]);
+      else if (item.status === 'RESOLVIDA' && before?.status !== 'RESOLVIDA') dispararJornada('demanda_resolvida', item.phone, [item.citizenName, assuntoDemanda(item)]);
     },
   }),
   { writeRoles: [A, SP, C], readRoles: [A, C] } // demandas de cidadãos (dados pessoais) — só equipe

@@ -2,6 +2,7 @@ import prisma from '../config/prisma.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { AppError } from '../utils/AppError.js';
 import { volunteerRanking } from '../services/score.service.js';
+import { dispararJornada } from '../services/whatsapp.service.js';
 
 const include = {
   supporter: {
@@ -111,6 +112,11 @@ export const setConfirmation = asyncHandler(async (req, res) => {
       changedById: req.user?.id,
     },
   });
+
+  // Jornada: confirmou agora (não estava confirmado antes) → boas-vindas.
+  if (confirmado && !atual.confirmed) {
+    dispararJornada('voluntario_bem_vindo', v.supporter?.whatsapp || v.supporter?.phone, [v.supporter?.name]);
+  }
 
   res.json(v);
 });
