@@ -8,7 +8,8 @@ import {
 import Layout from '../components/layout/Layout.jsx';
 import api, { apiError } from '../api/client.js';
 import { label } from '../config/enums.js';
-import { formatPhone } from '../lib/format.js';
+import { formatPhone, waLink, nomeProprio } from '../lib/format.js';
+import WhatsAppIcon from '../components/icons/WhatsAppIcon.jsx';
 import 'leaflet/dist/leaflet.css';
 
 const RS_CENTER = [-29.6, -53.2];
@@ -243,6 +244,8 @@ export default function MapView() {
 
 function Detail({ layer, p }) {
   if (layer === 'supporters') {
+    const primeiro = nomeProprio(p.name).split(' ')[0] || '';
+    const waHref = waLink(p.whatsapp || p.phone, `Olá ${primeiro}!`);
     return (
       <div className="map-popup">
         <div className="map-popup-title">{p.name}</div>
@@ -253,6 +256,11 @@ function Detail({ layer, p }) {
         <div className="map-popup-sub">
           {[p.neighborhood, p.cityName].filter(Boolean).join(' · ')}
         </div>
+        {waHref && (
+          <a className="map-popup-wa" href={waHref} target="_blank" rel="noopener noreferrer">
+            <WhatsAppIcon size={15} /> Chamar no WhatsApp
+          </a>
+        )}
       </div>
     );
   }

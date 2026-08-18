@@ -1386,6 +1386,13 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .leaflet-popup-tip { box-shadow: none !important; }
 .map-popup { min-width: 180px; }
 .map-popup-title { font-weight: 700; font-size: 13.5px; color: var(--ink-700); margin-bottom: 5px; }
+.map-popup-wa {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 10px; padding: 7px 12px;
+  background: #25D366; color: #fff; font-weight: 600; font-size: 12.5px;
+  border-radius: 8px; text-decoration: none; transition: background .14s;
+}
+.map-popup-wa:hover { background: #1EBE5A; }
 .map-popup-badge {
   display: inline-block;
   padding: 2px 8px;
