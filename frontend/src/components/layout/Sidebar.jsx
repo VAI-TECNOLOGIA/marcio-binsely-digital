@@ -37,11 +37,7 @@ export default function Sidebar({ open, onClose }) {
   return (
     <aside className={`sidebar ${open ? 'open' : ''}`}>
       <div className="sidebar-brand">
-        <div className="brand-mark"><img src="/perfil.jpg" alt="Márcio Bins Ely" /></div>
-        <div className="brand-text">
-          <strong>Márcio Binsely</strong>
-          <span>Digital</span>
-        </div>
+        <img className="brand-logo" src="/logo-oficial.svg" alt="Márcio Bins Ely 1234 — Deputado Federal" />
       </div>
 
       <nav className="nav">

@@ -135,7 +135,7 @@ export default function Cadastro() {
       <div className="cad-flag"><i className="g" /><i className="y" /><i className="r" /></div>
 
       <div className="cad-visual-txt">
-        <span className="cad-visual-tag">Pré-candidato a Deputado Federal · PDT</span>
+        <span className="cad-visual-tag">Candidato a Deputado Federal · 1234 · PDT</span>
         <h2>
           O Rio Grande<br /><em>pode mais.</em>
         </h2>
@@ -161,7 +161,7 @@ export default function Cadastro() {
               <h1>Cadastro recebido!</h1>
               <p>
                 Obrigado, <strong>{f.nome.trim().split(' ')[0]}</strong>. Sua inscrição chegou para a
-                equipe da pré-campanha e em breve entraremos em contato pelo WhatsApp.
+                equipe da campanha e em breve entraremos em contato pelo WhatsApp.
               </p>
               <button className="cad-btn cad-btn-sec" onClick={() => { setF(VAZIO); setPronto(false); }}>
                 Cadastrar outra pessoa
@@ -180,8 +180,8 @@ export default function Cadastro() {
         <div className="cad-form-side">
       <form className="cad-box" onSubmit={enviar} noValidate>
         <header className="cad-head">
-          <span className="cad-tag">Márcio Bins Ely · Pré-candidato a Deputado Federal</span>
-          <h1>Faça parte da pré-campanha</h1>
+          <span className="cad-tag">Márcio Bins Ely 1234 · Candidato a Deputado Federal</span>
+          <h1>Faça parte da campanha</h1>
           <p>Preencha seus dados e some-se ao movimento.</p>
         </header>
 
@@ -281,7 +281,7 @@ export default function Cadastro() {
           <span>
             Li e concordo com os <a href="/termos" target="_blank" rel="noopener">Termos de Uso</a> e com a{' '}
             <a href="/privacidade" target="_blank" rel="noopener">Política de Privacidade</a>, e autorizo o
-            contato da pré-campanha pelo WhatsApp.
+            contato da campanha pelo WhatsApp.
           </span>
         </label>
         {erros.aceite && <small className="cad-erro">{erros.aceite}</small>}
@@ -291,7 +291,7 @@ export default function Cadastro() {
         </button>
 
         <p className="cad-rodape">
-          <ShieldCheck size={14} /> Seus dados são usados apenas pela pré-campanha e não são
+          <ShieldCheck size={14} /> Seus dados são usados apenas pela campanha e não são
           vendidos nem compartilhados com terceiros.
         </p>
       </form>

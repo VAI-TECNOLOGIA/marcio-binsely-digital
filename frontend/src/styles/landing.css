@@ -3,12 +3,12 @@
    100% escopado sob `.mlp` para não conflitar com o design system.
    ============================================================ */
 .mlp{
-  --navy:#0a326b; --navy-2:#062248; --blue:#003e9d; --blue-lite:#1f6feb; --blue-soft:#e8eefb;
-  --red:#f3083e; --gold:#fec330; --green:#2bb153; --ink:#0e1726; --muted:#5b6b82;
+  --navy:#032946; --navy-2:#021d33; --blue:#043868; --blue-lite:#1f6feb; --blue-soft:#e8eefb;
+  --red:#f3083e; --gold:#f7a810; --green:#2dbe60; --ink:#0e1726; --muted:#5b6b82;
   --line:#e6ebf2; --paper:#fff; --paper-soft:#f6f8fc; --rad:18px;
   --sh-sm:0 4px 14px rgba(10,37,64,.06);
   --sh:0 18px 48px rgba(10,37,64,.12);
-  --sh-lg:0 36px 90px rgba(6,34,72,.26);
+  --sh-lg:0 36px 90px rgba(2,29,51,.26);
   font-family:'Inter',system-ui,sans-serif; color:var(--ink); background:var(--paper);
   line-height:1.62; -webkit-font-smoothing:antialiased; overflow-x:hidden;
 }
@@ -31,12 +31,12 @@
 .mlp-btn--sm{padding:9px 18px;font-size:13.5px}
 .mlp-btn--lg{padding:16px 32px;font-size:16px}
 .mlp-btn--block{width:100%}
-.mlp-btn--primary{background:linear-gradient(135deg,var(--blue),var(--navy-2));color:#fff;box-shadow:0 12px 30px rgba(0,62,157,.34)}
-.mlp-btn--primary:hover{transform:translateY(-3px);box-shadow:0 20px 46px rgba(0,62,157,.46)}
+.mlp-btn--primary{background:linear-gradient(135deg,var(--blue),var(--navy-2));color:#fff;box-shadow:0 12px 30px rgba(4,56,104,.34)}
+.mlp-btn--primary:hover{transform:translateY(-3px);box-shadow:0 20px 46px rgba(4,56,104,.46)}
 .mlp-btn--glass{background:rgba(255,255,255,.1);color:#fff;border:1.5px solid rgba(255,255,255,.42);backdrop-filter:blur(8px)}
 .mlp-btn--glass:hover{background:rgba(255,255,255,.2);transform:translateY(-3px)}
-.mlp-btn--outline{background:#fff;color:var(--blue);border:1.5px solid #c9d8f0;box-shadow:0 6px 18px rgba(10,50,107,.08)}
-.mlp-btn--outline:hover{border-color:var(--blue);transform:translateY(-3px);box-shadow:0 12px 28px rgba(10,50,107,.14)}
+.mlp-btn--outline{background:#fff;color:var(--blue);border:1.5px solid #c9d8f0;box-shadow:0 6px 18px rgba(3,41,70,.08)}
+.mlp-btn--outline:hover{border-color:var(--blue);transform:translateY(-3px);box-shadow:0 12px 28px rgba(3,41,70,.14)}
 /* Botões usados como <a>: `.mlp a{color:inherit}` vence .mlp-btn--* por
    especificidade — reforço explícito pra nunca ficar azul-sobre-azul. */
 .mlp a.mlp-btn--primary{color:#fff}
@@ -50,9 +50,9 @@
 .mlp-header.scrolled{background:rgba(255,255,255,.82);backdrop-filter:saturate(1.6) blur(16px);border-bottom:1px solid var(--line);box-shadow:0 4px 24px rgba(10,37,64,.06)}
 .mlp-header.scrolled .mlp-bar{height:66px}
 .mlp-brand{display:flex;align-items:center;gap:12px}
-.mlp-brand .num{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;font-family:'Inter';font-weight:900;font-size:17px;letter-spacing:.02em;background:linear-gradient(135deg,var(--blue),var(--navy));color:#fff;box-shadow:0 8px 20px rgba(0,62,157,.42)}
+.mlp-brand .num{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;font-family:'Inter';font-weight:900;font-size:17px;letter-spacing:.02em;background:linear-gradient(135deg,var(--blue),var(--navy));color:#fff;box-shadow:0 8px 20px rgba(4,56,104,.42)}
 /* Chip com a bandeira do RS (substitui as iniciais) */
-.num.num-rs{background:#fff;padding:0;overflow:hidden;border:1px solid #dfe7f2;box-shadow:0 8px 20px rgba(10,50,107,.16)}
+.num.num-rs{background:#fff;padding:0;overflow:hidden;border:1px solid #dfe7f2;box-shadow:0 8px 20px rgba(3,41,70,.16)}
 .num.num-rs svg{width:100%;height:100%;display:block}
 .mlp-brand .wm b{font-weight:800;font-size:18px;display:block;line-height:1.05;color:var(--ink);letter-spacing:-.01em}
 .mlp-brand .wm small{font-weight:700;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--blue)}
@@ -72,7 +72,7 @@
 .mlp-hero-bg .o3{width:320px;height:320px;background:var(--gold);opacity:.14;top:38%;left:46%;animation-delay:-9s}
 @keyframes mlp-float{0%,100%{transform:translate(0,0)}50%{transform:translate(24px,-30px)}}
 .mlp-hero-bg .grid-lines{position:absolute;inset:0;opacity:.6;
-  background:linear-gradient(rgba(0,62,157,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,62,157,.05) 1px,transparent 1px);
+  background:linear-gradient(rgba(4,56,104,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(4,56,104,.05) 1px,transparent 1px);
   background-size:56px 56px;mask-image:radial-gradient(120% 80% at 50% 30%,#000 30%,transparent 80%)}
 .mlp-hero-grid{position:relative;z-index:2;display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center;width:100%}
 .mlp-hero-copy .mlp-eyebrow{color:var(--blue)}
@@ -91,8 +91,8 @@
 .mlp-portrait{position:relative;width:min(420px,90%)}
 .mlp-portrait .glow{position:absolute;inset:-26px;border-radius:36px;background:conic-gradient(from 140deg,#9cc3ff,var(--gold),#9cc3ff);filter:blur(30px);opacity:.5;animation:mlp-spin 18s linear infinite}
 @keyframes mlp-spin{to{transform:rotate(360deg)}}
-.mlp-portrait img{position:relative;width:100%;border-radius:28px;box-shadow:0 30px 70px rgba(10,50,107,.22);border:1px solid #fff}
-.mlp-badge{position:absolute;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.9);backdrop-filter:blur(14px);border:1px solid #e3ebf7;border-radius:14px;padding:11px 15px;color:var(--navy-2);box-shadow:0 18px 44px rgba(10,50,107,.18)}
+.mlp-portrait img{position:relative;width:100%;border-radius:28px;box-shadow:0 30px 70px rgba(3,41,70,.22);border:1px solid #fff}
+.mlp-badge{position:absolute;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.9);backdrop-filter:blur(14px);border:1px solid #e3ebf7;border-radius:14px;padding:11px 15px;color:var(--navy-2);box-shadow:0 18px 44px rgba(3,41,70,.18)}
 .mlp-badge svg{color:var(--blue);flex-shrink:0}
 .mlp-badge small{display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .mlp-badge b{font-size:14px;font-weight:800}
@@ -100,7 +100,7 @@
 .mlp-badge.b-bot{bottom:34px;right:-30px;animation:mlp-bob 5s ease-in-out infinite;animation-delay:-2.5s}
 @keyframes mlp-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 
-.mlp-scroll{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);z-index:3;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:var(--blue);border:1.5px solid #c4d4ef;background:#fff;box-shadow:0 8px 20px rgba(10,50,107,.12);animation:mlp-bob 2.4s ease-in-out infinite}
+.mlp-scroll{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);z-index:3;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:var(--blue);border:1.5px solid #c4d4ef;background:#fff;box-shadow:0 8px 20px rgba(3,41,70,.12);animation:mlp-bob 2.4s ease-in-out infinite}
 
 /* ---------- Marquee ---------- */
 .mlp-marquee{background:var(--navy-2);color:#fff;overflow:hidden;border-top:1px solid rgba(255,255,255,.08)}
@@ -154,7 +154,7 @@
 .mlp-frentes{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
 .mlp-frente{display:flex;gap:18px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:var(--rad);padding:22px 24px;transition:transform .24s,box-shadow .24s}
 .mlp-frente:hover{transform:translateX(4px);box-shadow:var(--sh-sm)}
-.mlp-frente .n{flex-shrink:0;font-family:'Inter';font-weight:800;font-size:15px;color:#fff;background:linear-gradient(135deg,var(--blue),var(--navy));width:42px;height:42px;border-radius:12px;display:grid;place-items:center;box-shadow:0 8px 18px rgba(0,62,157,.3)}
+.mlp-frente .n{flex-shrink:0;font-family:'Inter';font-weight:800;font-size:15px;color:#fff;background:linear-gradient(135deg,var(--blue),var(--navy));width:42px;height:42px;border-radius:12px;display:grid;place-items:center;box-shadow:0 8px 18px rgba(4,56,104,.3)}
 .mlp-frente h3{font-size:16.5px;color:var(--ink);margin-bottom:4px;line-height:1.25}
 .mlp-frente p{font-size:13.5px;color:var(--muted)}
 
@@ -224,9 +224,9 @@
 .mlp-raiz{background:linear-gradient(180deg,#fff, #f2f6fd)}
 .mlp-raiz-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:center}
 .mlp-raiz-photo{position:relative;max-width:440px;justify-self:center}
-.mlp-raiz-photo img{width:100%;border-radius:26px;box-shadow:0 34px 80px rgba(10,50,107,.28);border:6px solid #fff;transform:rotate(-2deg);transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+.mlp-raiz-photo img{width:100%;border-radius:26px;box-shadow:0 34px 80px rgba(3,41,70,.28);border:6px solid #fff;transform:rotate(-2deg);transition:transform .35s cubic-bezier(.2,.7,.2,1)}
 .mlp-raiz-photo:hover img{transform:rotate(0deg) scale(1.015)}
-.mlp-raiz-tag{position:absolute;bottom:18px;left:-14px;display:inline-flex;align-items:center;gap:8px;background:var(--navy-2);color:#fff;font-weight:700;font-size:13px;padding:10px 16px;border-radius:50px;box-shadow:0 14px 34px rgba(6,34,72,.35)}
+.mlp-raiz-tag{position:absolute;bottom:18px;left:-14px;display:inline-flex;align-items:center;gap:8px;background:var(--navy-2);color:#fff;font-weight:700;font-size:13px;padding:10px 16px;border-radius:50px;box-shadow:0 14px 34px rgba(2,29,51,.35)}
 .mlp-raiz-tag svg{color:var(--gold)}
 .mlp-raiz-copy h2{font-size:clamp(28px,3.4vw,42px);color:var(--ink);margin:14px 0 16px}
 .mlp-raiz-copy p{color:var(--muted);font-size:16px;margin-bottom:14px;max-width:560px}

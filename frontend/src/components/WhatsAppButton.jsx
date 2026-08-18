@@ -12,11 +12,11 @@ import { waLink, nomeProprio } from '../lib/format.js';
 export default function WhatsAppButton({ person, size = 15 }) {
   // A base veio em CAIXA ALTA — "Olá, ROBERTO!" parece disparo automático.
   const primeiro = nomeProprio(person?.name).split(' ')[0] || '';
-  // "pré-campanha": antes do registro da candidatura, tratar como campanha
+  // Campanha oficial (candidatura registrada — site com número de urna 1234).
   // caracteriza propaganda eleitoral antecipada.
   const saudacao = primeiro
-    ? `Olá, ${primeiro}! Aqui é da pré-campanha do Márcio Bins Ely.`
-    : 'Olá! Aqui é da pré-campanha do Márcio Bins Ely.';
+    ? `Olá, ${primeiro}! Aqui é da campanha do Márcio Bins Ely.`
+    : 'Olá! Aqui é da campanha do Márcio Bins Ely.';
 
   const href = waLink(person?.whatsapp || person?.phone, saudacao);
   if (!href) return null;

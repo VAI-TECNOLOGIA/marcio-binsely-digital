@@ -13,7 +13,7 @@ export default function PhoneCell({ person, message }) {
   const texto =
     message ||
     person?.__msg ||
-    `Olá, ${nomeProprio(person?.name).split(' ')[0]}! Aqui é da pré-campanha do Márcio Bins Ely.`;
+    `Olá, ${nomeProprio(person?.name).split(' ')[0]}! Aqui é da campanha do Márcio Bins Ely.`;
   const href = waLink(numero, texto);
 
   if (!numero) return <span className="cell-sem-tel">Sem telefone</span>;

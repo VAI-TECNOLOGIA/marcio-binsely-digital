@@ -30,7 +30,7 @@ const BAIRROS = [
 ];
 const VERBOS = ['virou apoiador!','entrou na campanha!','agora caminha com o Márcio!','se juntou ao movimento!','virou voluntário!'];
 const TEMPOS = ['agora mesmo','há poucos segundos','há instantes'];
-const CORES = [['#003e9d','#062248'],['#f3083e','#a8062a'],['#2bb153','#1a7d3a'],['#0054d6','#00348a'],['#fec330','#d99e06'],['#0ea5e9','#075985']];
+const CORES = [['#043868','#021d33'],['#f3083e','#a8062a'],['#2dbe60','#1a7d3a'],['#0054d6','#032e56'],['#f7a810','#c98708'],['#0ea5e9','#075985']];
 
 function gerarPool() {
   const pool = [];
@@ -151,7 +151,7 @@ export default function Landing() {
         <div className="mlp-wrap mlp-bar">
           <a href="#topo" className="mlp-brand">
             <span className="num num-rs" aria-label="Bandeira do Rio Grande do Sul"><RsFlag /></span>
-            <span className="wm"><b>Márcio Bins Ely</b><small>Pré-candidato · Dep. Federal</small></span>
+            <span className="wm"><b>Márcio Bins Ely</b><small>Candidato · Dep. Federal 1234</small></span>
           </a>
           <nav className="mlp-menu">
             <a className="mlp-navlink" href="#bandeiras">Bandeiras</a>
@@ -172,7 +172,7 @@ export default function Landing() {
         </div>
         <div className="mlp-wrap mlp-hero-grid">
           <div className="mlp-hero-copy">
-            <span className="mlp-eyebrow mlp-reveal"><Flag size={13} /> Pré-candidato a Deputado Federal · PDT</span>
+            <span className="mlp-eyebrow mlp-reveal"><Flag size={13} /> Candidato a Deputado Federal · 1234 · PDT</span>
             <h1 className="mlp-reveal">
               O Rio Grande<br /><span className="accent">pode mais.</span>
             </h1>
@@ -349,7 +349,7 @@ export default function Landing() {
           <blockquote>Política se faz <span className="hl">com</span> as pessoas, não <span className="hl">pelas</span> pessoas. É caminhando junto, com trabalho e coerência, que Porto Alegre muda de verdade.</blockquote>
           <div className="mlp-by">
             <img src="/foto.png" alt="Márcio Bins Ely" />
-            <div><b>Márcio Bins Ely</b><span>Pré-candidato a Deputado Federal · PDT</span></div>
+            <div><b>Márcio Bins Ely</b><span>Candidato a Deputado Federal · 1234 · PDT</span></div>
           </div>
         </div>
       </section>
@@ -477,7 +477,7 @@ export default function Landing() {
             </div>
           </div>
           <div className="mlp-foot-bottom">
-            © {new Date().getFullYear()} Márcio Bins Ely · Vereador · Porto Alegre/RS · PDT
+            © {new Date().getFullYear()} Márcio Bins Ely · Candidato a Deputado Federal · 1234 · PDT
           </div>
         </div>
       </footer>
@@ -527,9 +527,9 @@ function RsFlag() {
         <clipPath id="rsclip"><rect x="0" y="0" width="48" height="48" rx="13" /></clipPath>
       </defs>
       <g clipPath="url(#rsclip)">
-        <polygon points="0,0 48,0 48,10 0,28" fill="#2bb153" />
+        <polygon points="0,0 48,0 48,10 0,28" fill="#2dbe60" />
         <polygon points="0,28 48,10 48,30 0,48" fill="#f3083e" />
-        <polygon points="0,48 48,30 48,48" fill="#fec330" />
+        <polygon points="0,48 48,30 48,48" fill="#f7a810" />
       </g>
     </svg>
   );

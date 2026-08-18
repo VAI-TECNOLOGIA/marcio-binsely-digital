@@ -7,7 +7,7 @@
 .cad {
   min-height: 100vh;
   background:
-    radial-gradient(1100px 520px at 50% -12%, rgba(0, 62, 157, 0.10), transparent 62%),
+    radial-gradient(1100px 520px at 50% -12%, rgba(4, 56, 104, 0.10), transparent 62%),
     linear-gradient(180deg, #fbfdff, #eef4fd 55%, #e8effc);
 }
 
@@ -20,7 +20,7 @@
    maior que a tela) e o texto de baixo some da vista. */
 .cad-visual {
   position: sticky; top: 0; align-self: start;
-  height: 100vh; overflow: hidden; background: #0A326B;
+  height: 100vh; overflow: hidden; background: #032946;
 }
 .cad-foto {
   position: absolute; inset: 0;
@@ -30,7 +30,7 @@
 }
 .cad-tint {
   position: absolute; inset: 0;
-  background: linear-gradient(160deg, rgba(0,62,157,0.30) 0%, rgba(6,34,72,0.16) 52%, rgba(0,62,157,0.12) 100%);
+  background: linear-gradient(160deg, rgba(4,56,104,0.30) 0%, rgba(2,29,51,0.16) 52%, rgba(4,56,104,0.12) 100%);
 }
 /* Escurece só a base, onde entra o texto — o rosto fica claro. */
 .cad-sombra {
@@ -40,8 +40,8 @@
 /* Faixa tricolor do RS no topo. */
 .cad-flag { position: absolute; top: 0; left: 0; right: 0; height: 5px; display: flex; z-index: 2; }
 .cad-flag i { flex: 1; }
-.cad-flag .g { background: #2BB153; }
-.cad-flag .y { background: #FEC330; }
+.cad-flag .g { background: #2dbe60; }
+.cad-flag .y { background: #f7a810; }
 .cad-flag .r { background: #F3083E; }
 
 .cad-visual-txt {
@@ -51,13 +51,13 @@
 .cad-visual-tag {
   display: inline-block; font-size: 11px; font-weight: 800;
   letter-spacing: 0.11em; text-transform: uppercase;
-  color: #FEC330; margin-bottom: 12px;
+  color: #f7a810; margin-bottom: 12px;
 }
 .cad-visual-txt h2 {
   font-size: clamp(30px, 3.4vw, 46px); line-height: 1.06; font-weight: 800;
   letter-spacing: -0.028em; margin: 0 0 14px; color: #fff;
 }
-.cad-visual-txt h2 em { font-style: normal; color: #FEC330; }
+.cad-visual-txt h2 em { font-style: normal; color: #f7a810; }
 .cad-visual-txt p {
   font-size: 15px; line-height: 1.6; color: rgba(255,255,255,0.9);
   margin: 0 0 24px; max-width: 40ch;
@@ -79,7 +79,7 @@
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 20px;
   padding: 30px 28px 26px;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 18px 46px rgba(0, 62, 157, 0.10);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 18px 46px rgba(4, 56, 104, 0.10);
 }
 
 @media (max-width: 900px) {
@@ -102,12 +102,12 @@
 .cad-tag {
   display: inline-block;
   font-size: 11px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase;
-  color: #003E9D; background: rgba(0, 62, 157, 0.08);
+  color: #043868; background: rgba(4, 56, 104, 0.08);
   padding: 5px 11px; border-radius: 999px; margin-bottom: 12px;
 }
 .cad-head h1 {
   font-size: clamp(24px, 5vw, 31px); line-height: 1.14; font-weight: 800;
-  color: #0A326B; letter-spacing: -0.02em; margin: 0 0 7px;
+  color: #032946; letter-spacing: -0.02em; margin: 0 0 7px;
 }
 .cad-head p { color: #5b6b86; font-size: 15px; margin: 0; }
 
@@ -136,8 +136,8 @@
 .cad-campo input:focus,
 .cad-campo textarea:focus {
   outline: none;
-  border-color: #003E9D;
-  box-shadow: 0 0 0 3px rgba(0, 62, 157, 0.14);
+  border-color: #043868;
+  box-shadow: 0 0 0 3px rgba(4, 56, 104, 0.14);
 }
 .cad-opcional { font-weight: 400; color: #9aa7bd; font-size: 0.86em; }
 
@@ -165,9 +165,9 @@
   border: 1px solid rgba(15, 23, 42, 0.16); border-radius: 11px;
   transition: border-color 0.14s, background 0.14s, color 0.14s;
 }
-.cad-opcoes label:hover { border-color: #003E9D; }
-.cad-opcoes label.on { border-color: #003E9D; background: rgba(0, 62, 157, 0.07); color: #003E9D; }
-.cad-opcoes input { accent-color: #003E9D; width: 16px; height: 16px; }
+.cad-opcoes label:hover { border-color: #043868; }
+.cad-opcoes label.on { border-color: #043868; background: rgba(4, 56, 104, 0.07); color: #043868; }
+.cad-opcoes input { accent-color: #043868; width: 16px; height: 16px; }
 
 /* ---------- Aceite (LGPD) ---------- */
 .cad-aceite {
@@ -176,8 +176,8 @@
   background: #f7f9fc; border: 1px solid rgba(15, 23, 42, 0.07); border-radius: 12px;
   font-size: 13px; line-height: 1.5; color: #46556f; cursor: pointer;
 }
-.cad-aceite input { margin-top: 2px; width: 17px; height: 17px; accent-color: #003E9D; flex: none; }
-.cad-aceite a { color: #003E9D; font-weight: 600; }
+.cad-aceite input { margin-top: 2px; width: 17px; height: 17px; accent-color: #043868; flex: none; }
+.cad-aceite a { color: #043868; font-weight: 600; }
 
 /* ---------- Erros ---------- */
 .cad-erro { color: #b91c1c; font-size: 12px; font-weight: 600; }
@@ -194,16 +194,16 @@
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   padding: 15px 20px;
   font-size: 16px; font-weight: 700; font-family: inherit; color: #fff;
-  background: linear-gradient(135deg, #003E9D, #0A326B);
+  background: linear-gradient(135deg, #043868, #032946);
   border: none; border-radius: 12px; cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0, 62, 157, 0.24), 0 10px 26px rgba(0, 62, 157, 0.26);
+  box-shadow: 0 2px 5px rgba(4, 56, 104, 0.24), 0 10px 26px rgba(4, 56, 104, 0.26);
   transition: transform 0.14s, box-shadow 0.14s, filter 0.14s;
 }
 .cad-btn:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.07); }
 .cad-btn:disabled { opacity: 0.68; cursor: not-allowed; transform: none; }
 .cad-btn-sec {
-  background: #fff; color: #003E9D;
-  border: 1px solid rgba(0, 62, 157, 0.3); box-shadow: none;
+  background: #fff; color: #043868;
+  border: 1px solid rgba(4, 56, 104, 0.3); box-shadow: none;
 }
 .cad-girando { animation: cad-spin 0.9s linear infinite; }
 @keyframes cad-spin { to { transform: rotate(360deg); } }
@@ -218,9 +218,9 @@
 .cad-ok-ic {
   width: 62px; height: 62px; margin: 0 auto 18px;
   display: grid; place-items: center;
-  border-radius: 50%; background: rgba(43, 177, 83, 0.13); color: #2BB153;
+  border-radius: 50%; background: rgba(43, 177, 83, 0.13); color: #2dbe60;
 }
-.cad-ok h1 { font-size: 26px; font-weight: 800; color: #0A326B; margin: 0 0 10px; }
+.cad-ok h1 { font-size: 26px; font-weight: 800; color: #032946; margin: 0 0 10px; }
 .cad-ok p { color: #46556f; font-size: 15px; line-height: 1.6; margin: 0 0 22px; }
 
 /* ---------- Modo escuro do sistema ---------- */

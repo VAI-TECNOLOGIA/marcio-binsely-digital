@@ -48,11 +48,11 @@ export default function Login() {
             <div className="auth-party">PDT</div>
           </div>
           <div>
-            <div className="auth-name">Márcio Bins Ely · Vereador · PDT</div>
+            <div className="auth-name">Márcio Bins Ely 1234 · Deputado Federal · PDT</div>
             <h1 className="auth-headline">
-              Trabalho que <em>move</em>
+              O Rio Grande
               <br />
-              Porto Alegre
+              <em>pode mais</em>
             </h1>
             <p className="auth-tagline">
               A central de comando da campanha. Mobilização, dados, atendimento e território — numa só

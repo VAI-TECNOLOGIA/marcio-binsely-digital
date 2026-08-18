@@ -237,7 +237,7 @@ function BlocoIndicacoes({ dados }) {
         <Card
           title={`Ranking de indicações (${ranking.length})`}
           icon={Trophy}
-          subtitle="Produtividade individual de quem trouxe gente para a pré-campanha"
+          subtitle="Produtividade individual de quem trouxe gente para a campanha"
         >
           <div className="toolbar" style={{ marginBottom: 10 }}>
             <div className="search">

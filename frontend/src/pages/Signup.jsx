@@ -64,7 +64,7 @@ export default function Signup() {
         <div className="auth-content">
           <div className="auth-top"><div className="auth-party">PDT</div></div>
           <div>
-            <div className="auth-name">Márcio Bins Ely · Vereador · PDT</div>
+            <div className="auth-name">Márcio Bins Ely 1234 · Deputado Federal · PDT</div>
             <h1 className="auth-headline">Faça parte<br />do <em>movimento</em></h1>
             <p className="auth-tagline">Crie o seu acesso e caminhe com a gente. Leva menos de um minuto.</p>
           </div>

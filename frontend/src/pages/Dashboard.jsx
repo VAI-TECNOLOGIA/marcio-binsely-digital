@@ -83,7 +83,7 @@ export default function Dashboard() {
           </div>
           <div style={{ marginTop: 18 }}>
             <Card title="Cadastros por dia" icon={TrendingUp} subtitle={`Entradas diárias nos últimos ${res.dias} dias`}>
-              <LineChartCard data={serieDiaria} color="#2BB153" />
+              <LineChartCard data={serieDiaria} color="#2dbe60" />
             </Card>
           </div>
         </>
