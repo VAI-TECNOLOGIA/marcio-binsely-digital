@@ -782,14 +782,14 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .tv { position: relative; overflow: hidden; }
 .tv-flag-banner { position: absolute; top: 30px; right: -80px; width: 360px; height: 46px; transform: rotate(38deg); display: flex; box-shadow: 0 14px 40px rgba(0,0,0,0.45); opacity: 0.9; }
 .tv-flag-banner i { flex: 1; }
-.tv-flag-banner .g { background: #1b7a43; } .tv-flag-banner .y { background: #f2b705; } .tv-flag-banner .r { background: #c8102e; }
+.tv-flag-banner .g { background: #2DBE60; } .tv-flag-banner .y { background: #F7A810; } .tv-flag-banner .r { background: #F3083E; }
 .tv-head { position: relative; z-index: 2; }
 .tv-live { display: inline-flex; align-items: center; gap: 8px; background: rgba(214,40,40,0.18); border: 1px solid rgba(255,80,80,0.4); color: #ffd; font-weight: 700; font-size: 13px; padding: 8px 14px; border-radius: 999px; letter-spacing: .03em; }
 .tv-live .dot { width: 9px; height: 9px; border-radius: 50%; background: #ff5252; animation: tv-pulse 1.3s infinite; }
 @keyframes tv-pulse { 0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,82,82,.6); } 50% { opacity: .5; box-shadow: 0 0 0 6px rgba(255,82,82,0); } }
 .tv-stat { position: relative; overflow: hidden; transition: transform .2s; }
 .tv-stat:hover { transform: translateY(-3px); }
-.tv-stat-ico { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: rgba(242,183,5,0.16); color: #f2b705; margin-bottom: 12px; }
+.tv-stat-ico { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: rgba(242,183,5,0.16); color: #F7A810; margin-bottom: 12px; }
 .tv-stat .v { text-shadow: 0 4px 24px rgba(242,183,5,0.35); }
 .tv-rs .leaflet-container, .tv-rs .recharts-wrapper { background: transparent; }
 .tv-map { position: relative; height: 460px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.12); margin-top: 6px; }
@@ -797,7 +797,7 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .leaflet-tooltip.tv-tip { background: rgba(8,26,18,0.88); border: 1px solid rgba(242,183,5,0.55); color: #ffe9a8; font-weight: 600; font-size: 12px; padding: 3px 8px; border-radius: 7px; box-shadow: 0 4px 14px rgba(0,0,0,0.4); white-space: nowrap; }
 .leaflet-tooltip.tv-tip b { color: #fff; }
 .leaflet-tooltip.tv-tip::before { display: none; }
-.tv-map-legend { position: absolute; left: 14px; bottom: 12px; z-index: 500; background: rgba(8,26,18,0.8); color: #f2b705; font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(242,183,5,0.35); }
+.tv-map-legend { position: absolute; left: 14px; bottom: 12px; z-index: 500; background: rgba(8,26,18,0.8); color: #F7A810; font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(242,183,5,0.35); }
 .tv-map-legend span { color: rgba(255,255,255,0.6); font-weight: 500; }
 @media (max-width: 1000px) { .tv-grid { grid-template-columns: repeat(2, 1fr); } .tv-cols { grid-template-columns: 1fr; } .tv-flag-banner { display: none; } }
 

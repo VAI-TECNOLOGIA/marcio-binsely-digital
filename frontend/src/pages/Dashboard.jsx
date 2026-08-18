@@ -144,7 +144,7 @@ export default function Dashboard() {
           <div className="text-sm" style={{ fontWeight: 700, color: 'var(--green-rs)', marginBottom: 6 }}>Mais fortes</div>
           {(charts.strongRegions || []).map((r) => (
             <div className="rank-row" key={r.name}>
-              <span className="legend-dot" style={{ background: r.color || '#C8102E' }} />
+              <span className="legend-dot" style={{ background: r.color || '#F3083E' }} />
               <div className="rank-info"><strong>{r.name}</strong></div>
               <div className="rank-score">{r.value}</div>
             </div>

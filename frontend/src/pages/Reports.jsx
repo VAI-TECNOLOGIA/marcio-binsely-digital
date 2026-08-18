@@ -68,7 +68,7 @@ export default function Reports() {
 
       <div className="grid grid-2">
         <Card title="Apoiadores por região" icon={BarChart3}>
-          <BarChartCard data={data.supportersByRegion} color="#1B7A43" />
+          <BarChartCard data={data.supportersByRegion} color="#2DBE60" />
         </Card>
         <Card title="Apoiadores por cidade/bairro" icon={BarChart3}>
           <BarChartCard data={data.supportersByCity} />
@@ -86,7 +86,7 @@ export default function Reports() {
 
       <div className="grid grid-2" style={{ marginTop: 18 }}>
         <Card title="Ações de rua por tipo">
-          <BarChartCard data={tr('StreetActionType', data.actionsByType)} color="#1B7A43" />
+          <BarChartCard data={tr('StreetActionType', data.actionsByType)} color="#2DBE60" />
         </Card>
         <Card title="Engajamento por tipo">
           <BarChartCard data={tr('TaskType', data.engagementByType)} color="#B45309" />

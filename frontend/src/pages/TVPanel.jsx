@@ -47,7 +47,7 @@ function RSMap({ byCity }) {
               key={c.name}
               center={c.coord}
               radius={r}
-              pathOptions={{ color: '#f2b705', fillColor: '#f2b705', fillOpacity: 0.5, weight: 2 }}
+              pathOptions={{ color: '#F7A810', fillColor: '#F7A810', fillOpacity: 0.5, weight: 2 }}
             >
               <LeafletTooltip permanent={big} direction="top" className="tv-tip" offset={[0, -2]}>
                 <b>{c.name}</b> · {c.total.toLocaleString('pt-BR')}
@@ -111,7 +111,7 @@ export default function TVPanel() {
           <RSFlag size={64} />
           <div>
             <h1>{campaign.name || 'Márcio Bins Ely'}</h1>
-            <div style={{ color: '#f2b705', fontWeight: 600 }}>{campaign.slogan || 'Juntos por ti, juntos por Porto Alegre'}</div>
+            <div style={{ color: '#F7A810', fontWeight: 600 }}>{campaign.slogan || 'Juntos por ti, juntos por Porto Alegre'}</div>
           </div>
         </div>
         <div className="flex items-center gap-12">
@@ -128,16 +128,16 @@ export default function TVPanel() {
       </div>
 
       <div className="tv-card" style={{ marginBottom: 20 }}>
-        <h3><MapPin size={20} style={{ verticalAlign: '-3px', color: '#f2b705' }} /> Apoio pelo Rio Grande do Sul</h3>
+        <h3><MapPin size={20} style={{ verticalAlign: '-3px', color: '#F7A810' }} /> Apoio pelo Rio Grande do Sul</h3>
         <RSMap byCity={byCity} />
       </div>
 
       <div className="tv-cols">
         <div className="tv-card">
-          <h3><Trophy size={20} style={{ verticalAlign: '-3px', color: '#f2b705' }} /> Top voluntários</h3>
+          <h3><Trophy size={20} style={{ verticalAlign: '-3px', color: '#F7A810' }} /> Top voluntários</h3>
           {(rankings.volunteers || []).slice(0, 6).map((v) => (
             <div className="tv-rank-row" key={v.id}>
-              <strong style={{ color: '#f2b705', width: 32 }}>{v.rank}º</strong>
+              <strong style={{ color: '#F7A810', width: 32 }}>{v.rank}º</strong>
               <span style={{ flex: 1 }}>{v.name}</span>
               <strong>{v.score} pts</strong>
             </div>
@@ -145,7 +145,7 @@ export default function TVPanel() {
         </div>
 
         <div className="tv-card">
-          <h3><Target size={20} style={{ verticalAlign: '-3px', color: '#f2b705' }} /> Metas da campanha</h3>
+          <h3><Target size={20} style={{ verticalAlign: '-3px', color: '#F7A810' }} /> Metas da campanha</h3>
           <GoalBar label="Apoiadores" current={stats.totalSupporters} target={goals.supporters} pct={goal(stats.totalSupporters, goals.supporters)} />
           <GoalBar label="Voluntários" current={stats.totalVolunteers} target={goals.volunteers} pct={goal(stats.totalVolunteers, goals.volunteers)} />
           <GoalBar label="Faixas" current={stats.authorizedBanners} target={goals.banners} pct={goal(stats.authorizedBanners, goals.banners)} />
@@ -154,7 +154,7 @@ export default function TVPanel() {
       </div>
 
       <div className="tv-card" style={{ marginTop: 20 }}>
-        <h3><CalendarDays size={20} style={{ verticalAlign: '-3px', color: '#f2b705' }} /> Próximos eventos</h3>
+        <h3><CalendarDays size={20} style={{ verticalAlign: '-3px', color: '#F7A810' }} /> Próximos eventos</h3>
         {events.length === 0 && <p style={{ color: '#cbd5e1' }}>Sem eventos agendados.</p>}
         {events.map((e) => (
           <div className="tv-rank-row" key={e.id}>
@@ -172,9 +172,9 @@ function RSFlag({ size = 60 }) {
     <svg width={size} height={size} viewBox="0 0 64 64" aria-label="Bandeira do RS">
       <defs><clipPath id="tvflag"><rect width="64" height="64" rx="13" /></clipPath></defs>
       <g clipPath="url(#tvflag)">
-        <rect width="64" height="64" fill="#1b7a43" />
-        <polygon points="64,0 64,64 0,64" fill="#c8102e" />
-        <line x1="-3" y1="67" x2="67" y2="-3" stroke="#f2b705" strokeWidth="15" />
+        <rect width="64" height="64" fill="#2DBE60" />
+        <polygon points="64,0 64,64 0,64" fill="#F3083E" />
+        <line x1="-3" y1="67" x2="67" y2="-3" stroke="#F7A810" strokeWidth="15" />
       </g>
     </svg>
   );
@@ -198,7 +198,7 @@ function GoalBar({ label, current, target, pct }) {
         <strong>{current} / {target || '—'}</strong>
       </div>
       <div style={{ height: 12, background: 'rgba(255,255,255,0.12)', borderRadius: 999 }}>
-        <div style={{ width: `${pct}%`, height: '100%', background: 'linear-gradient(90deg,#1B7A43,#f2b705)', borderRadius: 999, transition: 'width .6s ease' }} />
+        <div style={{ width: `${pct}%`, height: '100%', background: 'linear-gradient(90deg,#2DBE60,#F7A810)', borderRadius: 999, transition: 'width .6s ease' }} />
       </div>
     </div>
   );

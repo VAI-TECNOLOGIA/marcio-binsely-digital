@@ -41,7 +41,7 @@ const regionsConfig = {
   fields: [
     { name: 'name', label: 'Nome', required: true },
     { name: 'uf', label: 'UF', placeholder: 'RS' },
-    { name: 'color', label: 'Cor (hex)', placeholder: '#C8102E' },
+    { name: 'color', label: 'Cor (hex)', placeholder: '#F3083E' },
     { name: 'coordinatorId', label: 'Coordenador responsável', optionsFrom: 'coordinators', full: true, hint: 'Aparece automaticamente ao selecionar esta região nos formulários. Cadastre a pessoa em Usuários primeiro.' },
   ],
 };

@@ -49,8 +49,8 @@ const TILE_ATTR =
 
 const LAYERS = [
   { key: 'supporters',    lbl: 'Apoiadores',     color: '#2563eb', icon: Users },
-  { key: 'banners',       lbl: 'Faixas',         color: '#C8102E', icon: MapPin },
-  { key: 'streetActions', lbl: 'Ações de rua',   color: '#1B7A43', icon: Activity },
+  { key: 'banners',       lbl: 'Faixas',         color: '#F3083E', icon: MapPin },
+  { key: 'streetActions', lbl: 'Ações de rua',   color: '#2DBE60', icon: Activity },
 ];
 
 function timeAgo(ts) {
@@ -268,7 +268,7 @@ function Detail({ layer, p }) {
     return (
       <div className="map-popup">
         <div className="map-popup-title">Faixa — {p.responsibleName || '—'}</div>
-        <div className="map-popup-badge" style={{ background: '#fde8ec', color: '#c8102e' }}>
+        <div className="map-popup-badge" style={{ background: '#fde8ec', color: '#F3083E' }}>
           {label('BannerStatus', p.status)}
         </div>
         <div className="map-popup-sub">

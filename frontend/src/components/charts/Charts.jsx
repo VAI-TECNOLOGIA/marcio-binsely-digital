@@ -3,7 +3,7 @@ import {
   PieChart, Pie, Cell, Legend, AreaChart, Area,
 } from 'recharts';
 
-export const PALETTE = ['#2563eb', '#1B7A43', '#F2B705', '#C8102E', '#6D28D9', '#0891B2', '#DB2777', '#B45309'];
+export const PALETTE = ['#2563eb', '#2DBE60', '#F7A810', '#F3083E', '#6D28D9', '#0891B2', '#DB2777', '#B45309'];
 
 // Cores neutras que funcionam no tema claro e escuro (cinza médio + grid translúcido).
 const AXIS = '#8b93a3';

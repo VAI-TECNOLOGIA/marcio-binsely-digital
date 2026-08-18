@@ -42,14 +42,14 @@ export function resetPasswordEmail({ name, resetUrl }) {
     subject: 'Redefinição de senha — Márcio Binsely Digital',
     html: `
 <div style="font-family:Arial,Helvetica,sans-serif;max-width:520px;margin:0 auto;color:#1f2733">
-  <div style="background:#C8102E;padding:18px 24px;border-radius:10px 10px 0 0">
+  <div style="background:#043868;padding:18px 24px;border-radius:10px 10px 0 0">
     <span style="color:#fff;font-size:17px;font-weight:bold">Márcio Binsely Digital</span>
   </div>
   <div style="border:1px solid #e6e9ef;border-top:none;border-radius:0 0 10px 10px;padding:26px 24px">
     <p style="margin:0 0 12px">Olá${name ? `, <strong>${name}</strong>` : ''}!</p>
     <p style="margin:0 0 18px">Recebemos um pedido para redefinir a sua senha. Clique no botão abaixo para criar uma nova (o link vale por <strong>1 hora</strong>):</p>
     <p style="text-align:center;margin:26px 0">
-      <a href="${resetUrl}" style="background:#C8102E;color:#fff;text-decoration:none;font-weight:bold;padding:13px 30px;border-radius:9px;display:inline-block">Redefinir minha senha</a>
+      <a href="${resetUrl}" style="background:#043868;color:#fff;text-decoration:none;font-weight:bold;padding:13px 30px;border-radius:9px;display:inline-block">Redefinir minha senha</a>
     </p>
     <p style="margin:0 0 8px;font-size:13px;color:#6b7686">Se o botão não funcionar, copie e cole este endereço no navegador:</p>
     <p style="margin:0 0 18px;font-size:12px;word-break:break-all;color:#6b7686">${resetUrl}</p>

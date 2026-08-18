@@ -48,9 +48,9 @@ async function main() {
 
   console.log('🗺️  Regiões e cidades...');
   const regionsSpec = [
-    { name: 'Centro', color: '#C8102E' },
-    { name: 'Zona Norte', color: '#1B7A43' },
-    { name: 'Zona Sul', color: '#F2B705' },
+    { name: 'Centro', color: '#F3083E' },
+    { name: 'Zona Norte', color: '#2DBE60' },
+    { name: 'Zona Sul', color: '#F7A810' },
     { name: 'Zona Leste', color: '#B45309' },
     { name: 'Região Metropolitana', color: '#6D28D9' },
   ];
@@ -294,7 +294,7 @@ async function main() {
   console.log('⚙️  Configurações...');
   const settings = [
     { key: 'campaign', value: { name: 'Márcio Binsely Digital', candidate: 'Márcio Bins Ely', office: 'Vereador de Porto Alegre', party: 'PDT', number: '12345', city: 'Porto Alegre', uf: 'RS', slogan: 'Trabalho que move Porto Alegre' } },
-    { key: 'theme', value: { brand: '#C8102E', green: '#1B7A43', accent: '#F2B705' } },
+    { key: 'theme', value: { brand: '#F3083E', green: '#2DBE60', accent: '#F7A810' } },
     { key: 'goals', value: { volunteers: 500, supporters: 5000, banners: 300, actions: 100 } },
   ];
   for (const s of settings) await prisma.setting.create({ data: s });
