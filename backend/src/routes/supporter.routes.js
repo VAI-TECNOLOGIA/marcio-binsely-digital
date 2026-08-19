@@ -6,6 +6,7 @@ const r = Router();
 
 r.get('/suspects', authorize('LIDER'), supporter.listSuspects);
 r.get('/tags', authorize('LIDER', 'MEMBRO'), supporter.listTags);
+r.get('/indicante', authorize('LIDER', 'MEMBRO'), supporter.buscarIndicante);
 r.get('/', authorize('LIDER', 'MEMBRO'), supporter.list);
 r.get('/:id', authorize('LIDER', 'MEMBRO'), supporter.get);
 r.post('/', authorize('LIDER', 'MEMBRO'), supporter.create);

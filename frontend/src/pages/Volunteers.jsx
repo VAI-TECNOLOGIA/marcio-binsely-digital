@@ -82,6 +82,8 @@ export default function Volunteers() {
   const [editing, setEditing] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [savingEdit, setSavingEdit] = useState(false);
+  // Quem indicou este voluntário, quando encontrado na base (p/ chamar no WhatsApp).
+  const [indicante, setIndicante] = useState(null);
 
   async function load(p = page) {
     setLoading(true);
@@ -138,8 +140,19 @@ export default function Volunteers() {
   // Editar o cadastro da pessoa (o apoiador por trás do voluntário).
   async function abrirEdicao(row) {
     try {
+      setIndicante(null);
       const { data } = await api.get(`/supporters/${row.supporter.id}`);
+      // A indicação vive como tag "INDICAÇÃO: NOME" — vira campo editável e,
+      // quando o indicante está na base com telefone, atalho de WhatsApp.
+      const tagInd = (data.tags || []).find((t) => t.startsWith('INDICAÇÃO: '));
+      const nomeInd = tagInd ? tagInd.slice('INDICAÇÃO: '.length).trim() : '';
+      if (nomeInd) {
+        api.get('/supporters/indicante', { params: { nome: nomeInd } })
+          .then((r) => { if (r.data.data) setIndicante(r.data.data); })
+          .catch(() => {});
+      }
       setEditForm({
+        indicante: nomeInd ? nomeProprio(nomeInd) : '',
         name: data.name || '',
         phone: data.phone || '',
         whatsapp: data.whatsapp || '',
@@ -361,6 +374,27 @@ export default function Volunteers() {
             {EDIT_FIELDS.map((f) => (
               <Field key={f.name} field={f} value={editForm[f.name]} onChange={setCampo} />
             ))}
+            <div className="field">
+              <label>Quem indicou</label>
+              <div className="flex items-center gap-8">
+                <input
+                  className="input"
+                  style={{ flex: 1 }}
+                  value={editForm.indicante ?? ''}
+                  onChange={(e) => setCampo('indicante', e.target.value)}
+                  placeholder="Nome de quem indicou esta pessoa"
+                />
+                {indicante && <WhatsAppButton person={indicante} size={16} />}
+              </div>
+              {indicante ? (
+                <span className="cell-muted text-sm">
+                  Indicado por <b>{nomeProprio(indicante.name)}</b> — o botão verde chama quem indicou no WhatsApp
+                  (útil quando o telefone do voluntário está errado).
+                </span>
+              ) : editForm.indicante ? (
+                <span className="cell-muted text-sm">Indicante ainda não encontrado na base (sem atalho de WhatsApp).</span>
+              ) : null}
+            </div>
           </div>
           <div className="flex items-center gap-8" style={{ justifyContent: 'flex-end', marginTop: 16 }}>
             <button className="btn btn-ghost" onClick={() => setEditing(null)} disabled={savingEdit}>Cancelar</button>

@@ -37,6 +37,25 @@ const TIPOS_VOLUNTARIO = ['VOLUNTARIO', 'FAIXA_CASA', 'KIT_MATERIAL'];
 export const { list, get } = factory;
 
 /** Tags distintas da base (grupos do gabinete), com contagem — alimenta o filtro. */
+/**
+ * Localiza quem indicou (para o atalho de WhatsApp no modal do voluntário).
+ * Busca na base INTEIRA — a listagem normal esconde voluntários (baseWhere),
+ * e o indicante muitas vezes é ele próprio um voluntário.
+ */
+export const buscarIndicante = asyncHandler(async (req, res) => {
+  const nome = String(req.query.nome || '').trim();
+  if (nome.length < 3) return res.json({ data: null });
+  const comFone = { OR: [{ phone: { not: null } }, { whatsapp: { not: null } }] };
+  const select = { name: true, phone: true, whatsapp: true };
+  const exato = await prisma.supporter.findFirst({
+    where: { ...comFone, name: { equals: nome, mode: 'insensitive' } }, select,
+  });
+  const achado = exato || await prisma.supporter.findFirst({
+    where: { ...comFone, name: { contains: nome, mode: 'insensitive' } }, select,
+  });
+  res.json({ data: achado });
+});
+
 export const listTags = asyncHandler(async (_req, res) => {
   const rows = await prisma.$queryRaw`
     SELECT t AS tag, count(DISTINCT "Supporter".id)::int AS total
