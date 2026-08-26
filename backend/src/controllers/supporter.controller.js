@@ -140,12 +140,15 @@ export async function sincronizarDestinos(supporterId, { confirmar = false, user
 
   const fone = s.whatsapp || s.phone;
   let vol = s.volunteer;
+  const criouAgora = !vol;
   if (!vol) {
     vol = await prisma.volunteer.create({ data: { supporterId } });
     // Só pede confirmação quando NÃO vai confirmar agora (senão manda "confirme?" e "confirmado!" juntos).
     if (!confirmar) dispararJornada('voluntario_confirmacao', fone, [s.name]);
   }
-  if (confirmar && !vol.confirmed) {
+  // Confirma/ativa APENAS quando o voluntário é criado agora. Editar um voluntário
+  // que já existe nunca reverte o estado (senão "Inativo" voltava a Ativo a cada save).
+  if (confirmar && criouAgora && !vol.confirmed) {
     await prisma.volunteer.update({
       where: { id: vol.id },
       data: { confirmed: true, active: true, confirmationStatus: 'CONFIRMADO', confirmedAt: new Date() },
@@ -334,6 +337,25 @@ export const update = asyncHandler(async (req, res) => {
   }
   // Corrente: marcar Voluntário/Faixa/Kit e salvar → vira voluntário + destinos.
   await sincronizarDestinos(supporter.id, { confirmar: true, userId: req.user?.id });
+
+  // O campo "Status" do modal edita o Supporter, mas a lista de Voluntários lê
+  // Volunteer.active/confirmationStatus. Espelha a mudança para os dois baterem —
+  // é o que faz "marcar Inativo" realmente inativar o voluntário na lista.
+  if (data.status && anterior && data.status !== anterior.status) {
+    const vol = await prisma.volunteer.findUnique({ where: { supporterId: supporter.id } });
+    if (vol) {
+      const ESPELHO = {
+        INATIVO: { active: false, confirmed: false, confirmationStatus: 'CANCELADO' },
+        SUSPEITO: { active: false, confirmed: false, confirmationStatus: 'CANCELADO' },
+        PENDENTE: { active: false, confirmed: false, confirmationStatus: 'A_CONFIRMAR' },
+        NOVO: { active: false, confirmed: false, confirmationStatus: 'A_CONFIRMAR' },
+        CONFIRMADO: { active: true, confirmed: true, confirmationStatus: 'CONFIRMADO' },
+        ATIVO: { active: true, confirmed: true, confirmationStatus: 'CONFIRMADO' },
+      };
+      if (ESPELHO[data.status]) await prisma.volunteer.update({ where: { id: vol.id }, data: ESPELHO[data.status] });
+    }
+  }
+
   const atualizado = await prisma.supporter.findUnique({ where: { id: supporter.id }, include });
   await audit({ userId: req.user?.id, action: 'UPDATE', entity: 'Supporter', entityId: supporter.id, ip: req.ip });
   res.json(atualizado);
