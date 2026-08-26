@@ -84,7 +84,7 @@ export const LABELS = {
   },
   DemandStatus: { NOVA: 'Nova', EM_ANALISE: 'Em análise', EM_ANDAMENTO: 'Em andamento', RESOLVIDA: 'Resolvida', ARQUIVADA: 'Arquivada' },
   BroadcastStatus: { RASCUNHO: 'Rascunho', AGENDADA: 'Agendada', ENVIANDO: 'Enviando', CONCLUIDA: 'Concluída', PAUSADA: 'Pausada', CANCELADA: 'Cancelada' },
-  BroadcastContactStatus: { PENDENTE: 'Pendente', ENVIADO: 'Enviado', ENTREGUE: 'Entregue', FALHA: 'Falha' },
+  BroadcastContactStatus: { PENDENTE: 'Pendente', ENVIADO: 'Enviado', ENTREGUE: 'Entregue', LIDA: 'Lida', FALHA: 'Falha' },
   AutomationType: {
     ANIVERSARIO: 'Aniversário', NATAL: 'Natal', DIA_AMIGO: 'Dia do amigo',
     AGRADECIMENTO_VOLUNTARIO: 'Agradecimento voluntário', LEMBRETE_EVENTO: 'Lembrete de evento',

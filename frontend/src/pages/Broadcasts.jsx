@@ -1,5 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
-import { Plus, Send, Upload, Megaphone, X, Search } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Plus, Send, Megaphone, X, Search, Users, ShieldCheck, Clock, Copy, Trash2,
+  Download, Pause, Play, ChevronLeft, ChevronRight, Zap, ClipboardList, RefreshCw,
+} from 'lucide-react';
 import Layout from '../components/layout/Layout.jsx';
 import { Card } from '../components/ui/Card.jsx';
 import Modal from '../components/ui/Modal.jsx';
@@ -10,39 +13,122 @@ import { LoadingBox } from '../components/ui/Spinner.jsx';
 import EmptyState from '../components/ui/EmptyState.jsx';
 import api, { apiError } from '../api/client.js';
 import { useToast } from '../context/ToastContext.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 import { label, options } from '../config/enums.js';
+
+// ============================================================
+//  Campanhas — disparo pela API Oficial.
+//  Público por segmentos da base + números colados, template com
+//  prévia, declaração de conformidade obrigatória (não pré-
+//  marcada), créditos com validade e envio agora ou agendado.
+// ============================================================
+
+const FONTES_VAR = [
+  { value: 'nome', label: 'Nome do contato' },
+  { value: 'cidade', label: 'Cidade' },
+  { value: 'bairro', label: 'Bairro' },
+  { value: 'responsavel', label: 'Responsável' },
+  { value: 'fixo', label: 'Texto fixo' },
+];
+
+function fmtData(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+}
+
+/** Prévia da mensagem em bolha (header, corpo com variáveis, rodapé, botões). */
+function PreviewBolha({ tpl, headerImageUrl, vars }) {
+  if (!tpl) return null;
+  const corpo = (tpl.bodyText || '').replace(/\{\{\s*(\d+)\s*\}\}/g, (_, n) => {
+    const v = vars?.[Number(n) - 1];
+    if (!v) return `{{${n}}}`;
+    if (v.source === 'fixo') return v.value || `{{${n}}}`;
+    return `[${FONTES_VAR.find((f) => f.value === v.source)?.label || v.source}]`;
+  });
+  return (
+    <div className="wa-preview">
+      <div className="wa-bubble">
+        {tpl.headerFormat === 'IMAGE' && (
+          headerImageUrl
+            ? <img src={headerImageUrl} alt="" className="wa-header-img" onError={(e) => { e.target.style.display = 'none'; }} />
+            : <div className="wa-header-ph">Imagem do topo</div>
+        )}
+        {tpl.headerText && <div className="wa-header-text">{tpl.headerText}</div>}
+        <div className="wa-body">{corpo}</div>
+        {tpl.footerText && <div className="wa-footer">{tpl.footerText}</div>}
+        {tpl.buttons?.length > 0 && (
+          <div className="wa-buttons">
+            {tpl.buttons.map((b, i) => <div key={i} className="wa-btn">{b.text}</div>)}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** Barra de progresso do envio de uma campanha. */
+function Progresso({ c }) {
+  const total = c.totalContacts || 0;
+  if (!total) return <span className="cell-muted">—</span>;
+  const feito = (c.sentCount || 0) + (c.failedCount || 0);
+  const pct = Math.min(100, Math.round((feito / total) * 100));
+  return (
+    <div className="bc-progress" style={{ minWidth: 130 }}>
+      <div className="bc-progress-bar"><div className="bc-progress-fill" style={{ width: `${pct}%` }} /></div>
+      <div className="bc-progress-info" style={{ fontSize: 11 }}>{feito}/{total} ({pct}%)</div>
+    </div>
+  );
+}
 
 export default function Broadcasts() {
   const toast = useToast();
+  const { user } = useAuth();
+  const isLider = user?.role === 'LIDER';
+
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [createOpen, setCreateOpen] = useState(false);
-  const [form, setForm] = useState({});
-  const [detail, setDetail] = useState(null);
-  const [csv, setCsv] = useState('nome,telefone,cidade,bairro\nMaria,5551999990000,Porto Alegre,Centro');
-  const [sendingState, setSendingState] = useState(null); // { sent, failed, total, pct } | null
-  const cancelRef = useRef(false);
   const [busca, setBusca] = useState('');
   const [statusFiltro, setStatusFiltro] = useState('');
   const [templates, setTemplates] = useState([]);
-  const [modo, setModo] = useState('template'); // 'template' (marketing) | 'livre' (janela 24h)
+  const [creditos, setCreditos] = useState(null);
+  const [declInfo, setDeclInfo] = useState(null);
+
+  // Wizard
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [passo, setPasso] = useState(1);
+  const [form, setForm] = useState({});
+  const [filtros, setFiltros] = useState({});
+  const [colados, setColados] = useState('');
+  const [opcoes, setOpcoes] = useState(null);
+  const [tags, setTags] = useState([]);
+  const [previewPublico, setPreviewPublico] = useState(null);
+  const [calculando, setCalculando] = useState(false);
+  const [modo, setModo] = useState('template');
+  const [vars, setVars] = useState([]);
+  const [salvando, setSalvando] = useState(false);
+  const [campId, setCampId] = useState(null);
+  const [declAceita, setDeclAceita] = useState(false);
+  const [fonesTeste, setFoneTeste] = useState('');
+
+  // Detalhe
+  const [detail, setDetail] = useState(null);
+  const [contatos, setContatos] = useState({ data: [], total: 0, page: 1 });
+  const [contatoStatus, setContatoStatus] = useState('');
+  const [sendingState, setSendingState] = useState(null);
+  const cancelRef = useRef(false);
+  const [declDetalheAceita, setDeclDetalheAceita] = useState(false);
+
+  const tplSel = useMemo(() => templates.find((t) => t.name === form.templateName) || null, [templates, form.templateName]);
 
   useEffect(() => {
     api.get('/whatsapp/templates').then(({ data }) => setTemplates(data.data || [])).catch(() => {});
+    api.get('/broadcasts/declaracao/texto').then(({ data }) => setDeclInfo(data)).catch(() => {});
+    carregarCreditos();
   }, []);
 
-  const setCampo = (n, v) => setForm((s) => ({ ...s, [n]: v }));
-  function selecionarTemplate(name) {
-    const t = templates.find((x) => x.name === name);
-    setForm((s) => ({
-      ...s,
-      templateName: name || null,
-      templateLang: t?.language || 'pt_BR',
-      channel: 'WHATSAPP',
-      headerImageUrl: t?.headerFormat === 'IMAGE' ? (s.headerImageUrl || 'https://app.marciobinsely.site/logo.png') : null,
-    }));
+  function carregarCreditos() {
+    api.get('/broadcasts/creditos/status').then(({ data }) => setCreditos(data)).catch(() => {});
   }
-  const tplSel = templates.find((t) => t.name === form.templateName) || null;
 
   async function load() {
     setLoading(true);
@@ -64,43 +150,170 @@ export default function Broadcasts() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [busca, statusFiltro]);
 
-  async function create() {
-    const payload = modo === 'template'
-      ? { name: form.name, channel: 'WHATSAPP', templateName: form.templateName, templateLang: form.templateLang, headerImageUrl: form.headerImageUrl }
-      : { name: form.name, channel: form.channel || 'WHATSAPP', message: form.message };
+  // Atualiza o detalhe sozinho enquanto a campanha envia (o cron também envia).
+  useEffect(() => {
+    if (!detail || detail.status !== 'ENVIANDO' || sendingState) return;
+    const t = setInterval(() => refreshDetail(detail.id), 5000);
+    return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [detail?.id, detail?.status, sendingState]);
+
+  const setCampo = (n, v) => setForm((s) => ({ ...s, [n]: v }));
+
+  // ---------- Wizard ----------
+  function abrirWizard() {
+    setForm({ templateLang: 'pt_BR' });
+    setFiltros({ usarBase: true });
+    setColados('');
+    setPreviewPublico(null);
+    setModo('template');
+    setVars([]);
+    setCampId(null);
+    setDeclAceita(false);
+    setPasso(1);
+    setWizardOpen(true);
+    if (!opcoes) {
+      api.get('/broadcasts/audiencia/opcoes').then(({ data }) => setOpcoes(data)).catch(() => {});
+      api.get('/supporters/tags').then(({ data }) => setTags(data.data || data || [])).catch(() => {});
+    }
+  }
+
+  function selecionarTemplate(name) {
+    const t = templates.find((x) => x.name === name);
+    setForm((s) => ({ ...s, templateName: name || null, templateLang: t?.language || 'pt_BR', headerImageUrl: t?.headerFormat === 'IMAGE' ? (s.headerImageUrl || '') : null }));
+    setVars(Array.from({ length: t?.bodyVarCount || 0 }, (_, i) => ({ source: i === 0 ? 'nome' : 'fixo', value: '' })));
+  }
+
+  function toggleFiltro(chave, valor) {
+    setFiltros((f) => {
+      const atual = new Set(f[chave] || []);
+      if (atual.has(valor)) atual.delete(valor); else atual.add(valor);
+      return { ...f, [chave]: [...atual] };
+    });
+    setPreviewPublico(null);
+  }
+
+  async function calcularPublico() {
+    setCalculando(true);
     try {
-      await api.post('/broadcasts', payload);
-      toast.success('Campanha criada!');
-      setCreateOpen(false);
-      setForm({});
-      load();
+      const { data } = await api.post('/broadcasts/audiencia/preview', { filtros, colados });
+      setPreviewPublico(data);
+    } catch (e) {
+      toast.error(apiError(e));
+    } finally {
+      setCalculando(false);
+    }
+  }
+
+  async function avancar() {
+    if (passo === 1) {
+      if (!form.name || form.name.trim().length < 2) return toast.error('Dê um nome para a campanha.');
+      return setPasso(2);
+    }
+    if (passo === 2) {
+      if (!previewPublico) return toast.error('Clique em "Calcular público" para conferir os números.');
+      if (!previewPublico.total) return toast.error('O público está vazio — ajuste os filtros ou cole números.');
+      return setPasso(3);
+    }
+    if (passo === 3) {
+      if (modo === 'template' && !form.templateName) return toast.error('Selecione um template aprovado.');
+      if (modo === 'livre' && !(form.message || '').trim()) return toast.error('Escreva a mensagem.');
+      // Cria a campanha (rascunho/agendada) + grava o público.
+      setSalvando(true);
+      try {
+        const payload = {
+          name: form.name,
+          channel: 'WHATSAPP',
+          scheduledAt: form.scheduledAt || null,
+          ...(modo === 'template'
+            ? { templateName: form.templateName, templateLang: form.templateLang, headerImageUrl: form.headerImageUrl || null, varsJson: vars }
+            : { message: form.message }),
+        };
+        let id = campId;
+        if (!id) {
+          const { data } = await api.post('/broadcasts', payload);
+          id = data.id;
+          setCampId(id);
+        } else {
+          await api.patch(`/broadcasts/${id}`, payload);
+        }
+        await api.post(`/broadcasts/${id}/audiencia`, { filtros, colados, replace: true });
+        setDeclAceita(false);
+        setPasso(4);
+      } catch (e) {
+        toast.error(apiError(e));
+      } finally {
+        setSalvando(false);
+      }
+    }
+  }
+
+  async function enviarTesteWizard() {
+    if (!fonesTeste.trim()) return toast.error('Informe o número para o teste.');
+    try {
+      await api.post(`/broadcasts/${campId}/teste`, { phone: fonesTeste });
+      toast.success('Teste enviado. Confira o WhatsApp.');
+      carregarCreditos();
     } catch (e) {
       toast.error(apiError(e));
     }
   }
 
+  async function concluirWizard(enviarAgora) {
+    if (!declAceita) return toast.error('Marque a declaração de conformidade para liberar o envio.');
+    setSalvando(true);
+    try {
+      await api.post(`/broadcasts/${campId}/declaracao`, { aceito: true });
+      if (enviarAgora) {
+        setWizardOpen(false);
+        const { data } = await api.get(`/broadcasts/${campId}`);
+        setDetail(data);
+        await dispararLoop(data);
+      } else {
+        toast.success(form.scheduledAt ? 'Campanha agendada. O sistema envia sozinho no horário.' : 'Campanha pronta. Abra e clique em Disparar quando quiser.');
+        setWizardOpen(false);
+      }
+      load();
+      carregarCreditos();
+    } catch (e) {
+      toast.error(apiError(e));
+    } finally {
+      setSalvando(false);
+    }
+  }
+
+  // ---------- Detalhe ----------
+  async function refreshDetail(id) {
+    try {
+      const { data } = await api.get(`/broadcasts/${id}`);
+      setDetail(data);
+      const params = { page: contatos.page, take: 50 };
+      if (contatoStatus) params.status = contatoStatus;
+      const r = await api.get(`/broadcasts/${id}/contacts`, { params });
+      setContatos(r.data);
+    } catch { /* silencioso */ }
+  }
   async function openDetail(row) {
     const { data } = await api.get(`/broadcasts/${row.id}`);
     setDetail(data);
+    setDeclDetalheAceita(false);
+    setContatoStatus('');
+    const r = await api.get(`/broadcasts/${row.id}/contacts`, { params: { page: 1, take: 50 } });
+    setContatos(r.data);
   }
-  async function importContacts() {
-    try {
-      const { data } = await api.post(`/broadcasts/${detail.id}/contacts`, { csv });
-      toast.success(`${data.imported} contatos importados.${data.skippedBlacklist ? ` ${data.skippedBlacklist} na blacklist foram ignorados.` : ''}`);
-      openDetail(detail);
-      load();
-    } catch (e) {
-      toast.error(apiError(e));
-    }
-  }
-  // Bug 2: dispara em lotes com progresso; cada request responde rápido (202).
-  async function send() {
-    if (sendingState) return;
-    const id = detail.id;
-    const total = detail.totalContacts || 0;
-    if (!total) { toast.error('Importe contatos antes de disparar.'); return; }
+  useEffect(() => {
+    if (!detail) return;
+    const params = { page: contatos.page, take: 50 };
+    if (contatoStatus) params.status = contatoStatus;
+    api.get(`/broadcasts/${detail.id}/contacts`, { params }).then((r) => setContatos(r.data)).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contatoStatus, contatos.page]);
+
+  async function dispararLoop(camp) {
+    const id = camp.id;
+    const total = camp.totalContacts || 0;
     cancelRef.current = false;
-    setSendingState({ sent: detail.sentCount || 0, failed: detail.failedCount || 0, total, pct: 0 });
+    setSendingState({ sent: camp.sentCount || 0, failed: camp.failedCount || 0, total, pct: 0 });
     try {
       let done = false;
       while (!done && !cancelRef.current) {
@@ -108,58 +321,138 @@ export default function Broadcasts() {
         const processed = data.sentCount + data.failedCount;
         setSendingState({ sent: data.sentCount, failed: data.failedCount, total: data.totalContacts || total, pct: total ? Math.round((processed / total) * 100) : 100 });
         done = data.done;
-        if (!done && data.sent === 0 && data.failed === 0) break; // nada a processar — evita loop
+        if (!done && data.sent === 0 && data.failed === 0) break;
       }
       if (cancelRef.current) { await api.post(`/broadcasts/${id}/pause`).catch(() => {}); toast.success('Envio pausado.'); }
-      else toast.success('Disparo concluído!');
+      else toast.success('Disparo concluído.');
     } catch (e) {
       toast.error(apiError(e));
     } finally {
       setSendingState(null);
       cancelRef.current = false;
-      openDetail({ id });
+      refreshDetail(id);
       load();
+      carregarCreditos();
     }
   }
-  function cancelSend() { cancelRef.current = true; }
+
+  async function aceitarDeclaracaoDetalhe() {
+    if (!declDetalheAceita) return toast.error('Marque a declaração para registrar o aceite.');
+    try {
+      await api.post(`/broadcasts/${detail.id}/declaracao`, { aceito: true });
+      toast.success('Declaração registrada. Envio liberado.');
+      refreshDetail(detail.id);
+    } catch (e) {
+      toast.error(apiError(e));
+    }
+  }
+
+  async function exportarCsv() {
+    try {
+      const resp = await api.get(`/broadcasts/${detail.id}/contacts`, { params: { format: 'csv' }, responseType: 'blob' });
+      const url = URL.createObjectURL(resp.data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `campanha-${(detail.name || 'export').replace(/[^\w-]+/g, '-').toLowerCase()}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      toast.error(apiError(e));
+    }
+  }
+
+  async function duplicar(row) {
+    try {
+      await api.post(`/broadcasts/${row.id}/duplicar`);
+      toast.success('Campanha duplicada como rascunho.');
+      load();
+    } catch (e) {
+      toast.error(apiError(e));
+    }
+  }
+  async function excluir(row) {
+    if (!window.confirm(`Excluir a campanha "${row.name}"?`)) return;
+    try {
+      await api.delete(`/broadcasts/${row.id}`);
+      toast.success('Campanha excluída.');
+      setDetail(null);
+      load();
+    } catch (e) {
+      toast.error(apiError(e));
+    }
+  }
+  async function ativarPacote() {
+    if (!window.confirm('Ativar o pacote de 80.000 mensagens? A validade de 120 dias começa agora.')) return;
+    try {
+      await api.post('/broadcasts/creditos/ativar', { total: 80000 });
+      toast.success('Pacote ativado.');
+      carregarCreditos();
+    } catch (e) {
+      toast.error(apiError(e));
+    }
+  }
 
   const columns = [
-    { key: 'name', label: 'Campanha', render: (r) => <div className="cell-strong">{r.name}</div> },
-    { key: 'channel', label: 'Canal', render: (r) => <Badge tone="blue">{label('Channel', r.channel)}</Badge> },
-    { key: 'contacts', label: 'Contatos', render: (r) => r._count?.contacts ?? r.totalContacts ?? 0 },
-    { key: 'sent', label: 'Enviados', render: (r) => r.sentCount },
+    { key: 'name', label: 'Campanha', render: (r) => (
+      <div>
+        <div className="cell-strong">{r.name}</div>
+        <div className="cell-muted" style={{ fontSize: 12 }}>{r.templateName ? `Template: ${r.templateName}` : 'Mensagem livre'}</div>
+      </div>
+    ) },
+    { key: 'contacts', label: 'Público', render: (r) => r._count?.contacts ?? r.totalContacts ?? 0 },
+    { key: 'progress', label: 'Progresso', render: (r) => <Progresso c={r} /> },
+    { key: 'lidas', label: 'Entregues / Lidas', render: (r) => <span>{r.deliveredCount || 0} / {r.readCount || 0}</span> },
+    { key: 'agendada', label: 'Agendada para', render: (r) => (r.scheduledAt ? fmtData(r.scheduledAt) : '—') },
+    { key: 'decl', label: 'Declaração', render: (r) => (r.declAcceptedAt ? <Badge tone="green">Registrada</Badge> : <Badge tone="amber">Pendente</Badge>) },
     { key: 'status', label: 'Status', render: (r) => <StatusBadge group="BroadcastStatus" value={r.status} /> },
   ];
 
-  return (
-    <Layout title="Disparador da equipe" subtitle="Campanhas com variáveis e relatório — pronto para API Oficial">
-      <div className="warning-box" style={{ marginBottom: 16 }}>
-        <span>
-          Conectado à <strong>API Oficial do WhatsApp</strong>. Disparo em massa (marketing) usa <strong>template aprovado</strong> —
-          entrega para qualquer número. Mensagem livre só chega a quem respondeu nas últimas 24h. Limite atual: <strong>250 envios/dia</strong>.
-        </span>
-      </div>
+  const pctCreditos = creditos?.total ? Math.min(100, Math.round(((creditos.usado || 0) / creditos.total) * 100)) : 0;
 
-      <div className="toolbar">
+  return (
+    <Layout title="Campanhas" subtitle="Disparo pela API Oficial — segmentos da base, templates aprovados e agendamento">
+      {/* Painel de créditos */}
+      <Card>
+        <div className="flex" style={{ alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Zap size={20} style={{ color: 'var(--gold, #F7A810)' }} />
+            <div>
+              <div className="stat-label">Créditos de mensagem</div>
+              {creditos?.total ? (
+                <div className="stat-value" style={{ fontSize: 22 }}>
+                  {(creditos.saldo ?? 0).toLocaleString('pt-BR')} <span className="cell-muted" style={{ fontSize: 13, fontWeight: 400 }}>de {creditos.total.toLocaleString('pt-BR')}</span>
+                </div>
+              ) : (
+                <div className="cell-muted">Nenhum pacote ativado</div>
+              )}
+            </div>
+          </div>
+          {creditos?.total > 0 && (
+            <div style={{ flex: 1, minWidth: 220 }}>
+              <div className="bc-progress-bar"><div className="bc-progress-fill" style={{ width: `${pctCreditos}%` }} /></div>
+              <div className="cell-muted" style={{ fontSize: 12, marginTop: 4 }}>
+                {creditos.usado.toLocaleString('pt-BR')} usados · validade: {creditos.diasRestantes} dia(s) restante(s)
+                {creditos.expirado && <b style={{ color: 'var(--red)' }}> · EXPIRADO</b>}
+              </div>
+            </div>
+          )}
+          {isLider && (!creditos?.total || (creditos?.expirado)) && (
+            <button className="btn btn-primary" onClick={ativarPacote}><Zap size={15} /> Ativar pacote 80.000</button>
+          )}
+        </div>
+      </Card>
+
+      <div className="toolbar" style={{ marginTop: 16 }}>
         <div className="search">
           <Search size={16} />
-          <input
-            className="input"
-            placeholder="Buscar campanha por nome ou mensagem..."
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-          />
+          <input className="input" placeholder="Buscar campanha..." value={busca} onChange={(e) => setBusca(e.target.value)} />
         </div>
         <select className="select" style={{ width: 'auto' }} value={statusFiltro} onChange={(e) => setStatusFiltro(e.target.value)}>
           <option value="">Todos os status</option>
-          {options('BroadcastStatus').map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
+          {options('BroadcastStatus').map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
         <div className="spacer" />
-        <button className="btn btn-primary" onClick={() => { setForm({ channel: 'WHATSAPP', templateLang: 'pt_BR' }); setModo('template'); setCreateOpen(true); }}>
-          <Plus size={16} /> Nova campanha
-        </button>
+        <button className="btn btn-primary" onClick={abrirWizard}><Plus size={16} /> Nova campanha</button>
       </div>
 
       <Card noBody>
@@ -169,75 +462,262 @@ export default function Broadcasts() {
           <DataTable
             columns={columns}
             rows={list}
-            empty={<EmptyState icon={Megaphone} title="Nenhuma campanha" message="Crie uma campanha de disparo para sua base." />}
+            empty={<EmptyState icon={Megaphone} title="Nenhuma campanha" message="Crie uma campanha para falar com a sua base." />}
             actions={(row) => (
-              <button className="btn btn-ghost btn-sm" onClick={() => openDetail(row)}>Abrir</button>
+              <div className="flex gap-8">
+                <button className="btn btn-ghost btn-sm" onClick={() => openDetail(row)}>Abrir</button>
+                <button className="btn btn-ghost btn-sm" title="Duplicar" onClick={() => duplicar(row)}><Copy size={14} /></button>
+              </div>
             )}
           />
         )}
       </Card>
 
-      {createOpen && (
+      {/* ==================== WIZARD ==================== */}
+      {wizardOpen && (
         <Modal
-          title="Nova campanha de disparo"
-          onClose={() => setCreateOpen(false)}
+          title={`Nova campanha — passo ${passo} de 4`}
+          wide
+          onClose={() => setWizardOpen(false)}
           footer={
             <>
-              <button className="btn" onClick={() => setCreateOpen(false)}>Cancelar</button>
-              <button className="btn btn-primary" onClick={create}>Criar</button>
-            </>
-          }
-        >
-          <Field field={{ name: 'name', label: 'Nome da campanha', required: true }} value={form.name} onChange={setCampo} />
-
-          <div className="field">
-            <label>Tipo de envio</label>
-            <div className="flex gap-8">
-              <button type="button" className={`btn ${modo === 'template' ? 'btn-primary' : ''}`} onClick={() => setModo('template')}>Template aprovado</button>
-              <button type="button" className={`btn ${modo === 'livre' ? 'btn-primary' : ''}`} onClick={() => setModo('livre')}>Mensagem livre</button>
-            </div>
-            <span className="field-hint">{modo === 'template' ? 'Marketing/massa — entrega para qualquer número.' : 'Só entrega para quem te respondeu nas últimas 24h.'}</span>
-          </div>
-
-          {modo === 'template' ? (
-            <>
-              <div className="field">
-                <label>Template aprovado <span className="req">*</span></label>
-                <select className="select" value={form.templateName || ''} onChange={(e) => selecionarTemplate(e.target.value)}>
-                  <option value="">Selecione um template...</option>
-                  {templates.map((t) => <option key={t.name} value={t.name}>{t.name} · {t.category}</option>)}
-                </select>
-                {templates.length === 0 && <span className="field-hint">Nenhum template aprovado encontrado na conta.</span>}
-              </div>
-              {tplSel && (
+              {passo > 1 && passo < 4 && <button className="btn" onClick={() => setPasso(passo - 1)}><ChevronLeft size={15} /> Voltar</button>}
+              <div className="spacer" />
+              {passo < 4 && <button className="btn btn-primary" disabled={salvando} onClick={avancar}>{salvando ? 'Salvando...' : <>Avançar <ChevronRight size={15} /></>}</button>}
+              {passo === 4 && (
                 <>
-                  <div className="field">
-                    <label>Prévia (corpo do template)</label>
-                    <div className="media-caption">{tplSel.bodyText || '—'}</div>
-                    {tplSel.bodyVarCount > 0 && <span className="field-hint">Variáveis preenchidas automaticamente: {'{{1}}'}=nome, {'{{2}}'}=cidade, {'{{3}}'}=bairro.</span>}
-                  </div>
-                  {tplSel.headerFormat === 'IMAGE' && (
-                    <Field field={{ name: 'headerImageUrl', label: 'Imagem do topo (URL)', hint: 'URL pública da imagem do header do template.' }} value={form.headerImageUrl} onChange={setCampo} />
+                  <button className="btn" disabled={salvando || !declAceita} onClick={() => concluirWizard(false)}>
+                    <Clock size={15} /> {form.scheduledAt ? 'Confirmar agendamento' : 'Salvar para depois'}
+                  </button>
+                  {isLider && !form.scheduledAt && (
+                    <button className="btn btn-primary" disabled={salvando || !declAceita} onClick={() => concluirWizard(true)}>
+                      <Send size={15} /> Enviar agora
+                    </button>
                   )}
                 </>
               )}
             </>
-          ) : (
+          }
+        >
+          {/* Passo 1 — dados */}
+          {passo === 1 && (
             <>
-              <Field field={{ name: 'channel', label: 'Canal', type: 'select', options: options('Channel') }} value={form.channel} onChange={setCampo} />
-              <Field field={{ name: 'message', label: 'Mensagem', type: 'textarea', rows: 4, hint: 'Variáveis: {{nome}}, {{cidade}}, {{bairro}}, {{responsavel}}' }} value={form.message} onChange={setCampo} />
+              <Field field={{ name: 'name', label: 'Nome da campanha', required: true, hint: 'Uso interno — ex.: "Convite lançamento Zona Sul".' }} value={form.name} onChange={setCampo} />
+              <Field field={{ name: 'scheduledAt', label: 'Agendar para (opcional)', type: 'datetime-local', hint: 'Em branco = envio manual. Agendada, o sistema dispara sozinho no horário.' }} value={form.scheduledAt} onChange={setCampo} />
+            </>
+          )}
+
+          {/* Passo 2 — público */}
+          {passo === 2 && (
+            <>
+              <div className="field">
+                <label><Users size={14} style={{ verticalAlign: -2 }} /> Bases importadas</label>
+                <div className="flex gap-8" style={{ flexWrap: 'wrap' }}>
+                  <button type="button" className={`btn btn-sm ${filtros.usarBase !== false ? 'btn-primary' : ''}`} onClick={() => { setFiltros((f) => ({ ...f, usarBase: f.usarBase === false })); setPreviewPublico(null); }}>
+                    Usar a base de apoiadores
+                  </button>
+                  <button type="button" className={`btn btn-sm ${filtros.apenasVoluntarios ? 'btn-primary' : ''}`} onClick={() => { setFiltros((f) => ({ ...f, apenasVoluntarios: !f.apenasVoluntarios })); setPreviewPublico(null); }}>
+                    Somente voluntários ativos {opcoes ? `(${opcoes.voluntariosAtivos})` : ''}
+                  </button>
+                </div>
+                <span className="field-hint">Sem nenhum filtro abaixo, entra a base inteira com telefone. Cada filtro reduz o público.</span>
+              </div>
+
+              {filtros.usarBase !== false && (
+                <>
+                  <div className="field">
+                    <label>Grupos / etiquetas</label>
+                    <div className="chip-wrap">
+                      {(tags || []).slice(0, 60).map((t) => {
+                        const nome = t.tag || t.value || t;
+                        const qtd = t.count ?? t.total ?? null;
+                        const on = (filtros.tags || []).includes(nome);
+                        return (
+                          <button key={nome} type="button" className={`chip ${on ? 'chip-on' : ''}`} onClick={() => toggleFiltro('tags', nome)}>
+                            {nome}{qtd != null ? ` · ${qtd}` : ''}
+                          </button>
+                        );
+                      })}
+                      {(!tags || !tags.length) && <span className="cell-muted">Sem etiquetas na base.</span>}
+                    </div>
+                  </div>
+                  <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div className="field">
+                      <label>Cidades</label>
+                      <div className="chip-wrap" style={{ maxHeight: 130, overflow: 'auto' }}>
+                        {(opcoes?.cidades || []).map((c) => (
+                          <button key={c.value} type="button" className={`chip ${(filtros.cities || []).includes(c.value) ? 'chip-on' : ''}`} onClick={() => toggleFiltro('cities', c.value)}>
+                            {c.value} · {c.count}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="field">
+                      <label>Bairros</label>
+                      <div className="chip-wrap" style={{ maxHeight: 130, overflow: 'auto' }}>
+                        {(opcoes?.bairros || []).map((b) => (
+                          <button key={b.value} type="button" className={`chip ${(filtros.neighborhoods || []).includes(b.value) ? 'chip-on' : ''}`} onClick={() => toggleFiltro('neighborhoods', b.value)}>
+                            {b.value} · {b.count}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              <div className="field">
+                <label><ClipboardList size={14} style={{ verticalAlign: -2 }} /> Colar números novos (um por linha)</label>
+                <textarea
+                  className="textarea" rows={4}
+                  placeholder={'51999990000 Maria da Silva\n(51) 98888-7777\n5551977776666'}
+                  value={colados}
+                  onChange={(e) => { setColados(e.target.value); setPreviewPublico(null); }}
+                />
+                <span className="field-hint">Aceita com ou sem DDI 55, com máscara ou só dígitos. O nome depois do número é opcional.</span>
+              </div>
+
+              <div className="flex gap-8" style={{ alignItems: 'center' }}>
+                <button className="btn btn-primary" disabled={calculando} onClick={calcularPublico}><RefreshCw size={15} /> {calculando ? 'Calculando...' : 'Calcular público'}</button>
+                {previewPublico && (
+                  <div className="media-caption" style={{ flex: 1 }}>
+                    <b>{previewPublico.total.toLocaleString('pt-BR')} destinatários</b>
+                    {' '}· base: {previewPublico.daBase - previewPublico.semTelefone} · colados válidos: {previewPublico.colados - previewPublico.coladosInvalidos}
+                    {previewPublico.blacklist > 0 && <> · <b style={{ color: 'var(--red)' }}>{previewPublico.blacklist} na lista de supressão (fora)</b></>}
+                    {previewPublico.duplicados > 0 && <> · {previewPublico.duplicados} duplicados</>}
+                    {previewPublico.coladosInvalidos > 0 && <> · {previewPublico.coladosInvalidos} inválidos</>}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Passo 3 — mensagem */}
+          {passo === 3 && (
+            <>
+              <div className="field">
+                <label>Tipo de envio</label>
+                <div className="flex gap-8">
+                  <button type="button" className={`btn ${modo === 'template' ? 'btn-primary' : ''}`} onClick={() => setModo('template')}>Template aprovado</button>
+                  <button type="button" className={`btn ${modo === 'livre' ? 'btn-primary' : ''}`} onClick={() => setModo('livre')}>Mensagem livre</button>
+                </div>
+                <span className="field-hint">{modo === 'template' ? 'Necessário para alcançar quem não falou com o número nas últimas 24h.' : 'Entrega somente para quem respondeu nas últimas 24 horas.'}</span>
+              </div>
+
+              {modo === 'template' ? (
+                <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div>
+                    <div className="field">
+                      <label>Templates aprovados na conta <span className="req">*</span></label>
+                      <div style={{ maxHeight: 260, overflow: 'auto', border: '1px solid var(--border, #e2e5ea)', borderRadius: 8 }}>
+                        {templates.map((t) => (
+                          <button
+                            key={t.name} type="button"
+                            className="tpl-item"
+                            style={{
+                              display: 'block', width: '100%', textAlign: 'left', padding: '9px 12px', border: 'none',
+                              borderBottom: '1px solid var(--border, #eef0f3)', background: form.templateName === t.name ? 'var(--soft-primary, #e7eff7)' : 'transparent', cursor: 'pointer',
+                            }}
+                            onClick={() => selecionarTemplate(t.name)}
+                          >
+                            <div className="cell-strong" style={{ fontSize: 13 }}>{t.name}</div>
+                            <div className="cell-muted" style={{ fontSize: 11 }}>{t.category} · {t.language}{t.headerFormat ? ` · topo ${t.headerFormat}` : ''}{t.bodyVarCount ? ` · ${t.bodyVarCount} variável(is)` : ''}</div>
+                          </button>
+                        ))}
+                        {templates.length === 0 && <div className="cell-muted" style={{ padding: 12 }}>Nenhum template aprovado encontrado na conta.</div>}
+                      </div>
+                    </div>
+                    {tplSel?.headerFormat === 'IMAGE' && (
+                      <Field field={{ name: 'headerImageUrl', label: 'Imagem do topo (URL pública)', hint: 'Ex.: arte da campanha hospedada no site.' }} value={form.headerImageUrl} onChange={setCampo} />
+                    )}
+                    {tplSel?.bodyVarCount > 0 && (
+                      <div className="field">
+                        <label>Variáveis do texto</label>
+                        {vars.map((v, i) => (
+                          <div key={i} className="flex gap-8" style={{ marginBottom: 6, alignItems: 'center' }}>
+                            <span className="cell-muted" style={{ width: 42 }}>{'{{' + (i + 1) + '}}'}</span>
+                            <select className="select" style={{ flex: 1 }} value={v.source} onChange={(e) => setVars((arr) => arr.map((x, j) => (j === i ? { ...x, source: e.target.value } : x)))}>
+                              {FONTES_VAR.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
+                            </select>
+                            {v.source === 'fixo' && (
+                              <input className="input" style={{ flex: 1 }} placeholder="Texto fixo" value={v.value || ''} onChange={(e) => setVars((arr) => arr.map((x, j) => (j === i ? { ...x, value: e.target.value } : x)))} />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <div className="field"><label>Prévia</label></div>
+                    {tplSel ? <PreviewBolha tpl={tplSel} headerImageUrl={form.headerImageUrl} vars={vars} /> : <div className="cell-muted">Selecione um template para ver a prévia.</div>}
+                  </div>
+                </div>
+              ) : (
+                <Field field={{ name: 'message', label: 'Mensagem', type: 'textarea', rows: 5, hint: 'Variáveis: {{nome}}, {{cidade}}, {{bairro}}, {{responsavel}}' }} value={form.message} onChange={setCampo} />
+              )}
+            </>
+          )}
+
+          {/* Passo 4 — revisão + declaração */}
+          {passo === 4 && (
+            <>
+              <div className="grid stats-grid" style={{ marginBottom: 14 }}>
+                <div className="stat-card"><div className="stat-meta"><div className="stat-label">Destinatários</div><div className="stat-value">{(previewPublico?.total || 0).toLocaleString('pt-BR')}</div></div></div>
+                <div className="stat-card"><div className="stat-meta"><div className="stat-label">Créditos após envio</div><div className="stat-value">{Math.max(0, (creditos?.saldo || 0) - (previewPublico?.total || 0)).toLocaleString('pt-BR')}</div></div></div>
+                <div className="stat-card"><div className="stat-meta"><div className="stat-label">Quando</div><div className="stat-value" style={{ fontSize: 15 }}>{form.scheduledAt ? fmtData(form.scheduledAt) : 'Envio manual'}</div></div></div>
+              </div>
+              {(creditos?.saldo || 0) < (previewPublico?.total || 0) && (
+                <div className="warning-box" style={{ marginBottom: 12 }}>
+                  <span>O público é maior que o saldo de créditos. O envio para automaticamente quando o saldo acabar.</span>
+                </div>
+              )}
+
+              <div className="field">
+                <label>Teste antes de enviar (recomendado)</label>
+                <div className="flex gap-8">
+                  <input className="input" style={{ maxWidth: 220 }} placeholder="Seu número com DDD" value={fonesTeste} onChange={(e) => setFoneTeste(e.target.value)} />
+                  <button className="btn" onClick={enviarTesteWizard}><Send size={14} /> Enviar teste</button>
+                </div>
+                <span className="field-hint">Envia a mensagem real para o número informado (consome 1 crédito).</span>
+              </div>
+
+              <div className="decl-box" style={{ border: '1.5px solid var(--navy, #043868)', borderRadius: 10, padding: '14px 16px', background: 'var(--soft-primary, #f4f7fa)' }}>
+                <div className="flex" style={{ gap: 10, alignItems: 'flex-start' }}>
+                  <input id="decl" type="checkbox" checked={declAceita} onChange={(e) => setDeclAceita(e.target.checked)} style={{ marginTop: 4, width: 16, height: 16 }} />
+                  <label htmlFor="decl" style={{ fontSize: 13, lineHeight: 1.55, cursor: 'pointer' }}>
+                    {declInfo?.texto || 'Carregando o texto da declaração...'}
+                  </label>
+                </div>
+                <div className="cell-muted" style={{ fontSize: 11, marginTop: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <ShieldCheck size={13} /> O aceite registra usuário, data, hora e IP, e fica na auditoria da campanha. Sem o aceite o sistema bloqueia o envio.
+                </div>
+              </div>
             </>
           )}
         </Modal>
       )}
 
+      {/* ==================== DETALHE ==================== */}
       {detail && (
-        <Modal title={detail.name} wide onClose={() => setDetail(null)}>
-          <div className="grid stats-grid" style={{ marginBottom: 18 }}>
+        <Modal title={detail.name} wide onClose={() => { setDetail(null); load(); }}>
+          <div className="flex gap-8" style={{ marginBottom: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+            <StatusBadge group="BroadcastStatus" value={detail.status} />
+            {detail.scheduledAt && <Badge tone="blue"><Clock size={12} style={{ verticalAlign: -2 }} /> {fmtData(detail.scheduledAt)}</Badge>}
+            {detail.declAcceptedAt
+              ? <Badge tone="green"><ShieldCheck size={12} style={{ verticalAlign: -2 }} /> Declaração: {detail.declUserName || 'registrada'} em {fmtData(detail.declAcceptedAt)}</Badge>
+              : <Badge tone="amber">Declaração pendente</Badge>}
+            <div className="spacer" />
+            <button className="btn btn-ghost btn-sm" onClick={exportarCsv}><Download size={14} /> Exportar CSV</button>
+            {isLider && <button className="btn btn-ghost btn-sm" style={{ color: 'var(--red)' }} onClick={() => excluir(detail)}><Trash2 size={14} /> Excluir</button>}
+          </div>
+
+          <div className="grid stats-grid" style={{ marginBottom: 14 }}>
             <div className="stat-card"><div className="stat-meta"><div className="stat-label">Total</div><div className="stat-value">{detail.totalContacts}</div></div></div>
-            <div className="stat-card"><div className="stat-meta"><div className="stat-label">Enviados</div><div className="stat-value" style={{ color: 'var(--green-rs)' }}>{detail.sentCount}</div></div></div>
-            <div className="stat-card"><div className="stat-meta"><div className="stat-label">Pendentes</div><div className="stat-value" style={{ color: 'var(--amber)' }}>{detail.pendingCount}</div></div></div>
-            <div className="stat-card"><div className="stat-meta"><div className="stat-label">Falhas</div><div className="stat-value" style={{ color: 'var(--red)' }}>{detail.failedCount}</div></div></div>
+            <div className="stat-card"><div className="stat-meta"><div className="stat-label">Enviadas</div><div className="stat-value" style={{ color: 'var(--green-rs, #2DBE60)' }}>{detail.sentCount}</div></div></div>
+            <div className="stat-card"><div className="stat-meta"><div className="stat-label">Entregues</div><div className="stat-value">{detail.deliveredCount || 0}</div></div></div>
+            <div className="stat-card"><div className="stat-meta"><div className="stat-label">Lidas</div><div className="stat-value">{detail.readCount || 0}</div></div></div>
+            <div className="stat-card"><div className="stat-meta"><div className="stat-label">Pendentes</div><div className="stat-value" style={{ color: 'var(--amber, #b7791f)' }}>{detail.pendingCount}</div></div></div>
+            <div className="stat-card"><div className="stat-meta"><div className="stat-label">Falhas</div><div className="stat-value" style={{ color: 'var(--red, #c53030)' }}>{detail.failedCount}</div></div></div>
           </div>
 
           <div className="field">
@@ -245,44 +725,84 @@ export default function Broadcasts() {
             <div className="media-caption">{detail.templateName ? `${detail.templateName} · ${detail.templateLang || 'pt_BR'}` : (detail.message || '—')}</div>
           </div>
 
-          <div className="field">
-            <label>Importar contatos (CSV)</label>
-            <textarea className="textarea" rows={4} value={csv} onChange={(e) => setCsv(e.target.value)} />
-            <div className="flex gap-8" style={{ marginTop: 8 }}>
-              <button className="btn" onClick={importContacts} disabled={!!sendingState}><Upload size={15} /> Importar</button>
-              {sendingState ? (
-                <button className="btn btn-danger" onClick={cancelSend}><X size={15} /> Cancelar envio</button>
-              ) : (
-                <button className="btn btn-primary" onClick={send}><Send size={15} /> Disparar pendentes</button>
-              )}
+          {/* Gate da declaração no detalhe (campanha sem aceite) */}
+          {!detail.declAcceptedAt && isLider && ['RASCUNHO', 'AGENDADA', 'PAUSADA'].includes(detail.status) && (
+            <div className="decl-box" style={{ border: '1.5px solid var(--navy, #043868)', borderRadius: 10, padding: '12px 14px', marginBottom: 12, background: 'var(--soft-primary, #f4f7fa)' }}>
+              <div className="flex" style={{ gap: 10, alignItems: 'flex-start' }}>
+                <input id="decl2" type="checkbox" checked={declDetalheAceita} onChange={(e) => setDeclDetalheAceita(e.target.checked)} style={{ marginTop: 4, width: 16, height: 16 }} />
+                <label htmlFor="decl2" style={{ fontSize: 13, lineHeight: 1.5, cursor: 'pointer' }}>{declInfo?.texto}</label>
+              </div>
+              <button className="btn btn-primary btn-sm" style={{ marginTop: 10 }} disabled={!declDetalheAceita} onClick={aceitarDeclaracaoDetalhe}>
+                <ShieldCheck size={14} /> Registrar declaração e liberar envio
+              </button>
             </div>
-            {sendingState && (
-              <div className="bc-progress" style={{ marginTop: 12 }}>
-                <div className="bc-progress-bar"><div className="bc-progress-fill" style={{ width: `${sendingState.pct}%` }} /></div>
-                <div className="bc-progress-info">
-                  Enviando… <b>{sendingState.sent}</b> enviados · {sendingState.failed} falhas · {sendingState.total} total ({sendingState.pct}%)
-                </div>
+          )}
+
+          <div className="flex gap-8" style={{ marginBottom: 14, flexWrap: 'wrap' }}>
+            {isLider && !sendingState && ['RASCUNHO', 'AGENDADA', 'PAUSADA', 'ENVIANDO'].includes(detail.status) && (
+              <button className="btn btn-primary" onClick={() => dispararLoop(detail)} disabled={!detail.declAcceptedAt}>
+                <Send size={15} /> {detail.sentCount > 0 ? 'Continuar envio' : 'Disparar agora'}
+              </button>
+            )}
+            {sendingState && <button className="btn btn-danger" onClick={() => { cancelRef.current = true; }}><Pause size={15} /> Pausar envio</button>}
+            {isLider && detail.status === 'PAUSADA' && !sendingState && (
+              <button className="btn" onClick={async () => { try { await api.post(`/broadcasts/${detail.id}/resume`); refreshDetail(detail.id); } catch (e) { toast.error(apiError(e)); } }}>
+                <Play size={15} /> Retomar (envio automático)
+              </button>
+            )}
+            {isLider && (
+              <div className="flex gap-8" style={{ alignItems: 'center' }}>
+                <input className="input" style={{ maxWidth: 190 }} placeholder="Número para teste" value={fonesTeste} onChange={(e) => setFoneTeste(e.target.value)} />
+                <button
+                  className="btn"
+                  onClick={async () => {
+                    if (!fonesTeste.trim()) return toast.error('Informe o número.');
+                    try { await api.post(`/broadcasts/${detail.id}/teste`, { phone: fonesTeste }); toast.success('Teste enviado.'); carregarCreditos(); } catch (e) { toast.error(apiError(e)); }
+                  }}
+                >
+                  Teste
+                </button>
               </div>
             )}
           </div>
 
-          {detail.contacts?.length > 0 && (
-            <div className="table-wrap" style={{ marginTop: 12 }}>
-              <table className="table">
-                <thead><tr><th>Nome</th><th>Telefone</th><th>Local</th><th>Status</th></tr></thead>
-                <tbody>
-                  {detail.contacts.slice(0, 50).map((c) => (
-                    <tr key={c.id}>
-                      <td>{c.name}</td>
-                      <td>{c.phone}</td>
-                      <td className="cell-muted">{[c.neighborhood, c.cityName].filter(Boolean).join(', ')}</td>
-                      <td><StatusBadge group="BroadcastContactStatus" value={c.status} /></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {sendingState && (
+            <div className="bc-progress" style={{ marginBottom: 14 }}>
+              <div className="bc-progress-bar"><div className="bc-progress-fill" style={{ width: `${sendingState.pct}%` }} /></div>
+              <div className="bc-progress-info">Enviando... <b>{sendingState.sent}</b> enviadas · {sendingState.failed} falhas · {sendingState.total} total ({sendingState.pct}%)</div>
             </div>
           )}
+
+          <div className="flex gap-8" style={{ alignItems: 'center', marginBottom: 8 }}>
+            <label className="cell-muted" style={{ fontSize: 12 }}>Contatos ({contatos.total}):</label>
+            <select className="select" style={{ width: 'auto' }} value={contatoStatus} onChange={(e) => { setContatoStatus(e.target.value); setContatos((c) => ({ ...c, page: 1 })); }}>
+              <option value="">Todos</option>
+              {options('BroadcastContactStatus').map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+            <div className="spacer" />
+            <button className="btn btn-ghost btn-sm" disabled={contatos.page <= 1} onClick={() => setContatos((c) => ({ ...c, page: c.page - 1 }))}><ChevronLeft size={14} /></button>
+            <span className="cell-muted" style={{ fontSize: 12 }}>pág. {contatos.page}</span>
+            <button className="btn btn-ghost btn-sm" disabled={contatos.page * 50 >= contatos.total} onClick={() => setContatos((c) => ({ ...c, page: c.page + 1 }))}><ChevronRight size={14} /></button>
+          </div>
+          <div className="table-wrap">
+            <table className="table">
+              <thead><tr><th>Nome</th><th>Telefone</th><th>Origem</th><th>Status</th><th>Detalhe</th></tr></thead>
+              <tbody>
+                {contatos.data.map((c) => (
+                  <tr key={c.id}>
+                    <td>{c.name || '—'}</td>
+                    <td>{c.phone}</td>
+                    <td className="cell-muted">{c.source || '—'}</td>
+                    <td><StatusBadge group="BroadcastContactStatus" value={c.status} /></td>
+                    <td className="cell-muted" style={{ fontSize: 12 }}>
+                      {c.status === 'FALHA' ? (c.error || '') : [c.deliveredAt && `entregue ${fmtData(c.deliveredAt)}`, c.readAt && `lida ${fmtData(c.readAt)}`].filter(Boolean).join(' · ')}
+                    </td>
+                  </tr>
+                ))}
+                {!contatos.data.length && <tr><td colSpan={5} className="cell-muted">Nenhum contato.</td></tr>}
+              </tbody>
+            </table>
+          </div>
         </Modal>
       )}
     </Layout>

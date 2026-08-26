@@ -34,13 +34,16 @@ export const NAV = [
   { section: 'Comunicação' },
   { to: '/conversas', label: 'Conversas (CRM)', icon: 'MessageSquare', roles: INTERNO },
   { to: '/demandas', label: 'Demandas', icon: 'Inbox', roles: INTERNO },
-  { to: '/disparos', label: 'Disparos', icon: 'Send', roles: INTERNO },
+  { to: '/disparos', label: 'Campanhas', icon: 'Send', roles: INTERNO },
   { to: '/automacoes', label: 'Automações', icon: 'Bot', roles: LIDER },
 
   { section: 'Administração' },
   { to: '/usuarios', label: 'Usuários', icon: 'UserCog', roles: LIDER },
   { to: '/configuracoes', label: 'Configurações', icon: 'Settings', roles: LIDER },
   { to: '/painel-tv', label: 'Painel TV', icon: 'Tv', roles: INTERNO },
+
+  { section: 'Conta' },
+  { to: '/conta', label: 'Minha conta', icon: 'UserCircle', roles: '*' },
 ];
 
 export function can(user, roles) {

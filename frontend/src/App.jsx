@@ -24,6 +24,7 @@ import Broadcasts from './pages/Broadcasts.jsx';
 import Automations from './pages/Automations.jsx';
 import Users from './pages/Users.jsx';
 import Settings from './pages/Settings.jsx';
+import Account from './pages/Account.jsx';
 
 // Páginas pesadas saem do bundle principal (Leaflet/Google Maps, Recharts,
 // landing com CSS próprio) e carregam sob demanda na primeira visita.
@@ -82,6 +83,7 @@ export default function App() {
       <Route path="/suspeitos" element={P(['LIDER'], <Suspects />)} />
       <Route path="/blacklist" element={P(['LIDER'], <Blacklist />)} />
 
+      <Route path="/conta" element={P(null, <Account />)} />
       <Route path="/mural" element={P(null, <Notices />)} />
       <Route path="/midia-kit" element={P(null, <MediaKit />)} />
       <Route path="/tarefas" element={P(null, <Engagement />)} />

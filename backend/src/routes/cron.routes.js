@@ -3,6 +3,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { AppError } from '../utils/AppError.js';
 import { runAutomations } from '../services/automation.service.js';
 import { enviarAniversarios } from '../services/aniversario.service.js';
+import { processarAgendadas } from '../services/broadcast.service.js';
 
 // ============================================================
 //  Rotas de cron (Vercel Cron Jobs).
@@ -31,6 +32,16 @@ r.get('/aniversarios', asyncHandler(async (req, res) => {
   requireCronSecret(req);
   const result = await enviarAniversarios();
   console.log('[cron:aniversarios]', JSON.stringify(result));
+  res.json({ ok: true, ...result });
+}));
+
+// Campanhas: promove agendadas vencidas (com declaração aceita) e continua o
+// envio das ativas — roda a cada minuto no crontab do VPS. O envio não depende
+// de navegador aberto.
+r.get('/broadcasts', asyncHandler(async (req, res) => {
+  requireCronSecret(req);
+  const result = await processarAgendadas();
+  if (result.promovidas || result.campanhas.length) console.log('[cron:broadcasts]', JSON.stringify(result));
   res.json({ ok: true, ...result });
 }));
 

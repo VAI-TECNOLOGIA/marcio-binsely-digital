@@ -11,6 +11,7 @@ r.post('/forgot-password', auth.forgotPassword);
 r.post('/reset-password', auth.resetPassword);
 
 r.get('/me', authenticate, auth.me);
+r.delete('/me', authenticate, auth.deleteAccount); // excluir a própria conta (Apple 5.1.1(v))
 r.post('/change-password', authenticate, auth.changePassword);
 r.post('/register', authenticate, authorize('LIDER'), auth.register);
 

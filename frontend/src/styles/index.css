@@ -1456,3 +1456,36 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
   }
   .map-shell .map-wrap { height: calc(100vh - 420px); min-height: 380px; }
 }
+
+/* ==== Campanhas (disparo oficial) ==== */
+.chip-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  border: 1px solid var(--border, #dde2e9); background: var(--card, #fff);
+  color: var(--text, #26313f); border-radius: 999px; padding: 4px 11px;
+  font-size: 12px; cursor: pointer; line-height: 1.3; transition: all .12s ease;
+}
+.chip:hover { border-color: var(--navy, #043868); }
+.chip-on {
+  background: var(--navy, #043868); border-color: var(--navy, #043868); color: #fff;
+}
+.wa-preview {
+  background: #e8ded3; border-radius: 12px; padding: 16px 14px; min-height: 120px;
+}
+.wa-bubble {
+  background: #fff; border-radius: 10px; padding: 8px 10px; max-width: 340px;
+  box-shadow: 0 1px 1px rgba(0,0,0,.12); font-size: 13px; color: #1f2733;
+}
+.wa-header-img { width: 100%; border-radius: 7px; margin-bottom: 7px; display: block; }
+.wa-header-ph {
+  background: #eef1f4; color: #8a93a0; border-radius: 7px; padding: 26px 10px;
+  text-align: center; font-size: 12px; margin-bottom: 7px;
+}
+.wa-header-text { font-weight: 700; margin-bottom: 4px; }
+.wa-body { white-space: pre-wrap; line-height: 1.45; }
+.wa-footer { color: #8a93a0; font-size: 11px; margin-top: 6px; }
+.wa-buttons { border-top: 1px solid #eef0f3; margin-top: 8px; padding-top: 4px; }
+.wa-btn {
+  color: #0a7cff; text-align: center; padding: 7px 4px; font-size: 13px; font-weight: 600;
+  border-bottom: 1px solid #eef0f3;
+}
+.wa-btn:last-child { border-bottom: none; }

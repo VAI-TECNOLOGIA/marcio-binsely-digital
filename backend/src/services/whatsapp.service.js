@@ -61,6 +61,8 @@ function resumirTemplate(t) {
   const comps = t.components || [];
   const header = comps.find((c) => c.type === 'HEADER');
   const body = comps.find((c) => c.type === 'BODY');
+  const footer = comps.find((c) => c.type === 'FOOTER');
+  const buttons = comps.find((c) => c.type === 'BUTTONS');
   const bodyText = body?.text || '';
   const varCount = (bodyText.match(/\{\{\s*\d+\s*\}\}/g) || []).length;
   return {
@@ -69,8 +71,11 @@ function resumirTemplate(t) {
     category: t.category,
     status: t.status,
     headerFormat: header?.format || null, // IMAGE / TEXT / VIDEO / DOCUMENT / null
+    headerText: header?.format === 'TEXT' ? header?.text || null : null,
     bodyText,
     bodyVarCount: varCount,
+    footerText: footer?.text || null,
+    buttons: (buttons?.buttons || []).map((b) => ({ type: b.type, text: b.text, url: b.url || null })),
   };
 }
 

@@ -207,6 +207,7 @@ enum BroadcastContactStatus {
   PENDENTE
   ENVIADO
   ENTREGUE
+  LIDA
   FALHA
 }
 
@@ -761,12 +762,31 @@ model BroadcastCampaign {
   templateName   String?
   templateLang   String? @default("pt_BR")
   headerImageUrl String?
+  // Mapeamento das variáveis do corpo ({{1}}, {{2}}…): [{source:'nome'|'cidade'|'bairro'|'responsavel'|'fixo', value?}]
+  varsJson       Json?
+  // Filtros usados para montar o público (registro do que foi selecionado).
+  audienceJson   Json?
   status      BroadcastStatus @default(RASCUNHO)
   scheduledAt DateTime?
   totalContacts Int    @default(0)
   sentCount     Int    @default(0)
   failedCount   Int    @default(0)
   pendingCount  Int    @default(0)
+  deliveredCount Int   @default(0)
+  readCount      Int   @default(0)
+  creditsUsed    Int   @default(0)
+
+  // Declaração de conformidade (aceite ativo, não pré-marcado, antes do envio).
+  // Registra usuário, data/hora, IP, versão do texto, contagem e hashes da
+  // lista e do conteúdo no momento do aceite. Lista alterada => novo aceite.
+  declAcceptedAt  DateTime?
+  declUserId      String?
+  declUserName    String?
+  declIp          String?
+  declVersion     String?
+  declListCount   Int?
+  declListHash    String?
+  declContentHash String?
 
   ownerId String?
   owner   User?   @relation("BroadcastOwner", fields: [ownerId], references: [id], onDelete: SetNull)
@@ -792,6 +812,12 @@ model BroadcastContact {
   status      BroadcastContactStatus @default(PENDENTE)
   error       String?
   sentAt      DateTime?
+  // Rastreio da API Oficial: id da mensagem (wamid) + confirmações do webhook.
+  wamid       String?
+  deliveredAt DateTime?
+  readAt      DateTime?
+  // Origem do contato na campanha: BASE (segmentos), COLADO (números colados), CSV.
+  source      String?
 
   supporterId String?
   supporter   Supporter? @relation(fields: [supporterId], references: [id], onDelete: SetNull)
@@ -800,6 +826,20 @@ model BroadcastContact {
 
   @@index([campaignId])
   @@index([status])
+  @@index([wamid])
+}
+
+// Pacote de créditos de mensagem contratado (ex.: 80.000 · 120 dias).
+// used incrementa a cada envio ACEITO pela API. Saldo = total - used.
+model CreditPackage {
+  id          String   @id @default(uuid())
+  label       String
+  total       Int
+  used        Int      @default(0)
+  activatedAt DateTime @default(now())
+  expiresAt   DateTime
+  createdById String?
+  createdAt   DateTime @default(now())
 }
 
 model Automation {

@@ -25,14 +25,53 @@ export const receiveWebhook = asyncHandler(async (req, res) => {
       await handleInbound({
         phone: onlyDigits(message.from),
         name: value?.contacts?.[0]?.profile?.name,
-        body: message.text?.body || '',
+        body: message.text?.body || message.button?.text || '',
       });
+    }
+    // Confirmações de entrega/leitura/falha das campanhas (rastreio por wamid).
+    for (const st of value?.statuses || []) {
+      await handleStatus(st);
     }
   } catch (e) {
     console.warn('[whatsapp:webhook] erro ao processar:', e.message);
   }
   res.sendStatus(200);
 });
+
+/**
+ * Atualiza o contato da campanha conforme o status da Meta. Transições só
+ * "para cima" (ENVIADO -> ENTREGUE -> LIDA); failed vira FALHA com o motivo.
+ * Contadores da campanha acompanham a primeira transição de cada estágio.
+ */
+async function handleStatus(st) {
+  const wamid = st?.id;
+  const status = st?.status; // sent | delivered | read | failed
+  if (!wamid || !status) return;
+  const contato = await prisma.broadcastContact.findFirst({ where: { wamid } });
+  if (!contato) return;
+
+  if (status === 'delivered' && contato.status === 'ENVIADO') {
+    await prisma.broadcastContact.update({ where: { id: contato.id }, data: { status: 'ENTREGUE', deliveredAt: new Date() } });
+    await prisma.broadcastCampaign.update({ where: { id: contato.campaignId }, data: { deliveredCount: { increment: 1 } } });
+  } else if (status === 'read' && ['ENVIADO', 'ENTREGUE'].includes(contato.status)) {
+    const pulouEntrega = contato.status === 'ENVIADO';
+    await prisma.broadcastContact.update({
+      where: { id: contato.id },
+      data: { status: 'LIDA', readAt: new Date(), deliveredAt: contato.deliveredAt || new Date() },
+    });
+    await prisma.broadcastCampaign.update({
+      where: { id: contato.campaignId },
+      data: { readCount: { increment: 1 }, ...(pulouEntrega ? { deliveredCount: { increment: 1 } } : {}) },
+    });
+  } else if (status === 'failed' && ['ENVIADO', 'ENTREGUE'].includes(contato.status)) {
+    const motivo = st?.errors?.[0]?.title || st?.errors?.[0]?.message || 'Falha reportada pela Meta';
+    await prisma.broadcastContact.update({ where: { id: contato.id }, data: { status: 'FALHA', error: String(motivo).slice(0, 300) } });
+    await prisma.broadcastCampaign.update({
+      where: { id: contato.campaignId },
+      data: { failedCount: { increment: 1 }, sentCount: { decrement: 1 } },
+    });
+  }
+}
 
 /** Simula uma mensagem recebida — permite testar o fluxo sem a API real. */
 export const simulateInbound = asyncHandler(async (req, res) => {
@@ -47,8 +86,41 @@ export const listTemplates = asyncHandler(async (_req, res) => {
   res.json({ data });
 });
 
+/** Núcleo do telefone (sem DDI 55) — mesmo critério da blacklist/campanhas. */
+function nucleoFone(v) {
+  let d = String(v || '').replace(/\D/g, '');
+  if (d.startsWith('55') && d.length >= 12) d = d.slice(2);
+  return d;
+}
+
 async function handleInbound({ phone, name, body }) {
   if (!phone) return { ignored: true };
+
+  // ---- Descadastramento (opt-out): "SAIR" ou equivalentes ----
+  // Entra imediatamente na lista de supressão (Blacklist) e recebe a
+  // confirmação. Vale para todos os envios futuros de qualquer campanha.
+  const pedido = String(body || '').trim().toLowerCase();
+  if (/^(sair|parar|cancelar|remover|stop|descadastrar)$/.test(pedido)) {
+    const nucleo = nucleoFone(phone);
+    const jaBloqueado = await prisma.blacklist.findFirst({ where: { phone: { in: [nucleo, '55' + nucleo, phone] } } });
+    if (!jaBloqueado) {
+      await prisma.blacklist.create({
+        data: { phone: nucleo, name: name || null, reason: 'Descadastramento solicitado pelo destinatário (SAIR via WhatsApp).' },
+      });
+    }
+    const confirmacao = 'Pronto. Seu número foi removido da lista de comunicações e você não receberá novas mensagens. Se mudar de ideia, é só escrever VOLTAR.';
+    await sendWhatsApp({ to: phone, body: confirmacao });
+    return { optOut: true };
+  }
+  // Reversão do opt-out a pedido do próprio titular.
+  if (/^voltar$/.test(pedido)) {
+    const nucleo = nucleoFone(phone);
+    const removidos = await prisma.blacklist.deleteMany({ where: { phone: { in: [nucleo, '55' + nucleo, phone] } } });
+    if (removidos.count > 0) {
+      await sendWhatsApp({ to: phone, body: 'Seu número voltou a receber as comunicações da campanha. Para sair novamente, escreva SAIR.' });
+      return { optIn: true };
+    }
+  }
 
   const supporter = await prisma.supporter.findFirst({ where: { phone } });
   let convo = await prisma.conversation.findFirst({
@@ -82,7 +154,7 @@ async function handleInbound({ phone, name, body }) {
       });
       await prisma.supporter.update({ where: { id: supporter.id }, data: { status: 'CONFIRMADO' } });
       const ask =
-        'Que ótimo! 🎉 Como você prefere ajudar? Responda: (1) Caminhadas (2) Faixa em casa (3) Material digital (4) Eventos';
+        'Que ótimo! Como você prefere ajudar? Responda: (1) Caminhadas (2) Faixa em casa (3) Material digital (4) Eventos';
       const r = await sendWhatsApp({ to: phone, body: ask });
       await prisma.message.create({
         data: { conversationId: convo.id, direction: 'OUTBOUND', body: ask, channel: 'WHATSAPP', externalId: r.id },

@@ -106,6 +106,24 @@ export const me = asyncHandler(async (req, res) => {
   res.json(publicUser(user));
 });
 
+// Exclusão PERMANENTE da própria conta (Apple Guideline 5.1.1(v): quem cria conta
+// precisa poder excluí-la de dentro do app; desativar não basta). As relações do
+// User no schema são SetNull ou Cascade, então o Postgres anula as referências e
+// remove os dados pessoais (downloads, participações em threads etc.) sem violar
+// integridade. Ação irreversível.
+export const deleteAccount = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  // Registra a exclusão antes de apagar (o log sobrevive com userId anulado). Uma
+  // falha de auditoria nunca deve impedir o usuário de excluir a própria conta.
+  try {
+    await audit({ userId, action: 'DELETE', entity: 'User', entityId: userId, ip: req.ip });
+  } catch (e) {
+    console.error('[delete-account] falha ao auditar (ignorada):', e.message);
+  }
+  await prisma.user.delete({ where: { id: userId } });
+  res.json({ ok: true, message: 'Conta excluída permanentemente.' });
+});
+
 export const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = z.object({ email: z.string().email() }).parse(req.body);
   const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
