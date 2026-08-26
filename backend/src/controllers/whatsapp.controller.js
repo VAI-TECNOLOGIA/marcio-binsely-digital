@@ -125,7 +125,12 @@ async function handleInbound({ phone, name, body, phoneNumberId }) {
     }
   }
 
-  const supporter = await prisma.supporter.findFirst({ where: { phone } });
+  // Casa o contato com e sem DDI 55, no telefone e no WhatsApp cadastrados.
+  const nucleo = nucleoFone(phone);
+  const variantes = [phone, nucleo, '55' + nucleo];
+  const supporter = await prisma.supporter.findFirst({
+    where: { OR: [{ phone: { in: variantes } }, { whatsapp: { in: variantes } }] },
+  });
   let convo = await prisma.conversation.findFirst({
     where: { contactPhone: phone, status: { not: 'FECHADA' } },
     orderBy: { createdAt: 'desc' },
@@ -152,6 +157,62 @@ async function handleInbound({ phone, name, body, phoneNumberId }) {
     where: { id: convo.id },
     data: { lastMessageAt: new Date(), ...(phoneNumberId ? { phoneNumberId } : {}) },
   });
+
+  // ---- Kit de campanha (botões do template marcio_kit_campanha) ----
+  // "Quero receber o kit" abre o Pedido de Material automaticamente (sem
+  // duplicar pedido aberto) e confirma pelo MESMO número. Quem não está na
+  // base entra como apoiador (origem marcada) para o pedido sair com nome.
+  const resposta = String(body || '').trim().toLowerCase();
+  if (resposta === 'quero receber o kit') {
+    let quem = supporter;
+    if (!quem) {
+      quem = await prisma.supporter.create({
+        data: {
+          name: name || `Contato ${nucleo.slice(-4)}`,
+          phone,
+          whatsapp: phone,
+          status: 'NOVO',
+          tags: ['KIT VIA WHATSAPP'],
+        },
+      });
+    }
+    const aberto = await prisma.materialRequest.findFirst({
+      where: { supporterId: quem.id, materialName: 'Kit de campanha', status: { in: ['SOLICITADO', 'EM_ANALISE', 'APROVADO', 'SEPARADO'] } },
+    });
+    let texto;
+    if (aberto) {
+      texto = 'Seu kit já está registrado com a equipe e segue em preparação. Assim que houver novidade, avisamos por aqui.';
+    } else {
+      await prisma.materialRequest.create({
+        data: {
+          materialName: 'Kit de campanha',
+          materials: ['Kit de campanha'],
+          quantity: 1,
+          justification: 'Solicitado pelo apoiador via WhatsApp (resposta ao convite do kit).',
+          cityName: quem.cityName || null,
+          neighborhood: quem.neighborhood || null,
+          supporterId: quem.id,
+        },
+      });
+      const primeiro = (quem.name || '').split(' ')[0];
+      texto = supporter
+        ? `Anotado, ${primeiro}! Seu kit de campanha foi registrado e a equipe vai organizar a entrega. Obrigado por caminhar junto!`
+        : 'Anotado! Seu kit de campanha foi registrado. Para agilizar a entrega, responda com seu nome completo, bairro e cidade.';
+    }
+    const r = await sendWhatsApp({ to: phone, body: texto, phoneNumberId });
+    await prisma.message.create({
+      data: { conversationId: convo.id, direction: 'OUTBOUND', body: texto, channel: 'WHATSAPP', externalId: r.id },
+    });
+    return { conversationId: convo.id, supporterId: quem.id, kit: true };
+  }
+  if (resposta === 'agora não' || resposta === 'agora nao') {
+    const texto = 'Tudo bem, obrigado por responder! Se mudar de ideia, é só escrever por aqui.';
+    const r = await sendWhatsApp({ to: phone, body: texto, phoneNumberId });
+    await prisma.message.create({
+      data: { conversationId: convo.id, direction: 'OUTBOUND', body: texto, channel: 'WHATSAPP', externalId: r.id },
+    });
+    return { conversationId: convo.id, kitRecusado: true };
+  }
 
   if (supporter && /^\s*sim\b/i.test(body || '')) {
     const v = await prisma.volunteer.findUnique({ where: { supporterId: supporter.id } });
