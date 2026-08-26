@@ -1489,3 +1489,11 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
   border-bottom: 1px solid #eef0f3;
 }
 .wa-btn:last-child { border-bottom: none; }
+
+/* Rodízio de números (pool de disparo) */
+.pool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.pool-card {
+  border: 1px solid var(--border, #dde2e9); border-radius: 10px; padding: 10px 12px;
+  background: var(--card, #fff);
+}
+.pool-card.pool-off { opacity: .55; }

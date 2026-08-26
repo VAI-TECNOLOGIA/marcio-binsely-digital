@@ -695,6 +695,9 @@ model Conversation {
   status      ConversationStatus @default(ABERTA)
   contactName String?
   contactPhone String?
+  // Número do pool que RECEBEU a conversa — as respostas saem por ele
+  // (a janela de 24h da Meta vale por par contato+número).
+  phoneNumberId String?
   tags        Json     @default("[]")
   notes       String?
 
@@ -816,6 +819,8 @@ model BroadcastContact {
   wamid       String?
   deliveredAt DateTime?
   readAt      DateTime?
+  // Número do pool que fez este envio (phoneNumberId da Meta).
+  senderPhoneId String?
   // Origem do contato na campanha: BASE (segmentos), COLADO (números colados), CSV.
   source      String?
 
@@ -827,6 +832,23 @@ model BroadcastContact {
   @@index([campaignId])
   @@index([status])
   @@index([wamid])
+}
+
+// Número do pool de disparo (rodízio). O envio de campanha alterna entre os
+// números ativos respeitando o limite diário de cada um (tier da Meta).
+// Contadores diários zeram de forma preguiçosa quando muda o dayKey.
+model WhatsappNumber {
+  id            String    @id @default(uuid())
+  phoneNumberId String    @unique
+  display       String
+  active        Boolean   @default(true)
+  dailyCap      Int       @default(250)
+  sentToday     Int       @default(0)
+  failToday     Int       @default(0)
+  sentTotal     Int       @default(0)
+  dayKey        String?
+  lastUsedAt    DateTime?
+  createdAt     DateTime  @default(now())
 }
 
 // Pacote de créditos de mensagem contratado (ex.: 80.000 · 120 dias).

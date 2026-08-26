@@ -7,6 +7,8 @@ const r = Router();
 // Consulta (equipe interna).
 r.get('/', authorize('LIDER', 'MEMBRO'), bc.list);
 r.get('/creditos/status', authorize('LIDER', 'MEMBRO'), bc.creditosStatus);
+r.get('/pool/status', authorize('LIDER', 'MEMBRO'), bc.poolStatus);
+r.patch('/pool/:numeroId', authorize('LIDER'), bc.poolUpdate);
 r.get('/declaracao/texto', authorize('LIDER', 'MEMBRO'), bc.declaracaoTexto);
 r.get('/audiencia/opcoes', authorize('LIDER', 'MEMBRO'), bc.audienciaOpcoes);
 r.post('/audiencia/preview', authorize('LIDER', 'MEMBRO'), bc.audienciaPreview);

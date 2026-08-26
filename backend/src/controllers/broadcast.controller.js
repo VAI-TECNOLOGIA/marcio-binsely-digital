@@ -8,6 +8,7 @@ import { CHANNELS } from '../utils/enums.js';
 import {
   DECL_TEXTO,
   DECL_VERSION,
+  diaHojeBR,
   fonesBloqueados,
   hashConteudo,
   hashLista,
@@ -15,6 +16,7 @@ import {
   montarPublico,
   nucleoFone,
   pacoteCreditos,
+  poolNumeros,
   processarLote,
 } from '../services/broadcast.service.js';
 
@@ -280,6 +282,27 @@ export const creditosStatus = asyncHandler(async (_req, res) => {
     total: pkg?.total || 0, usado: pkg?.used || 0,
     label: pkg?.label || null, activatedAt: pkg?.activatedAt || null, expiresAt: pkg?.expiresAt || null,
   });
+});
+
+/** Pool de números do rodízio: envios de hoje, limite e situação de cada um. */
+export const poolStatus = asyncHandler(async (_req, res) => {
+  const numeros = await poolNumeros();
+  res.json({
+    dia: diaHojeBR(),
+    numeros: numeros.map((n) => ({
+      id: n.id, phoneNumberId: n.phoneNumberId, display: n.display, active: n.active,
+      dailyCap: n.dailyCap, sentToday: n.sentToday, failToday: n.failToday, sentTotal: n.sentTotal,
+      lastUsedAt: n.lastUsedAt,
+    })),
+  });
+});
+
+/** Ajusta um número do pool (ligar/desligar do rodízio, limite diário). */
+export const poolUpdate = asyncHandler(async (req, res) => {
+  const data = z.object({ active: z.boolean().optional(), dailyCap: z.number().int().min(1).max(100000).optional() }).parse(req.body);
+  const n = await prisma.whatsappNumber.update({ where: { id: req.params.numeroId }, data });
+  await audit({ userId: req.user?.id, action: 'POOL_NUMERO', entity: 'WhatsappNumber', entityId: n.id, ip: req.ip, changes: data });
+  res.json(n);
 });
 
 /** Ativa o pacote contratado (80.000 créditos · 120 dias). Só LIDER; um por vez. */

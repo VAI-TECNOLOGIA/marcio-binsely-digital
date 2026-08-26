@@ -56,6 +56,87 @@ export async function pacoteCreditos() {
   return { pkg, ativo: !expirado && saldo > 0, expirado, saldo, diasRestantes };
 }
 
+// ============================================================
+//  Pool de números (rodízio de disparo)
+//  O envio alterna entre os números ativos, sempre pelo que menos
+//  enviou hoje, respeitando o limite diário de cada um (tier da
+//  Meta). Contadores zeram sozinhos na virada do dia (fuso BRT).
+// ============================================================
+
+/** Chave do dia no fuso de Brasília (o "dia" do limite acompanha a operação). */
+export function diaHojeBR() {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
+}
+
+/** Zera contadores de quem virou o dia e devolve o pool atualizado. */
+export async function poolNumeros() {
+  const hoje = diaHojeBR();
+  await prisma.whatsappNumber.updateMany({
+    where: { OR: [{ dayKey: null }, { dayKey: { not: hoje } }] },
+    data: { sentToday: 0, failToday: 0, dayKey: hoje },
+  });
+  return prisma.whatsappNumber.findMany({ orderBy: { display: 'asc' } });
+}
+
+/**
+ * Escolhe o próximo número do rodízio: ativo, com folga no limite diário e
+ * fora da lista de exclusão, priorizando quem menos enviou hoje. Sem pool
+ * cadastrado, devolve um sintético com o número principal do .env (sem cap).
+ */
+export async function escolherNumero(excluir = []) {
+  const pool = await poolNumeros();
+  if (!pool.length) {
+    return { id: null, phoneNumberId: null, display: 'principal (.env)', sintetico: true };
+  }
+  const aptos = pool.filter((n) => n.active && n.sentToday < n.dailyCap && !excluir.includes(n.id));
+  if (!aptos.length) return null;
+  aptos.sort((a, b) => (a.sentToday - b.sentToday) || (new Date(a.lastUsedAt || 0) - new Date(b.lastUsedAt || 0)));
+  return aptos[0];
+}
+
+async function registrarUsoNumero(numero, ok) {
+  if (!numero?.id) return;
+  await prisma.whatsappNumber.update({
+    where: { id: numero.id },
+    data: ok
+      ? { sentToday: { increment: 1 }, sentTotal: { increment: 1 }, lastUsedAt: new Date() }
+      : { failToday: { increment: 1 }, lastUsedAt: new Date() },
+  });
+}
+
+/** Esgota o número por hoje (rate limit da Meta) — o rodízio segue nos outros. */
+async function esgotarNumeroHoje(numero) {
+  if (!numero?.id) return;
+  await prisma.whatsappNumber.update({ where: { id: numero.id }, data: { sentToday: numero.dailyCap } });
+}
+
+// Códigos da Meta que indicam limite do NÚMERO (não do destinatário):
+// 130429 = throughput; 131048 = spam rate limit; 80007 = rate limit legado.
+const CODES_LIMITE_NUMERO = new Set([130429, 131048, 80007]);
+
+/**
+ * Envia pelo rodízio: escolhe o número, envia e registra o uso. Se a Meta
+ * devolver limite DO NÚMERO, esgota-o por hoje e tenta UMA vez com o próximo.
+ * Devolve { result, numero } ou { poolEsgotado: true }.
+ */
+async function enviarPeloPool(montarPayload) {
+  const usados = [];
+  for (let tentativa = 0; tentativa < 2; tentativa++) {
+    const numero = await escolherNumero(usados);
+    if (!numero) return { poolEsgotado: true };
+    const result = await sendWhatsApp({ ...montarPayload(), phoneNumberId: numero.phoneNumberId || undefined });
+    const code = result?.raw?.error?.code;
+    if (result?.success === false && CODES_LIMITE_NUMERO.has(code) && !numero.sintetico) {
+      await esgotarNumeroHoje(numero);
+      usados.push(numero.id);
+      continue; // tenta o próximo número
+    }
+    await registrarUsoNumero(numero, result?.success !== false);
+    return { result, numero };
+  }
+  return { poolEsgotado: true };
+}
+
 /**
  * Monta o público a partir dos filtros + números colados. Usado no preview
  * (contagens) e na aplicação (grava BroadcastContact). Sempre: dedupe por
@@ -191,6 +272,7 @@ export async function processarLote(campaignId, { batch = 25 } = {}) {
   const bloqueados = lote.length ? await fonesBloqueados() : new Set();
   let sent = 0;
   let failed = 0;
+  let poolEsgotado = false;
   for (const c of lote) {
     if (bloqueados.has(nucleoFone(c.phone))) {
       await prisma.broadcastContact.update({ where: { id: c.id }, data: { status: 'FALHA', error: 'Número na lista de supressão — envio bloqueado.' } });
@@ -198,21 +280,29 @@ export async function processarLote(campaignId, { batch = 25 } = {}) {
       continue;
     }
     try {
-      let result;
-      if (tpl) {
-        result = await sendWhatsApp({
-          to: c.phone,
-          template: { name: tpl.name, language: { code: campaign.templateLang || tpl.language || 'pt_BR' }, components: montarComponentesTemplate(tpl, campaign, c) },
-        });
-      } else {
+      // Rodízio: cada mensagem sai pelo número do pool com menos envios hoje.
+      const envio = await enviarPeloPool(() => {
+        if (tpl) {
+          return {
+            to: c.phone,
+            template: { name: tpl.name, language: { code: campaign.templateLang || tpl.language || 'pt_BR' }, components: montarComponentesTemplate(tpl, campaign, c) },
+          };
+        }
         const body = renderTemplate(campaign.message, { nome: c.name, cidade: c.cityName, bairro: c.neighborhood, responsavel: c.responsible });
-        result = await sendViaChannel(campaign.channel, { to: c.phone, body });
+        return { to: c.phone, body };
+      });
+      if (envio.poolEsgotado) {
+        // Limite diário de todos os números atingido — o contato fica PENDENTE
+        // e o cron retoma sozinho na virada do dia.
+        poolEsgotado = true;
+        break;
       }
+      const { result, numero } = envio;
       if (result && result.success === false) {
-        await prisma.broadcastContact.update({ where: { id: c.id }, data: { status: 'FALHA', error: (result.error || 'Falha no envio').slice(0, 300) } });
+        await prisma.broadcastContact.update({ where: { id: c.id }, data: { status: 'FALHA', error: (result.error || 'Falha no envio').slice(0, 300), senderPhoneId: numero?.phoneNumberId || null } });
         failed++;
       } else {
-        await prisma.broadcastContact.update({ where: { id: c.id }, data: { status: 'ENVIADO', sentAt: new Date(), wamid: result?.id || null } });
+        await prisma.broadcastContact.update({ where: { id: c.id }, data: { status: 'ENVIADO', sentAt: new Date(), wamid: result?.id || null, senderPhoneId: numero?.phoneNumberId || null } });
         sent++;
       }
     } catch (e) {
@@ -241,6 +331,8 @@ export async function processarLote(campaignId, { batch = 25 } = {}) {
     failed,
     remaining,
     done: remaining === 0,
+    poolEsgotado,
+    ...(poolEsgotado ? { motivoPool: 'Limite diário dos números atingido — os pendentes seguem automaticamente na virada do dia.' } : {}),
     sentCount: updated.sentCount,
     failedCount: updated.failedCount,
     totalContacts: updated.totalContacts,
@@ -270,6 +362,7 @@ export async function processarAgendadas({ maxLotesPorCampanha = 6, batch = 25 }
       resumo.sent += r.sent;
       resumo.failed += r.failed;
       lotes++;
+      if (r.poolEsgotado) { resumo.motivo = r.motivoPool; break; }
       if (r.done || (r.sent === 0 && r.failed === 0)) break;
     }
     resultados.push({ id: c.id, name: c.name, ...resumo });

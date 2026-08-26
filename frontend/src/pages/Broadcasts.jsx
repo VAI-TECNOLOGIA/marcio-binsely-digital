@@ -91,6 +91,7 @@ export default function Broadcasts() {
   const [statusFiltro, setStatusFiltro] = useState('');
   const [templates, setTemplates] = useState([]);
   const [creditos, setCreditos] = useState(null);
+  const [pool, setPool] = useState(null);
   const [declInfo, setDeclInfo] = useState(null);
 
   // Wizard
@@ -128,6 +129,27 @@ export default function Broadcasts() {
 
   function carregarCreditos() {
     api.get('/broadcasts/creditos/status').then(({ data }) => setCreditos(data)).catch(() => {});
+    api.get('/broadcasts/pool/status').then(({ data }) => setPool(data)).catch(() => {});
+  }
+
+  async function alternarNumero(n) {
+    try {
+      await api.patch(`/broadcasts/pool/${n.id}`, { active: !n.active });
+      carregarCreditos();
+    } catch (e) {
+      toast.error(apiError(e));
+    }
+  }
+  async function salvarCap(n, valor) {
+    const cap = parseInt(valor, 10);
+    if (!cap || cap === n.dailyCap) return;
+    try {
+      await api.patch(`/broadcasts/pool/${n.id}`, { dailyCap: cap });
+      toast.success(`Limite diário do ${n.display} ajustado para ${cap}.`);
+      carregarCreditos();
+    } catch (e) {
+      toast.error(apiError(e));
+    }
   }
 
   async function load() {
@@ -321,10 +343,11 @@ export default function Broadcasts() {
         const processed = data.sentCount + data.failedCount;
         setSendingState({ sent: data.sentCount, failed: data.failedCount, total: data.totalContacts || total, pct: total ? Math.round((processed / total) * 100) : 100 });
         done = data.done;
+        if (data.poolEsgotado) { toast.success(data.motivoPool || 'Limite diário dos números atingido — o envio continua sozinho amanhã.'); break; }
         if (!done && data.sent === 0 && data.failed === 0) break;
       }
       if (cancelRef.current) { await api.post(`/broadcasts/${id}/pause`).catch(() => {}); toast.success('Envio pausado.'); }
-      else toast.success('Disparo concluído.');
+      else if (done) toast.success('Disparo concluído.');
     } catch (e) {
       toast.error(apiError(e));
     } finally {
@@ -440,6 +463,45 @@ export default function Broadcasts() {
             <button className="btn btn-primary" onClick={ativarPacote}><Zap size={15} /> Ativar pacote 80.000</button>
           )}
         </div>
+
+        {/* Rodízio de números — o envio alterna entre os ativos, respeitando o limite diário de cada um */}
+        {pool?.numeros?.length > 0 && (
+          <div style={{ marginTop: 14, borderTop: '1px solid var(--border, #e6e9ee)', paddingTop: 12 }}>
+            <div className="stat-label" style={{ marginBottom: 8 }}>Rodízio de números · envios de hoje ({pool.dia})</div>
+            <div className="pool-grid">
+              {pool.numeros.map((n) => {
+                const pct = n.dailyCap ? Math.min(100, Math.round((n.sentToday / n.dailyCap) * 100)) : 0;
+                return (
+                  <div key={n.id} className={`pool-card ${n.active ? '' : 'pool-off'}`}>
+                    <div className="flex" style={{ alignItems: 'center', gap: 8 }}>
+                      <b style={{ fontSize: 13 }}>{n.display}</b>
+                      <div className="spacer" />
+                      {isLider && (
+                        <button className={`btn btn-sm ${n.active ? '' : 'btn-primary'}`} onClick={() => alternarNumero(n)}>
+                          {n.active ? 'Pausar' : 'Ativar'}
+                        </button>
+                      )}
+                    </div>
+                    <div className="bc-progress-bar" style={{ marginTop: 6 }}><div className="bc-progress-fill" style={{ width: `${pct}%` }} /></div>
+                    <div className="cell-muted" style={{ fontSize: 11, marginTop: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      {n.sentToday}/
+                      {isLider ? (
+                        <input
+                          className="input" type="number" defaultValue={n.dailyCap}
+                          style={{ width: 74, padding: '1px 6px', fontSize: 11, height: 22 }}
+                          onBlur={(e) => salvarCap(n, e.target.value)}
+                          title="Limite diário deste número (tier da Meta)"
+                        />
+                      ) : n.dailyCap}
+                      hoje · total {n.sentTotal.toLocaleString('pt-BR')}
+                      {!n.active && <b style={{ color: 'var(--amber, #b7791f)' }}>· fora do rodízio</b>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </Card>
 
       <div className="toolbar" style={{ marginTop: 16 }}>

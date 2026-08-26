@@ -26,6 +26,9 @@ export const receiveWebhook = asyncHandler(async (req, res) => {
         phone: onlyDigits(message.from),
         name: value?.contacts?.[0]?.profile?.name,
         body: message.text?.body || message.button?.text || '',
+        // Número do pool que RECEBEU — as respostas precisam sair por ele
+        // (a janela de 24h vale por par contato+número).
+        phoneNumberId: value?.metadata?.phone_number_id || null,
       });
     }
     // Confirmações de entrega/leitura/falha das campanhas (rastreio por wamid).
@@ -93,7 +96,7 @@ function nucleoFone(v) {
   return d;
 }
 
-async function handleInbound({ phone, name, body }) {
+async function handleInbound({ phone, name, body, phoneNumberId }) {
   if (!phone) return { ignored: true };
 
   // ---- Descadastramento (opt-out): "SAIR" ou equivalentes ----
@@ -109,7 +112,7 @@ async function handleInbound({ phone, name, body }) {
       });
     }
     const confirmacao = 'Pronto. Seu número foi removido da lista de comunicações e você não receberá novas mensagens. Se mudar de ideia, é só escrever VOLTAR.';
-    await sendWhatsApp({ to: phone, body: confirmacao });
+    await sendWhatsApp({ to: phone, body: confirmacao, phoneNumberId });
     return { optOut: true };
   }
   // Reversão do opt-out a pedido do próprio titular.
@@ -117,7 +120,7 @@ async function handleInbound({ phone, name, body }) {
     const nucleo = nucleoFone(phone);
     const removidos = await prisma.blacklist.deleteMany({ where: { phone: { in: [nucleo, '55' + nucleo, phone] } } });
     if (removidos.count > 0) {
-      await sendWhatsApp({ to: phone, body: 'Seu número voltou a receber as comunicações da campanha. Para sair novamente, escreva SAIR.' });
+      await sendWhatsApp({ to: phone, body: 'Seu número voltou a receber as comunicações da campanha. Para sair novamente, escreva SAIR.', phoneNumberId });
       return { optIn: true };
     }
   }
@@ -134,6 +137,7 @@ async function handleInbound({ phone, name, body }) {
         status: 'ABERTA',
         contactName: name || supporter?.name || null,
         contactPhone: phone,
+        phoneNumberId: phoneNumberId || null,
         supporterId: supporter?.id || null,
         lastMessageAt: new Date(),
       },
@@ -143,7 +147,11 @@ async function handleInbound({ phone, name, body }) {
   await prisma.message.create({
     data: { conversationId: convo.id, direction: 'INBOUND', body: body || '', channel: 'WHATSAPP' },
   });
-  await prisma.conversation.update({ where: { id: convo.id }, data: { lastMessageAt: new Date() } });
+  // A conversa acompanha o número em que a pessoa escreveu por último.
+  await prisma.conversation.update({
+    where: { id: convo.id },
+    data: { lastMessageAt: new Date(), ...(phoneNumberId ? { phoneNumberId } : {}) },
+  });
 
   if (supporter && /^\s*sim\b/i.test(body || '')) {
     const v = await prisma.volunteer.findUnique({ where: { supporterId: supporter.id } });
@@ -155,7 +163,7 @@ async function handleInbound({ phone, name, body }) {
       await prisma.supporter.update({ where: { id: supporter.id }, data: { status: 'CONFIRMADO' } });
       const ask =
         'Que ótimo! Como você prefere ajudar? Responda: (1) Caminhadas (2) Faixa em casa (3) Material digital (4) Eventos';
-      const r = await sendWhatsApp({ to: phone, body: ask });
+      const r = await sendWhatsApp({ to: phone, body: ask, phoneNumberId });
       await prisma.message.create({
         data: { conversationId: convo.id, direction: 'OUTBOUND', body: ask, channel: 'WHATSAPP', externalId: r.id },
       });

@@ -21,9 +21,12 @@ function normalizarNumeroBR(to) {
   return d;
 }
 
-export async function sendWhatsApp({ to, body, template }) {
+// phoneNumberId (opcional) escolhe o número remetente — usado pelo rodízio do
+// pool de disparo e pelas respostas de conversa (sair pelo número que recebeu).
+// Sem ele, usa o número principal do .env.
+export async function sendWhatsApp({ to, body, template, phoneNumberId }) {
   if (env.whatsapp.provider === 'meta_cloud' && env.whatsapp.token) {
-    const url = `https://graph.facebook.com/v20.0/${env.whatsapp.phoneNumberId}/messages`;
+    const url = `https://graph.facebook.com/v20.0/${phoneNumberId || env.whatsapp.phoneNumberId}/messages`;
     const dest = normalizarNumeroBR(to);
     const payload = template
       ? { messaging_product: 'whatsapp', to: dest, type: 'template', template }
