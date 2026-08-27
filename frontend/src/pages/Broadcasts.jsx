@@ -590,9 +590,9 @@ export default function Broadcasts() {
     }
   }
   async function ativarPacote() {
-    if (!window.confirm('Ativar o pacote de 80.000 mensagens? A validade de 120 dias começa agora.')) return;
+    if (!window.confirm('Ativar o pacote de 44.444 mensagens? A validade de 120 dias começa agora.')) return;
     try {
-      await api.post('/broadcasts/creditos/ativar', { total: 80000 });
+      await api.post('/broadcasts/creditos/ativar', { total: 44444 });
       toast.success('Pacote ativado.');
       carregarCreditos();
     } catch (e) {
@@ -649,7 +649,7 @@ export default function Broadcasts() {
             </div>
           )}
           {isLider && (!creditos?.total || (creditos?.expirado)) && (
-            <button className="btn btn-primary" onClick={ativarPacote}><Zap size={15} /> Ativar pacote 80.000</button>
+            <button className="btn btn-primary" onClick={ativarPacote}><Zap size={15} /> Ativar pacote 44.444</button>
           )}
         </div>
 

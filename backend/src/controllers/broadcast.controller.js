@@ -442,9 +442,9 @@ export const poolUpdate = asyncHandler(async (req, res) => {
   res.json(n);
 });
 
-/** Ativa o pacote contratado (80.000 créditos · 120 dias). Só LIDER; um por vez. */
+/** Ativa o pacote contratado (44.444 créditos · 120 dias). Só LIDER; um por vez. */
 export const creditosAtivar = asyncHandler(async (req, res) => {
-  const { total, label } = z.object({ total: z.number().int().positive().default(80000), label: z.string().optional() }).parse(req.body || {});
+  const { total, label } = z.object({ total: z.number().int().positive().default(44444), label: z.string().optional() }).parse(req.body || {});
   const { pkg, expirado, saldo } = await pacoteCreditos();
   if (pkg && !expirado && saldo > 0) throw new AppError('Já existe um pacote ativo com saldo. Consuma ou aguarde expirar.', 409);
   const expiresAt = new Date(Date.now() + 120 * 86400000);
