@@ -263,8 +263,12 @@ export async function processarLote(campaignId, { batch = 25 } = {}) {
     await prisma.broadcastCampaign.update({ where: { id: campaignId }, data: { status: 'ENVIANDO' } });
   }
 
-  const tpl = campaign.templateName ? await getTemplate(campaign.templateName) : null;
-  if (campaign.templateName && !tpl) {
+  // API Oficial: sem modelo aprovado não há disparo de campanha.
+  if (!campaign.templateName) {
+    return { blocked: true, motivo: 'Campanha sem modelo aprovado — abra a campanha e escolha um template.' };
+  }
+  const tpl = await getTemplate(campaign.templateName);
+  if (!tpl) {
     await prisma.broadcastCampaign.update({ where: { id: campaignId }, data: { status: 'PAUSADA' } });
     return { blocked: true, motivo: `Template "${campaign.templateName}" não encontrado ou não aprovado na conta.` };
   }

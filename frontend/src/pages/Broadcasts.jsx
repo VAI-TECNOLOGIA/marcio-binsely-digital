@@ -112,7 +112,6 @@ export default function Broadcasts() {
   const [modoPublico, setModoPublico] = useState('todos'); // todos | voluntarios | segmentar
   const [buscaGrupo, setBuscaGrupo] = useState('');
   const [verTodosGrupos, setVerTodosGrupos] = useState(false);
-  const [modo, setModo] = useState('template');
   const [vars, setVars] = useState([]);
   const [salvando, setSalvando] = useState(false);
   const [campId, setCampId] = useState(null);
@@ -241,7 +240,6 @@ export default function Broadcasts() {
     setVerTodosGrupos(false);
     setColados('');
     setPreviewPublico(null);
-    setModo('template');
     setVars([]);
     setCampId(null);
     setDeclAceita(false);
@@ -308,8 +306,7 @@ export default function Broadcasts() {
       return setPasso(3);
     }
     if (passo === 3) {
-      if (modo === 'template' && !form.templateName) return toast.error('Selecione um template aprovado.');
-      if (modo === 'livre' && !(form.message || '').trim()) return toast.error('Escreva a mensagem.');
+      if (!form.templateName) return toast.error('Escolha um modelo aprovado.');
       // Cria a campanha (rascunho/agendada) + grava o público.
       setSalvando(true);
       try {
@@ -317,9 +314,10 @@ export default function Broadcasts() {
           name: form.name,
           channel: 'WHATSAPP',
           scheduledAt: form.scheduledAt || null,
-          ...(modo === 'template'
-            ? { templateName: form.templateName, templateLang: form.templateLang, headerImageUrl: form.headerImageUrl || null, varsJson: vars }
-            : { message: form.message }),
+          templateName: form.templateName,
+          templateLang: form.templateLang,
+          headerImageUrl: form.headerImageUrl || null,
+          varsJson: vars,
         };
         let id = campId;
         if (!id) {
@@ -773,69 +771,59 @@ export default function Broadcasts() {
             );
           })()}
 
-          {/* Passo 3 — mensagem */}
+          {/* Passo 3 — mensagem (somente template aprovado: exigência da API Oficial p/ campanha) */}
           {passo === 3 && (
             <>
-              <div className="field">
-                <label>Tipo de envio</label>
-                <div className="flex gap-8">
-                  <button type="button" className={`btn ${modo === 'template' ? 'btn-primary' : ''}`} onClick={() => setModo('template')}>Template aprovado</button>
-                  <button type="button" className={`btn ${modo === 'livre' ? 'btn-primary' : ''}`} onClick={() => setModo('livre')}>Mensagem livre</button>
-                </div>
-                <span className="field-hint">{modo === 'template' ? 'Necessário para alcançar quem não falou com o número nas últimas 24h.' : 'Entrega somente para quem respondeu nas últimas 24 horas.'}</span>
-              </div>
-
-              {modo === 'template' ? (
-                <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                  <div>
-                    <div className="field">
-                      <label>Templates aprovados na conta <span className="req">*</span></label>
-                      <div style={{ maxHeight: 260, overflow: 'auto', border: '1px solid var(--border, #e2e5ea)', borderRadius: 8 }}>
-                        {templates.map((t) => (
-                          <button
-                            key={t.name} type="button"
-                            className="tpl-item"
-                            style={{
-                              display: 'block', width: '100%', textAlign: 'left', padding: '9px 12px', border: 'none',
-                              borderBottom: '1px solid var(--border, #eef0f3)', background: form.templateName === t.name ? 'var(--soft-primary, #e7eff7)' : 'transparent', cursor: 'pointer',
-                            }}
-                            onClick={() => selecionarTemplate(t.name)}
-                          >
-                            <div className="cell-strong" style={{ fontSize: 13 }}>{t.name}</div>
-                            <div className="cell-muted" style={{ fontSize: 11 }}>{t.category} · {t.language}{t.headerFormat ? ` · topo ${t.headerFormat}` : ''}{t.bodyVarCount ? ` · ${t.bodyVarCount} variável(is)` : ''}</div>
-                          </button>
-                        ))}
-                        {templates.length === 0 && <div className="cell-muted" style={{ padding: 12 }}>Nenhum template aprovado encontrado na conta.</div>}
-                      </div>
+              <p className="cell-muted" style={{ marginBottom: 10, fontSize: 13 }}>
+                Qual mensagem vai ser enviada? Campanhas usam somente modelos aprovados pela Meta.
+              </p>
+              <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div>
+                  <div className="field">
+                    <label>Modelos aprovados <span className="req">*</span></label>
+                    <div style={{ maxHeight: 280, overflow: 'auto', border: '1px solid var(--border, #e2e5ea)', borderRadius: 8 }}>
+                      {templates.map((t) => (
+                        <button
+                          key={t.name} type="button"
+                          className="tpl-item"
+                          style={{
+                            display: 'block', width: '100%', textAlign: 'left', padding: '9px 12px', border: 'none',
+                            borderBottom: '1px solid var(--border, #eef0f3)', background: form.templateName === t.name ? 'var(--soft-primary, #e7eff7)' : 'transparent', cursor: 'pointer',
+                          }}
+                          onClick={() => selecionarTemplate(t.name)}
+                        >
+                          <div className="cell-strong" style={{ fontSize: 13 }}>{form.templateName === t.name ? '✓ ' : ''}{t.name}</div>
+                          <div className="cell-muted" style={{ fontSize: 11 }}>{t.category} · {t.language}{t.headerFormat ? ` · topo ${t.headerFormat}` : ''}{t.bodyVarCount ? ` · ${t.bodyVarCount} variável(is)` : ''}</div>
+                        </button>
+                      ))}
+                      {templates.length === 0 && <div className="cell-muted" style={{ padding: 12 }}>Nenhum modelo aprovado na conta ainda. Os modelos em análise na Meta aparecem aqui quando aprovarem.</div>}
                     </div>
-                    {tplSel?.headerFormat === 'IMAGE' && (
-                      <Field field={{ name: 'headerImageUrl', label: 'Imagem do topo (URL pública)', hint: 'Ex.: arte da campanha hospedada no site.' }} value={form.headerImageUrl} onChange={setCampo} />
-                    )}
-                    {tplSel?.bodyVarCount > 0 && (
-                      <div className="field">
-                        <label>Variáveis do texto</label>
-                        {vars.map((v, i) => (
-                          <div key={i} className="flex gap-8" style={{ marginBottom: 6, alignItems: 'center' }}>
-                            <span className="cell-muted" style={{ width: 42 }}>{'{{' + (i + 1) + '}}'}</span>
-                            <select className="select" style={{ flex: 1 }} value={v.source} onChange={(e) => setVars((arr) => arr.map((x, j) => (j === i ? { ...x, source: e.target.value } : x)))}>
-                              {FONTES_VAR.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
-                            </select>
-                            {v.source === 'fixo' && (
-                              <input className="input" style={{ flex: 1 }} placeholder="Texto fixo" value={v.value || ''} onChange={(e) => setVars((arr) => arr.map((x, j) => (j === i ? { ...x, value: e.target.value } : x)))} />
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
-                  <div>
-                    <div className="field"><label>Prévia</label></div>
-                    {tplSel ? <PreviewBolha tpl={tplSel} headerImageUrl={form.headerImageUrl} vars={vars} /> : <div className="cell-muted">Selecione um template para ver a prévia.</div>}
-                  </div>
+                  {tplSel?.headerFormat === 'IMAGE' && (
+                    <Field field={{ name: 'headerImageUrl', label: 'Imagem do topo (URL pública)', hint: 'Ex.: arte da campanha hospedada no site.' }} value={form.headerImageUrl} onChange={setCampo} />
+                  )}
+                  {tplSel?.bodyVarCount > 0 && (
+                    <div className="field">
+                      <label>Variáveis do texto</label>
+                      {vars.map((v, i) => (
+                        <div key={i} className="flex gap-8" style={{ marginBottom: 6, alignItems: 'center' }}>
+                          <span className="cell-muted" style={{ width: 42 }}>{'{{' + (i + 1) + '}}'}</span>
+                          <select className="select" style={{ flex: 1 }} value={v.source} onChange={(e) => setVars((arr) => arr.map((x, j) => (j === i ? { ...x, source: e.target.value } : x)))}>
+                            {FONTES_VAR.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
+                          </select>
+                          {v.source === 'fixo' && (
+                            <input className="input" style={{ flex: 1 }} placeholder="Texto fixo" value={v.value || ''} onChange={(e) => setVars((arr) => arr.map((x, j) => (j === i ? { ...x, value: e.target.value } : x)))} />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <Field field={{ name: 'message', label: 'Mensagem', type: 'textarea', rows: 5, hint: 'Variáveis: {{nome}}, {{cidade}}, {{bairro}}, {{responsavel}}' }} value={form.message} onChange={setCampo} />
-              )}
+                <div>
+                  <div className="field"><label>Como vai chegar no WhatsApp</label></div>
+                  {tplSel ? <PreviewBolha tpl={tplSel} headerImageUrl={form.headerImageUrl} vars={vars} /> : <div className="cell-muted">Escolha um modelo à esquerda para ver a mensagem.</div>}
+                </div>
+              </div>
             </>
           )}
 

@@ -73,8 +73,10 @@ const schema = z.object({
 
 export const create = asyncHandler(async (req, res) => {
   const data = schema.parse(req.body);
-  if (!data.templateName && (!data.message || data.message.trim().length < 2)) {
-    throw new AppError('Escolha um template aprovado ou escreva a mensagem.', 400);
+  // API Oficial: campanha SEMPRE usa modelo aprovado — mensagem livre só entrega
+  // na janela de 24h e não serve para disparo em massa.
+  if (!data.templateName) {
+    throw new AppError('Campanha usa somente modelo aprovado pela Meta. Escolha um template.', 400);
   }
   const c = await prisma.broadcastCampaign.create({
     data: {
@@ -247,7 +249,7 @@ export const aceitarDeclaracao = asyncHandler(async (req, res) => {
   const { aceito } = z.object({ aceito: z.literal(true) }).parse(req.body);
   const campaign = await prisma.broadcastCampaign.findUnique({ where: { id: req.params.id } });
   if (!campaign) throw new AppError('Campanha não encontrada', 404);
-  if (!campaign.templateName && !(campaign.message || '').trim()) throw new AppError('Defina o template ou a mensagem antes da declaração.', 400);
+  if (!campaign.templateName) throw new AppError('Escolha o modelo aprovado antes da declaração.', 400);
 
   const contatos = await prisma.broadcastContact.findMany({ where: { campaignId: campaign.id }, select: { phone: true } });
   if (!contatos.length) throw new AppError('Monte o público antes de aceitar a declaração.', 400);
@@ -413,7 +415,7 @@ export const teste = asyncHandler(async (req, res) => {
       origem: { tipo: 'TESTE', refId: campaign.id, nome: 'Teste da campanha' },
     });
   } else {
-    result = await sendWhatsApp({ to: phone, body: campaign.message, origem: { tipo: 'TESTE', refId: campaign.id, nome: 'Teste da campanha' } });
+    throw new AppError('Campanha sem modelo aprovado — escolha o template antes do teste.', 400);
   }
   if (result?.success === false) throw new AppError(`A Meta recusou o teste: ${result.error}`, 400);
   await prisma.creditPackage.update({ where: { id: pkg.id }, data: { used: { increment: 1 } } });
