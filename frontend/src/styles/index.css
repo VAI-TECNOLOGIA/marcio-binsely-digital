@@ -1544,3 +1544,10 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .map-var { border: 1px solid var(--border, #e6e9ee); border-radius: 10px; padding: 9px 12px; margin-bottom: 8px; background: var(--card, #fff); }
 .map-ctx { font-size: 12px; color: var(--muted, #7b8494); font-style: italic; margin-bottom: 6px; }
 .map-pend { border-color: #d97706 !important; background: #FFFBEB; }
+
+/* Passo Revisão — resumo em linguagem simples */
+.rev-card { border: 1px solid var(--border, #e6e9ee); border-radius: 12px; padding: 12px 15px; background: var(--card, #fff); }
+.rev-row { display: flex; gap: 10px; padding: 5px 0; border-bottom: 1px dashed var(--border, #eef0f3); font-size: 13px; align-items: baseline; }
+.rev-row:last-child { border-bottom: none; }
+.rev-k { width: 84px; flex-shrink: 0; color: var(--muted, #7b8494); font-size: 12px; }
+.rev-v { color: var(--text, #26313f); }
