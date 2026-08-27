@@ -27,6 +27,7 @@ export const authenticate = asyncHandler(async (req, res, next) => {
       managerId: true,
       active: true,
       avatarUrl: true,
+      podeAutorizar: true,
     },
   });
 

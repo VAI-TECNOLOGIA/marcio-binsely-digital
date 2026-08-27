@@ -248,6 +248,8 @@ model User {
   role      UserRole @default(PARCEIRO)
   avatarUrl String?
   active    Boolean  @default(true)
+  // Pode liberar campanhas para envio (gargalo de aprovação — só o dono/VAI).
+  podeAutorizar Boolean @default(false)
   code      String?  @unique // código único do membro (chat interno)
 
   regionId  String?
@@ -778,6 +780,16 @@ model BroadcastCampaign {
   deliveredCount Int   @default(0)
   readCount      Int   @default(0)
   creditsUsed    Int   @default(0)
+
+  // Autorização — nada roda sem liberação de quem pode autorizar (User.podeAutorizar).
+  // Fluxo: equipe solicita -> aguardando -> autorizador libera (ou recusa).
+  autorizada             Boolean   @default(false)
+  autorizacaoSolicitada  Boolean   @default(false)
+  solicitadaPorId        String?
+  solicitadaEm           DateTime?
+  autorizadaPorId        String?
+  autorizadaEm           DateTime?
+  autorizacaoNota        String?
 
   // Declaração de conformidade (aceite ativo, não pré-marcado, antes do envio).
   // Registra usuário, data/hora, IP, versão do texto, contagem e hashes da

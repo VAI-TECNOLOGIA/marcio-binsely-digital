@@ -119,6 +119,7 @@ export const update = asyncHandler(async (req, res) => {
       // Qualquer edição invalida o aceite anterior (conteúdo/condições mudaram).
       declAcceptedAt: null, declUserId: null, declUserName: null, declIp: null,
       declVersion: null, declListCount: null, declListHash: null, declContentHash: null,
+      autorizada: false, autorizacaoSolicitada: false, autorizadaPorId: null, autorizadaEm: null,
     },
   });
   res.json(c);
@@ -192,6 +193,7 @@ export const aplicarAudiencia = asyncHandler(async (req, res) => {
       audienceJson: { filtros, coladosQtd: stats.colados },
       declAcceptedAt: null, declUserId: null, declUserName: null, declIp: null,
       declVersion: null, declListCount: null, declListHash: null, declContentHash: null,
+      autorizada: false, autorizacaoSolicitada: false, autorizadaPorId: null, autorizadaEm: null,
     },
   });
   await audit({ userId: req.user?.id, action: 'AUDIENCIA', entity: 'BroadcastCampaign', entityId: campaignId, ip: req.ip, changes: { ...stats, replace } });
@@ -230,6 +232,7 @@ export const importContacts = asyncHandler(async (req, res) => {
       totalContacts: total, pendingCount: total,
       declAcceptedAt: null, declUserId: null, declUserName: null, declIp: null,
       declVersion: null, declListCount: null, declListHash: null, declContentHash: null,
+      autorizada: false, autorizacaoSolicitada: false, autorizadaPorId: null, autorizadaEm: null,
     },
   });
   res.status(201).json({ imported: valid.length, skippedBlacklist, total });
@@ -275,6 +278,72 @@ export const aceitarDeclaracao = asyncHandler(async (req, res) => {
     changes: { aceito, version: DECL_VERSION, texto: DECL_TEXTO, listCount: contatos.length, listHash, contentHash, template: campaign.templateName, scheduledAt: campaign.scheduledAt },
   });
   res.json(c);
+});
+
+/**
+ * Solicita autorização para enviar/agendar. Se quem solicita PODE autorizar
+ * (dono/VAI), a campanha já sai liberada; senão fica aguardando a liberação.
+ * Exige declaração aceita antes (a trava de conformidade continua valendo).
+ */
+export const solicitarAutorizacao = asyncHandler(async (req, res) => {
+  const campaign = await prisma.broadcastCampaign.findUnique({ where: { id: req.params.id } });
+  if (!campaign) throw new AppError('Campanha não encontrada', 404);
+  if (!campaign.declAcceptedAt) throw new AppError('Aceite a declaração de conformidade antes de solicitar o envio.', 409);
+  if (campaign.autorizada) return res.json({ autorizada: true, aguardando: false });
+
+  const podeAutorizar = req.user?.podeAutorizar === true;
+  const dados = {
+    autorizacaoSolicitada: true,
+    solicitadaPorId: req.user?.id || null,
+    solicitadaEm: new Date(),
+  };
+  if (podeAutorizar) {
+    // Quem pode autorizar libera na hora (não pede pra si mesmo).
+    dados.autorizada = true;
+    dados.autorizadaPorId = req.user?.id || null;
+    dados.autorizadaEm = new Date();
+    // "Enviar agora" (sem agendamento) entra em ENVIANDO — o cron dispara.
+    if (!campaign.scheduledAt && campaign.status !== 'ENVIANDO') dados.status = 'ENVIANDO';
+  }
+  const c = await prisma.broadcastCampaign.update({ where: { id: campaign.id }, data: dados });
+  await audit({ userId: req.user?.id, action: podeAutorizar ? 'CAMPANHA_AUTORIZADA' : 'CAMPANHA_SOLICITADA', entity: 'BroadcastCampaign', entityId: campaign.id, ip: req.ip });
+  res.json({ autorizada: c.autorizada, aguardando: c.autorizacaoSolicitada && !c.autorizada, autoLiberada: podeAutorizar });
+});
+
+/** Libera a campanha para envio. Só quem tem podeAutorizar (o dono/VAI). */
+export const autorizar = asyncHandler(async (req, res) => {
+  if (req.user?.podeAutorizar !== true) throw new AppError('Você não tem permissão para autorizar campanhas.', 403);
+  const campaign = await prisma.broadcastCampaign.findUnique({ where: { id: req.params.id } });
+  if (!campaign) throw new AppError('Campanha não encontrada', 404);
+  if (!campaign.declAcceptedAt) throw new AppError('A campanha ainda não tem a declaração aceita.', 409);
+  const c = await prisma.broadcastCampaign.update({
+    where: { id: campaign.id },
+    data: {
+      autorizada: true,
+      autorizacaoSolicitada: true,
+      autorizadaPorId: req.user?.id || null,
+      autorizadaEm: new Date(),
+      autorizacaoNota: null,
+      // Sem agendamento, libera direto para envio (o cron dispara em ~1 min).
+      ...(!campaign.scheduledAt && !['CONCLUIDA', 'CANCELADA'].includes(campaign.status) ? { status: 'ENVIANDO' } : {}),
+    },
+  });
+  await audit({ userId: req.user?.id, action: 'CAMPANHA_AUTORIZADA', entity: 'BroadcastCampaign', entityId: campaign.id, ip: req.ip });
+  res.json({ ok: true, autorizada: true, status: c.status });
+});
+
+/** Recusa a autorização (volta a rascunho). Só quem tem podeAutorizar. */
+export const recusarAutorizacao = asyncHandler(async (req, res) => {
+  if (req.user?.podeAutorizar !== true) throw new AppError('Você não tem permissão para autorizar campanhas.', 403);
+  const { nota } = z.object({ nota: z.string().max(300).optional().default('') }).parse(req.body || {});
+  const campaign = await prisma.broadcastCampaign.findUnique({ where: { id: req.params.id } });
+  if (!campaign) throw new AppError('Campanha não encontrada', 404);
+  const c = await prisma.broadcastCampaign.update({
+    where: { id: campaign.id },
+    data: { autorizada: false, autorizacaoSolicitada: false, autorizacaoNota: nota || null, status: 'RASCUNHO' },
+  });
+  await audit({ userId: req.user?.id, action: 'CAMPANHA_RECUSADA', entity: 'BroadcastCampaign', entityId: campaign.id, ip: req.ip, changes: { nota } });
+  res.json({ ok: true, status: c.status });
 });
 
 /** Situação do pacote de créditos (saldo, validade, consumo). */

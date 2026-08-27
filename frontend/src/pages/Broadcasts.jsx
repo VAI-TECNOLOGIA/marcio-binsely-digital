@@ -119,6 +119,26 @@ export default function Broadcasts() {
   const toast = useToast();
   const { user } = useAuth();
   const isLider = user?.role === 'LIDER';
+  const podeAutorizar = user?.podeAutorizar === true;
+
+  async function autorizarCampanha(id) {
+    try {
+      await api.post(`/broadcasts/${id}/autorizar`);
+      toast.success('Campanha liberada. O envio começa em instantes.');
+      load(); carregarCreditos();
+      if (detail?.id === id) refreshDetail(id);
+    } catch (e) { toast.error(apiError(e)); }
+  }
+  async function recusarCampanha(id) {
+    const nota = window.prompt('Recusar esta campanha e voltar a rascunho. Motivo (opcional):', '');
+    if (nota === null) return;
+    try {
+      await api.post(`/broadcasts/${id}/recusar`, { nota });
+      toast.success('Campanha recusada — voltou a rascunho.');
+      load();
+      if (detail?.id === id) refreshDetail(id);
+    } catch (e) { toast.error(apiError(e)); }
+  }
 
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -403,15 +423,23 @@ export default function Broadcasts() {
         if (!declAceita) { toast.error('Marque a declaração para agendar o envio.'); return; }
         await api.patch(`/broadcasts/${campId}`, { scheduledAt: form.scheduledAt });
         await api.post(`/broadcasts/${campId}/declaracao`, { aceito: true });
-        toast.success('Campanha agendada. O sistema envia sozinho no horário.');
+        const { data } = await api.post(`/broadcasts/${campId}/solicitar`);
+        toast.success(data.autoLiberada
+          ? 'Campanha agendada e autorizada. O sistema envia sozinho no horário.'
+          : 'Solicitação enviada. Assim que a coordenação liberar, o envio acontece no horário agendado.');
         setWizardOpen(false);
       } else {
         if (!declAceita) { toast.error('Marque a declaração para liberar o envio.'); return; }
         await api.post(`/broadcasts/${campId}/declaracao`, { aceito: true });
+        const { data } = await api.post(`/broadcasts/${campId}/solicitar`);
         setWizardOpen(false);
-        const { data } = await api.get(`/broadcasts/${campId}`);
-        setDetail(data);
-        await dispararLoop(data);
+        if (data.autorizada) {
+          const { data: camp } = await api.get(`/broadcasts/${campId}`);
+          setDetail(camp);
+          await dispararLoop(camp);
+        } else {
+          toast.success('Solicitação de autorização enviada. A campanha só será enviada após a coordenação liberar.');
+        }
       }
       load();
       carregarCreditos();
@@ -583,7 +611,11 @@ export default function Broadcasts() {
     { key: 'progress', label: 'Progresso', render: (r) => <Progresso c={r} /> },
     { key: 'lidas', label: 'Entregues / Lidas', render: (r) => <span>{r.deliveredCount || 0} / {r.readCount || 0}</span> },
     { key: 'agendada', label: 'Agendada para', render: (r) => (r.scheduledAt ? fmtData(r.scheduledAt) : '—') },
-    { key: 'decl', label: 'Declaração', render: (r) => (r.declAcceptedAt ? <Badge tone="green">Registrada</Badge> : <Badge tone="amber">Pendente</Badge>) },
+    { key: 'autorizacao', label: 'Autorização', render: (r) => (
+      r.autorizada ? <Badge tone="green">Liberada</Badge>
+      : r.autorizacaoSolicitada ? <Badge tone="amber">Aguardando</Badge>
+      : <span className="cell-muted">—</span>
+    ) },
     { key: 'status', label: 'Status', render: (r) => <StatusBadge group="BroadcastStatus" value={r.status} /> },
   ];
 
@@ -690,6 +722,9 @@ export default function Broadcasts() {
             empty={<EmptyState icon={Megaphone} title="Nenhuma campanha" message="Crie uma campanha para falar com a sua base." />}
             actions={(row) => (
               <div className="flex gap-8">
+                {podeAutorizar && row.autorizacaoSolicitada && !row.autorizada && (
+                  <button className="btn btn-primary btn-sm" onClick={() => autorizarCampanha(row.id)}><ShieldCheck size={14} /> Liberar</button>
+                )}
                 <button className="btn btn-ghost btn-sm" onClick={() => openDetail(row)}>Abrir</button>
                 <button className="btn btn-ghost btn-sm" title="Duplicar" onClick={() => duplicar(row)}><Copy size={14} /></button>
               </div>
@@ -1297,9 +1332,44 @@ export default function Broadcasts() {
             </div>
           )}
 
+          {/* Autorização — o gargalo: nada roda sem liberação */}
+          {detail.declAcceptedAt && !detail.autorizada && (
+            detail.autorizacaoSolicitada ? (
+              podeAutorizar ? (
+                <div className="decl-box" style={{ border: '1.5px solid var(--gold, #F7A810)', borderRadius: 10, padding: '12px 14px', marginBottom: 12, background: '#FFFBEB' }}>
+                  <div className="cell-strong" style={{ fontSize: 13, marginBottom: 4 }}>Esta campanha aguarda a sua liberação</div>
+                  <div className="cell-muted" style={{ fontSize: 12, marginBottom: 10 }}>
+                    Solicitada {detail.solicitadaEm ? `em ${fmtData(detail.solicitadaEm)}` : ''}. Nada foi enviado. Confira o público e a mensagem acima antes de liberar.
+                  </div>
+                  <div className="flex gap-8">
+                    <button className="btn btn-primary btn-sm" onClick={() => autorizarCampanha(detail.id)}><ShieldCheck size={14} /> Liberar envio</button>
+                    <button className="btn btn-ghost btn-sm" style={{ color: 'var(--red)' }} onClick={() => recusarCampanha(detail.id)}>Recusar</button>
+                  </div>
+                </div>
+              ) : (
+                <div className="warning-box" style={{ marginBottom: 12 }}>
+                  <span><b>Aguardando autorização da coordenação.</b> A solicitação foi registrada. A campanha só será enviada depois que a coordenação liberar.</span>
+                </div>
+              )
+            ) : (
+              <div className="warning-box" style={{ marginBottom: 12 }}>
+                <span>Esta campanha ainda não foi enviada para autorização. {isLider ? 'Use "Solicitar envio" abaixo.' : ''}</span>
+              </div>
+            )
+          )}
+          {detail.autorizada && detail.autorizadaEm && (
+            <div style={{ marginBottom: 12 }}><Badge tone="green"><ShieldCheck size={12} style={{ verticalAlign: -2 }} /> Liberada em {fmtData(detail.autorizadaEm)}</Badge></div>
+          )}
+
           <div className="flex gap-8" style={{ marginBottom: 14, flexWrap: 'wrap' }}>
-            {isLider && !sendingState && ['RASCUNHO', 'AGENDADA', 'PAUSADA', 'ENVIANDO'].includes(detail.status) && (
-              <button className="btn btn-primary" onClick={() => dispararLoop(detail)} disabled={!detail.declAcceptedAt}>
+            {/* Solicitar envio — quando tem declaração mas ainda não pediu autorização */}
+            {isLider && detail.declAcceptedAt && !detail.autorizacaoSolicitada && !detail.autorizada && ['RASCUNHO', 'AGENDADA'].includes(detail.status) && (
+              <button className="btn btn-primary" onClick={async () => { try { const { data } = await api.post(`/broadcasts/${detail.id}/solicitar`); toast.success(data.autoLiberada ? 'Liberada.' : 'Solicitação de autorização enviada.'); refreshDetail(detail.id); load(); } catch (e) { toast.error(apiError(e)); } }}>
+                <ShieldCheck size={15} /> Solicitar envio
+              </button>
+            )}
+            {isLider && detail.autorizada && !sendingState && ['RASCUNHO', 'AGENDADA', 'PAUSADA', 'ENVIANDO'].includes(detail.status) && (
+              <button className="btn btn-primary" onClick={() => dispararLoop(detail)}>
                 <Send size={15} /> {detail.sentCount > 0 ? 'Continuar envio' : 'Disparar agora'}
               </button>
             )}

@@ -243,6 +243,11 @@ export async function processarLote(campaignId, { batch = 25 } = {}) {
   if (!campaign) return { blocked: true, motivo: 'Campanha não encontrada.' };
   if (['CANCELADA', 'CONCLUIDA'].includes(campaign.status)) return { blocked: true, motivo: `Campanha ${campaign.status.toLowerCase()}.` };
 
+  // ---- Trava 0: autorização — nada roda sem liberação ----
+  if (!campaign.autorizada) {
+    return { blocked: true, motivo: campaign.autorizacaoSolicitada ? 'Campanha aguardando autorização da coordenação.' : 'Campanha ainda não foi enviada para autorização.' };
+  }
+
   // ---- Trava 1: declaração de conformidade (aceite ativo) ----
   if (!campaign.declAcceptedAt) return { blocked: true, motivo: 'Envio bloqueado: a declaração de conformidade ainda não foi aceita.' };
   const alterados = await prisma.broadcastContact.count({ where: { campaignId, createdAt: { gt: campaign.declAcceptedAt } } });
@@ -352,7 +357,7 @@ export async function processarLote(campaignId, { batch = 25 } = {}) {
 export async function processarAgendadas({ maxLotesPorCampanha = 6, batch = 25 } = {}) {
   const agora = new Date();
   const promovidas = await prisma.broadcastCampaign.updateMany({
-    where: { status: 'AGENDADA', scheduledAt: { lte: agora }, declAcceptedAt: { not: null } },
+    where: { status: 'AGENDADA', scheduledAt: { lte: agora }, declAcceptedAt: { not: null }, autorizada: true },
     data: { status: 'ENVIANDO' },
   });
 

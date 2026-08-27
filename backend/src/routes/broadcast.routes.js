@@ -24,6 +24,11 @@ r.post('/:id/audiencia', authorize('LIDER', 'MEMBRO'), bc.aplicarAudiencia);
 r.post('/:id/contacts', authorize('LIDER', 'MEMBRO'), bc.importContacts);
 r.post('/:id/duplicar', authorize('LIDER', 'MEMBRO'), bc.duplicate);
 
+// Autorização — equipe solicita; só quem tem podeAutorizar libera/recusa.
+r.post('/:id/solicitar', authorize('LIDER', 'MEMBRO'), bc.solicitarAutorizacao);
+r.post('/:id/autorizar', authorize('LIDER', 'MEMBRO'), bc.autorizar);
+r.post('/:id/recusar', authorize('LIDER', 'MEMBRO'), bc.recusarAutorizacao);
+
 // Ações sensíveis — somente LIDER: declaração, créditos, envio e exclusão.
 r.post('/:id/declaracao', authorize('LIDER'), bc.aceitarDeclaracao);
 r.post('/creditos/ativar', authorize('LIDER'), bc.creditosAtivar);
