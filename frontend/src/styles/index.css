@@ -1551,3 +1551,14 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .rev-row:last-child { border-bottom: none; }
 .rev-k { width: 84px; flex-shrink: 0; color: var(--muted, #7b8494); font-size: 12px; }
 .rev-v { color: var(--text, #26313f); }
+
+/* Criador de modelos — moldura de celular */
+.phone-mock {
+  width: 100%; max-width: 300px; margin: 0 auto;
+  border: 10px solid #1c2733; border-radius: 34px;
+  background: #e8ded3; padding: 26px 10px 20px; position: relative; min-height: 220px;
+}
+.phone-mock::before {
+  content: ""; position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+  width: 92px; height: 10px; background: #1c2733; border-radius: 6px;
+}

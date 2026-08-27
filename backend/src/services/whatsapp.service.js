@@ -188,6 +188,46 @@ export async function enviarRecuperarSenha({ to, nome, token }) {
   return sendWhatsApp({ to, template, origem: { tipo: 'JORNADA', nome: String(nome || '') || null } });
 }
 
+// App da Meta dono da WABA (para o upload retomável dos exemplos de imagem).
+const META_APP_ID = process.env.WHATSAPP_APP_ID || '2105355086681303';
+
+/**
+ * Sobe uma imagem local para a Meta (resumable upload) e devolve o handle
+ * usado como exemplo de header IMAGE na criação de template.
+ */
+export async function uploadHeaderHandle(filePath) {
+  const fs = await import('fs');
+  const buf = fs.readFileSync(filePath);
+  const mime = filePath.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+  const sess = await fetch(
+    `https://graph.facebook.com/v20.0/${META_APP_ID}/uploads?file_name=header&file_length=${buf.length}&file_type=${encodeURIComponent(mime)}&access_token=${env.whatsapp.token}`,
+    { method: 'POST' }
+  ).then((r) => r.json());
+  if (!sess?.id) throw new Error(sess?.error?.message || 'Falha ao abrir sessão de upload na Meta.');
+  const up = await fetch(`https://graph.facebook.com/v20.0/${sess.id}`, {
+    method: 'POST',
+    headers: { Authorization: `OAuth ${env.whatsapp.token}`, file_offset: '0' },
+    body: buf,
+  }).then((r) => r.json());
+  if (!up?.h) throw new Error(up?.error?.message || 'Falha ao enviar a imagem para a Meta.');
+  return up.h;
+}
+
+/** Cria um template na WABA. Devolve { id, status } ou lança erro legível. */
+export async function criarTemplateMeta({ name, category = 'MARKETING', language = 'pt_BR', components }) {
+  const resp = await fetch(`https://graph.facebook.com/v20.0/${env.whatsapp.wabaId}/message_templates`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${env.whatsapp.token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, language, category, allow_category_change: true, components }),
+  });
+  const data = await resp.json();
+  if (!resp.ok || !data?.id) {
+    const e = data?.error;
+    throw new Error(e?.error_user_msg || e?.message || 'A Meta recusou a criação do modelo.');
+  }
+  return { id: data.id, status: data.status };
+}
+
 /** Estrutura de um template pelo nome (para montar o envio). */
 export async function getTemplate(name) {
   if (!(env.whatsapp.provider === 'meta_cloud' && env.whatsapp.token && env.whatsapp.wabaId)) return null;

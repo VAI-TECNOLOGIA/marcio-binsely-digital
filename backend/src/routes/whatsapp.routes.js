@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import * as wa from '../controllers/whatsapp.controller.js';
 import { authenticate } from '../middlewares/auth.js';
+import { authorize } from '../middlewares/rbac.js';
 
 const r = Router();
 
@@ -12,5 +13,7 @@ r.post('/webhook', wa.receiveWebhook);
 r.post('/simulate', authenticate, wa.simulateInbound);
 // Templates aprovados (para o seletor do módulo de Disparos).
 r.get('/templates', authenticate, wa.listTemplates);
+// Criador de modelos — envia template para análise da Meta (só líder).
+r.post('/templates', authenticate, authorize('LIDER'), wa.createTemplate);
 
 export default r;

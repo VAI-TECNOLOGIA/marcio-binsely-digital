@@ -148,6 +148,14 @@ export default function Broadcasts() {
   const [campId, setCampId] = useState(null);
   const [declAceita, setDeclAceita] = useState(false);
   const [fonesTeste, setFoneTeste] = useState('');
+  // Decisão final da campanha: enviar agora, agendar ou guardar rascunho.
+  const [modoEnvio, setModoEnvio] = useState('agora');
+
+  // Criador de modelos (template) com prévia de celular.
+  const [tplOpen, setTplOpen] = useState(false);
+  const [tplForm, setTplForm] = useState({ titulo: '', corpo: '', rodape: '', tipoBotoes: 'nenhum', botoes: [''], urlBotao: '', textoBotaoUrl: '', imagem: null });
+  const [tplSalvando, setTplSalvando] = useState(false);
+  const [tplSubindoImg, setTplSubindoImg] = useState(false);
 
   // Extrato de envios (monitoramento cruzando campanhas)
   const [extratoOpen, setExtratoOpen] = useState(false);
@@ -274,6 +282,7 @@ export default function Broadcasts() {
     setVars([]);
     setCampId(null);
     setDeclAceita(false);
+    setModoEnvio('agora');
     setPasso(1);
     setWizardOpen(true);
     if (!opcoes) {
@@ -284,7 +293,7 @@ export default function Broadcasts() {
 
   function selecionarTemplate(name) {
     const t = templates.find((x) => x.name === name);
-    setForm((s) => ({ ...s, templateName: name || null, templateLang: t?.language || 'pt_BR', headerImageUrl: t?.headerFormat === 'IMAGE' ? (s.headerImageUrl || '') : null }));
+    setForm((s) => ({ ...s, templateName: name || null, templateLang: t?.language || 'pt_BR', headerImageUrl: t?.headerFormat === 'IMAGE' ? (s.headerImageUrl || t?.headerUrl || '') : null }));
     setVars(Array.from({ length: t?.bodyVarCount || 0 }, (_, i) => ({ source: i === 0 ? 'nome' : '', value: '' })));
   }
 
@@ -346,7 +355,6 @@ export default function Broadcasts() {
         const payload = {
           name: form.name,
           channel: 'WHATSAPP',
-          scheduledAt: form.scheduledAt || null,
           templateName: form.templateName,
           templateLang: form.templateLang,
           headerImageUrl: form.headerImageUrl || null,
@@ -382,19 +390,28 @@ export default function Broadcasts() {
     }
   }
 
-  async function concluirWizard(enviarAgora) {
-    if (!declAceita) return toast.error('Marque a declaração de conformidade para liberar o envio.');
+  async function concluirWizard() {
     setSalvando(true);
     try {
-      await api.post(`/broadcasts/${campId}/declaracao`, { aceito: true });
-      if (enviarAgora) {
+      if (modoEnvio === 'rascunho') {
+        // Rascunho não exige declaração — nada vai ser enviado.
+        await api.patch(`/broadcasts/${campId}`, { scheduledAt: null });
+        toast.success('Campanha salva como rascunho. Abra quando quiser enviar.');
+        setWizardOpen(false);
+      } else if (modoEnvio === 'agendar') {
+        if (!form.scheduledAt) { toast.error('Escolha a data e a hora do envio.'); return; }
+        if (!declAceita) { toast.error('Marque a declaração para agendar o envio.'); return; }
+        await api.patch(`/broadcasts/${campId}`, { scheduledAt: form.scheduledAt });
+        await api.post(`/broadcasts/${campId}/declaracao`, { aceito: true });
+        toast.success('Campanha agendada. O sistema envia sozinho no horário.');
+        setWizardOpen(false);
+      } else {
+        if (!declAceita) { toast.error('Marque a declaração para liberar o envio.'); return; }
+        await api.post(`/broadcasts/${campId}/declaracao`, { aceito: true });
         setWizardOpen(false);
         const { data } = await api.get(`/broadcasts/${campId}`);
         setDetail(data);
         await dispararLoop(data);
-      } else {
-        toast.success(form.scheduledAt ? 'Campanha agendada. O sistema envia sozinho no horário.' : 'Campanha pronta. Abra e clique em Disparar quando quiser.');
-        setWizardOpen(false);
       }
       load();
       carregarCreditos();
@@ -405,7 +422,46 @@ export default function Broadcasts() {
     }
   }
 
-  // ---------- Detalhe ----------
+  // ---------- Criador de modelos ----------
+  const setTpl = (k, v) => setTplForm((f) => ({ ...f, [k]: v }));
+  async function subirImagemTpl(file) {
+    if (!file) return;
+    setTplSubindoImg(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const { data } = await api.post('/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      setTpl('imagem', { filename: data.filename, url: data.url });
+    } catch (e) {
+      toast.error(apiError(e));
+    } finally {
+      setTplSubindoImg(false);
+    }
+  }
+  async function enviarTemplateParaAnalise() {
+    setTplSalvando(true);
+    try {
+      const payload = {
+        titulo: tplForm.titulo,
+        corpo: tplForm.corpo,
+        rodape: tplForm.rodape,
+        tipoBotoes: tplForm.tipoBotoes,
+        botoes: tplForm.botoes.map((b) => b.trim()).filter(Boolean),
+        urlBotao: tplForm.urlBotao,
+        textoBotaoUrl: tplForm.textoBotaoUrl,
+        imagemFilename: tplForm.imagem?.filename || '',
+      };
+      const { data } = await api.post('/whatsapp/templates', payload);
+      toast.success(`Modelo "${data.name}" enviado para análise da Meta. Ele aparece na galeria assim que for aprovado.`);
+      setTplOpen(false);
+    } catch (e) {
+      toast.error(apiError(e));
+    } finally {
+      setTplSalvando(false);
+    }
+  }
+
+  // ---------- Detalhe ----------  // ---------- Detalhe ----------
   async function refreshDetail(id) {
     try {
       const { data } = await api.get(`/broadcasts/${id}`);
@@ -615,6 +671,9 @@ export default function Broadcasts() {
           {options('BroadcastStatus').map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
         <div className="spacer" />
+        <button className="btn" onClick={() => { setTplForm({ titulo: '', corpo: '', rodape: '', tipoBotoes: 'nenhum', botoes: [''], urlBotao: '', textoBotaoUrl: '', imagem: null }); setTplOpen(true); }}>
+          <ClipboardList size={16} /> Criar modelo
+        </button>
         <button className="btn" onClick={() => { setExFiltro({ campaignId: '', status: '', sender: '', search: '', de: '', ate: '', kind: '', page: 1 }); setExtratoOpen(true); }}>
           <ScrollText size={16} /> Extrato de envios
         </button>
@@ -652,14 +711,16 @@ export default function Broadcasts() {
               {passo < 4 && <button className="btn btn-primary" disabled={salvando} onClick={avancar}>{salvando ? 'Salvando...' : <>Avançar <ChevronRight size={15} /></>}</button>}
               {passo === 4 && (
                 <>
-                  <button className="btn" disabled={salvando || !declAceita} onClick={() => concluirWizard(false)}>
-                    <Clock size={15} /> {form.scheduledAt ? 'Confirmar agendamento' : 'Salvar para depois'}
+                  <button className="btn" onClick={() => setPasso(3)}><ChevronLeft size={15} /> Voltar</button>
+                  <button
+                    className="btn btn-primary"
+                    disabled={salvando || (modoEnvio !== 'rascunho' && !declAceita) || (modoEnvio === 'agendar' && !form.scheduledAt)}
+                    onClick={concluirWizard}
+                  >
+                    {modoEnvio === 'agora' && <><Send size={15} /> {salvando ? 'Enviando...' : 'Enviar agora'}</>}
+                    {modoEnvio === 'agendar' && <><Clock size={15} /> {salvando ? 'Agendando...' : 'Agendar envio'}</>}
+                    {modoEnvio === 'rascunho' && <>{salvando ? 'Salvando...' : 'Salvar rascunho'}</>}
                   </button>
-                  {isLider && !form.scheduledAt && (
-                    <button className="btn btn-primary" disabled={salvando || !declAceita} onClick={() => concluirWizard(true)}>
-                      <Send size={15} /> Enviar agora
-                    </button>
-                  )}
                 </>
               )}
             </>
@@ -668,8 +729,7 @@ export default function Broadcasts() {
           {/* Passo 1 — dados */}
           {passo === 1 && (
             <>
-              <Field field={{ name: 'name', label: 'Nome da campanha', required: true, hint: 'Uso interno — ex.: "Convite lançamento Zona Sul".' }} value={form.name} onChange={setCampo} />
-              <Field field={{ name: 'scheduledAt', label: 'Agendar para (opcional)', type: 'datetime-local', hint: 'Em branco = envio manual. Agendada, o sistema dispara sozinho no horário.' }} value={form.scheduledAt} onChange={setCampo} />
+              <Field field={{ name: 'name', label: 'Nome da campanha', required: true, hint: 'Uso interno — ex.: "Convite lançamento Zona Sul". Você decide quando enviar no final.' }} value={form.name} onChange={setCampo} />
             </>
           )}
 
@@ -897,7 +957,7 @@ export default function Broadcasts() {
                   <div className="rev-card">
                     <div className="rev-row"><span className="rev-k">Mensagem</span><span className="rev-v"><b>{form.templateName}</b></span></div>
                     <div className="rev-row"><span className="rev-k">Vai para</span><span className="rev-v"><b>{total.toLocaleString('pt-BR')} pessoas</b>{previewPublico?.blacklist ? ` · ${previewPublico.blacklist} fora por pedido` : ''}</span></div>
-                    <div className="rev-row"><span className="rev-k">Quando</span><span className="rev-v">{form.scheduledAt ? <b>{fmtData(form.scheduledAt)} — o sistema envia sozinho</b> : 'Assim que você clicar em Enviar agora'}</span></div>
+                    <div className="rev-row"><span className="rev-k">Quando</span><span className="rev-v">{modoEnvio === 'rascunho' ? 'Fica guardada como rascunho' : modoEnvio === 'agendar' ? (form.scheduledAt ? <b>{fmtData(form.scheduledAt)} — o sistema envia sozinho</b> : 'Escolha a data abaixo') : 'Assim que você confirmar'}</span></div>
                     <div className="rev-row"><span className="rev-k">Sai por</span><span className="rev-v">{numerosAtivos.length} número(s) em rodízio, respeitando o limite diário de cada um</span></div>
                     <div className="rev-row"><span className="rev-k">Créditos</span><span className="rev-v">{semPacote ? '—' : <>vai consumir até <b>{Math.min(total, saldo).toLocaleString('pt-BR')}</b> dos {saldo.toLocaleString('pt-BR')} disponíveis</>}</span></div>
                   </div>
@@ -943,9 +1003,148 @@ export default function Broadcasts() {
                   O aceite registra usuário, data, hora e IP na auditoria. Mudou o público depois? O sistema exige aceitar de novo.
                 </div>
               </div>
+
+              <div className="field" style={{ marginTop: 14 }}>
+                <label>O que fazer com esta campanha?</label>
+                <div className="rc-grid" role="radiogroup" aria-label="Decisão de envio">
+                  <button type="button" role="radio" aria-checked={modoEnvio === 'agora'} className={`rc-card ${modoEnvio === 'agora' ? 'rc-on' : ''}`} onClick={() => setModoEnvio('agora')}>
+                    <b>Enviar agora</b>
+                    <span>O disparo começa imediatamente</span>
+                  </button>
+                  <button type="button" role="radio" aria-checked={modoEnvio === 'agendar'} className={`rc-card ${modoEnvio === 'agendar' ? 'rc-on' : ''}`} onClick={() => setModoEnvio('agendar')}>
+                    <b>Agendar envio</b>
+                    <span>O sistema dispara sozinho no dia e hora</span>
+                  </button>
+                  <button type="button" role="radio" aria-checked={modoEnvio === 'rascunho'} className={`rc-card ${modoEnvio === 'rascunho' ? 'rc-on' : ''}`} onClick={() => setModoEnvio('rascunho')}>
+                    <b>Salvar rascunho</b>
+                    <span>Nada é enviado — termina depois</span>
+                  </button>
+                </div>
+                {modoEnvio === 'agendar' && (
+                  <div style={{ marginTop: 10, maxWidth: 260 }}>
+                    <Field field={{ name: 'scheduledAt', label: 'Enviar em', type: 'datetime-local', required: true }} value={form.scheduledAt} onChange={setCampo} />
+                  </div>
+                )}
+                {modoEnvio !== 'rascunho' && !declAceita && (
+                  <span className="field-hint" style={{ display: 'block', marginTop: 6 }}>Marque a declaração acima para liberar o botão.</span>
+                )}
+              </div>
             </>
             );
           })()}
+        </Modal>
+      )}
+
+      {/* ==================== CRIADOR DE MODELOS ==================== */}
+      {tplOpen && (
+        <Modal
+          title="Criar modelo de mensagem"
+          wide
+          onClose={() => setTplOpen(false)}
+          footer={
+            <>
+              <button className="btn" onClick={() => setTplOpen(false)}>Cancelar</button>
+              <button className="btn btn-primary" disabled={tplSalvando || tplSubindoImg} onClick={enviarTemplateParaAnalise}>
+                <Send size={15} /> {tplSalvando ? 'Enviando...' : 'Enviar para análise da Meta'}
+              </button>
+            </>
+          }
+        >
+          <p className="cell-muted" style={{ marginBottom: 12, fontSize: 13 }}>
+            Monte a mensagem, veja como fica no celular e envie para a Meta aprovar. Aprovado, o modelo entra na galeria das campanhas.
+          </p>
+          <div className="grid" style={{ gridTemplateColumns: '1.15fr 1fr', gap: 18 }}>
+            <div>
+              <Field field={{ name: 'titulo', label: 'Nome do modelo', required: true, hint: 'Ex.: "Convite comício outubro". Vira o nome interno na Meta.' }} value={tplForm.titulo} onChange={setTpl} />
+
+              <div className="field">
+                <label>Imagem do topo (opcional)</label>
+                <div className="flex gap-8" style={{ alignItems: 'center' }}>
+                  <input type="file" accept="image/png,image/jpeg" id="tpl-img" style={{ display: 'none' }} onChange={(e) => subirImagemTpl(e.target.files?.[0])} />
+                  <button type="button" className="btn btn-sm" onClick={() => document.getElementById('tpl-img').click()} disabled={tplSubindoImg}>
+                    {tplSubindoImg ? 'Enviando imagem...' : (tplForm.imagem ? 'Trocar imagem' : 'Enviar imagem')}
+                  </button>
+                  {tplForm.imagem && <button type="button" className="btn btn-ghost btn-sm" onClick={() => setTpl('imagem', null)}><X size={14} /> Remover</button>}
+                </div>
+                <span className="field-hint">JPG ou PNG na horizontal (ideal 1200x628). Aparece no topo da mensagem.</span>
+              </div>
+
+              <div className="field">
+                <label>Texto da mensagem <span className="req">*</span></label>
+                <textarea className="textarea" rows={6} value={tplForm.corpo} onChange={(e) => setTpl('corpo', e.target.value)}
+                  placeholder={'Olá {{1}}! Escreva aqui a mensagem da campanha...'}
+                />
+                <div className="flex gap-8" style={{ marginTop: 6, alignItems: 'center' }}>
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={() => setTpl('corpo', (tplForm.corpo || '') + '{{1}}')}>+ Inserir nome da pessoa</button>
+                  <span className="field-hint">O nome entra automaticamente para cada contato no envio.</span>
+                </div>
+              </div>
+
+              <Field field={{ name: 'rodape', label: 'Rodapé (opcional)', hint: 'Até 60 caracteres. Ex.: "Propaganda eleitoral · Responda SAIR para não receber".' }} value={tplForm.rodape} onChange={setTpl} />
+
+              <div className="field">
+                <label>Botões</label>
+                <div className="flex gap-8" style={{ flexWrap: 'wrap' }}>
+                  <button type="button" className={`btn btn-sm ${tplForm.tipoBotoes === 'nenhum' ? 'btn-primary' : ''}`} onClick={() => setTpl('tipoBotoes', 'nenhum')}>Sem botões</button>
+                  <button type="button" className={`btn btn-sm ${tplForm.tipoBotoes === 'respostas' ? 'btn-primary' : ''}`} onClick={() => setTpl('tipoBotoes', 'respostas')}>Respostas (aceite)</button>
+                  <button type="button" className={`btn btn-sm ${tplForm.tipoBotoes === 'link' ? 'btn-primary' : ''}`} onClick={() => setTpl('tipoBotoes', 'link')}>Link do site</button>
+                </div>
+                {tplForm.tipoBotoes === 'respostas' && (
+                  <div style={{ marginTop: 8 }}>
+                    {tplForm.botoes.map((b, i) => (
+                      <div key={i} className="flex gap-8" style={{ marginBottom: 6 }}>
+                        <input className="input" style={{ flex: 1 }} maxLength={25} placeholder={i === 0 ? 'Ex.: Quero participar' : 'Ex.: Agora não'} value={b}
+                          onChange={(e) => setTpl('botoes', tplForm.botoes.map((x, j) => (j === i ? e.target.value : x)))} />
+                        {tplForm.botoes.length > 1 && (
+                          <button type="button" className="btn btn-ghost btn-sm" onClick={() => setTpl('botoes', tplForm.botoes.filter((_, j) => j !== i))}><X size={14} /></button>
+                        )}
+                      </div>
+                    ))}
+                    {tplForm.botoes.length < 3 && (
+                      <button type="button" className="btn btn-ghost btn-sm" onClick={() => setTpl('botoes', [...tplForm.botoes, ''])}><Plus size={14} /> Adicionar botão</button>
+                    )}
+                    <span className="field-hint" style={{ display: 'block', marginTop: 4 }}>A resposta de quem toca chega nas Conversas — serve como aceite registrado.</span>
+                  </div>
+                )}
+                {tplForm.tipoBotoes === 'link' && (
+                  <div style={{ marginTop: 8 }}>
+                    <div className="flex gap-8">
+                      <input className="input" style={{ flex: 1 }} maxLength={25} placeholder="Texto do botão — ex.: Conhecer as propostas" value={tplForm.textoBotaoUrl} onChange={(e) => setTpl('textoBotaoUrl', e.target.value)} />
+                      <input className="input" style={{ flex: 1.4 }} placeholder="https://marciobinsely.com" value={tplForm.urlBotao} onChange={(e) => setTpl('urlBotao', e.target.value)} />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <div className="field"><label>Como fica no celular</label></div>
+              <div className="phone-mock">
+                <div className="wa-bubble" style={{ maxWidth: '100%' }}>
+                  {tplForm.imagem
+                    ? <img src={tplForm.imagem.url} alt="" className="wa-header-img" />
+                    : null}
+                  <div className="wa-body">
+                    {(tplForm.corpo || 'A sua mensagem aparece aqui...').split(/(\{\{\s*1\s*\}\})/g).map((parte, i) =>
+                      /^\{\{\s*1\s*\}\}$/.test(parte) ? <span key={i} className="wa-fill">Maria</span> : parte
+                    )}
+                  </div>
+                  {tplForm.rodape && <div className="wa-footer">{tplForm.rodape}</div>}
+                  {tplForm.tipoBotoes === 'respostas' && tplForm.botoes.filter((b) => b.trim()).length > 0 && (
+                    <div className="wa-buttons">
+                      {tplForm.botoes.filter((b) => b.trim()).map((b, i) => <div key={i} className="wa-btn">{b}</div>)}
+                    </div>
+                  )}
+                  {tplForm.tipoBotoes === 'link' && (
+                    <div className="wa-buttons"><div className="wa-btn">{tplForm.textoBotaoUrl || 'Saiba mais'}</div></div>
+                  )}
+                </div>
+              </div>
+              <div className="cell-muted" style={{ fontSize: 11, marginTop: 10, textAlign: 'center' }}>
+                A Meta analisa em minutos ou horas. Aprovado, entra na galeria sozinho.
+              </div>
+            </div>
+          </div>
         </Modal>
       )}
 

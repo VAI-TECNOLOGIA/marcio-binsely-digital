@@ -1,7 +1,12 @@
+import path from 'path';
+import fs from 'fs';
+import { z } from 'zod';
 import prisma from '../config/prisma.js';
 import env from '../config/env.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
-import { sendWhatsApp, getTemplates } from '../services/whatsapp.service.js';
+import { AppError } from '../utils/AppError.js';
+import { audit } from '../utils/audit.js';
+import { sendWhatsApp, getTemplates, uploadHeaderHandle, criarTemplateMeta } from '../services/whatsapp.service.js';
 import { onlyDigits } from '../utils/helpers.js';
 
 /** Verificação do webhook (handshake exigido pela Meta Cloud API). */
@@ -108,7 +113,101 @@ export const simulateInbound = asyncHandler(async (req, res) => {
 /** Templates aprovados da conta — alimenta o seletor de disparo por template. */
 export const listTemplates = asyncHandler(async (_req, res) => {
   const data = await getTemplates();
-  res.json({ data });
+  // Anexa a URL pública da imagem do topo dos modelos criados pelo sistema
+  // (o envio precisa dela; o exemplo enviado à Meta é só para a análise).
+  const settings = await prisma.setting.findMany({ where: { key: { startsWith: 'tpl_header_' } } });
+  const mapa = Object.fromEntries(settings.map((s) => [s.key.replace('tpl_header_', ''), s.value]));
+  res.json({ data: data.map((t) => ({ ...t, headerUrl: mapa[t.name] || null })) });
+});
+
+const EMOJI_RE = /\p{Extended_Pictographic}/u;
+
+const criarTemplateSchema = z.object({
+  titulo: z.string().min(3, 'Dê um nome ao modelo').max(60),
+  corpo: z.string().min(20, 'Escreva a mensagem (mínimo 20 caracteres)').max(1024),
+  rodape: z.string().max(60, 'O rodapé aceita até 60 caracteres').optional().default(''),
+  tipoBotoes: z.enum(['nenhum', 'respostas', 'link']).default('nenhum'),
+  botoes: z.array(z.string().min(1).max(25, 'Botão aceita até 25 caracteres')).max(3).optional().default([]),
+  urlBotao: z.string().optional().default(''),
+  textoBotaoUrl: z.string().max(25).optional().default(''),
+  imagemFilename: z.string().optional().default(''),
+});
+
+/**
+ * Criador de modelos — monta e envia um template para análise da Meta.
+ * Regras que a Meta rejeita já validadas aqui: corpo não pode começar nem
+ * terminar com variável; botão não aceita emoji nem link de WhatsApp;
+ * respostas rápidas não misturam com botão de link.
+ */
+export const createTemplate = asyncHandler(async (req, res) => {
+  const d = criarTemplateSchema.parse(req.body);
+
+  const corpo = d.corpo.trim();
+  if (/^\{\{\s*\d+\s*\}\}/.test(corpo) || /\{\{\s*\d+\s*\}\}$/.test(corpo)) {
+    throw new AppError('A mensagem não pode começar nem terminar com o nome da pessoa — abra com "Olá {{1}}," por exemplo.', 400);
+  }
+  const varsNoCorpo = [...new Set((corpo.match(/\{\{\s*(\d+)\s*\}\}/g) || []).map((v) => v.replace(/\D/g, '')))];
+  if (varsNoCorpo.some((v) => v !== '1')) {
+    throw new AppError('Use apenas {{1}} (nome da pessoa) no texto. Outros dados entram na hora da campanha.', 400);
+  }
+
+  // Nome interno: slug do título (regra da Meta: minúsculas e underline).
+  const name = d.titulo
+    .toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 50);
+  if (!name) throw new AppError('Nome do modelo inválido.', 400);
+
+  const components = [];
+
+  // Imagem do topo (opcional): arquivo já enviado ao /uploads do sistema.
+  let headerUrl = null;
+  if (d.imagemFilename) {
+    const filename = path.basename(d.imagemFilename); // sem traversal
+    const filePath = path.resolve('uploads', filename);
+    if (!fs.existsSync(filePath)) throw new AppError('Imagem não encontrada — envie novamente.', 400);
+    const handle = await uploadHeaderHandle(filePath);
+    components.push({ type: 'HEADER', format: 'IMAGE', example: { header_handle: [handle] } });
+    headerUrl = `${env.publicUrl || 'https://app.marciobinsely.site'}/uploads/${filename}`;
+  }
+
+  components.push({
+    type: 'BODY',
+    text: corpo,
+    ...(varsNoCorpo.length ? { example: { body_text: [['Maria']] } } : {}),
+  });
+
+  if (d.rodape.trim()) components.push({ type: 'FOOTER', text: d.rodape.trim() });
+
+  if (d.tipoBotoes === 'respostas') {
+    const textos = d.botoes.map((b) => b.trim()).filter(Boolean);
+    if (!textos.length) throw new AppError('Adicione ao menos um botão de resposta.', 400);
+    for (const t of textos) {
+      if (EMOJI_RE.test(t)) throw new AppError(`O botão "${t}" não pode ter emoji (regra da Meta).`, 400);
+    }
+    components.push({ type: 'BUTTONS', buttons: textos.map((t) => ({ type: 'QUICK_REPLY', text: t })) });
+  } else if (d.tipoBotoes === 'link') {
+    const texto = (d.textoBotaoUrl || 'Saiba mais').trim();
+    const url = d.urlBotao.trim();
+    if (!/^https?:\/\//i.test(url)) throw new AppError('Informe o endereço completo do link (https://...).', 400);
+    if (/wa\.me|whatsapp\.com/i.test(url)) throw new AppError('A Meta não aceita link de WhatsApp em botão — use um endereço do site.', 400);
+    if (EMOJI_RE.test(texto)) throw new AppError('O texto do botão não pode ter emoji (regra da Meta).', 400);
+    components.push({ type: 'BUTTONS', buttons: [{ type: 'URL', text: texto, url }] });
+  }
+
+  const criado = await criarTemplateMeta({ name, components });
+
+  if (headerUrl) {
+    await prisma.setting.upsert({
+      where: { key: `tpl_header_${name}` },
+      update: { value: headerUrl },
+      create: { key: `tpl_header_${name}`, value: headerUrl },
+    });
+  }
+  await audit({ userId: req.user?.id, action: 'TEMPLATE_CRIADO', entity: 'WhatsappTemplate', entityId: criado.id, ip: req.ip, changes: { name, status: criado.status } });
+  res.status(201).json({ name, status: criado.status });
 });
 
 /** Núcleo do telefone (sem DDI 55) — mesmo critério da blacklist/campanhas. */
