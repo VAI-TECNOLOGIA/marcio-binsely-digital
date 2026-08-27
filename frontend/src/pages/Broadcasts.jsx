@@ -40,15 +40,46 @@ function fmtData(d) {
   return new Date(d).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 }
 
-/** Prévia da mensagem em bolha (header, corpo com variáveis, rodapé, botões). */
+/** Exemplos usados na prévia para dados do contato. */
+const EXEMPLO_VAR = { nome: 'Maria', cidade: 'Porto Alegre', bairro: 'Centro', responsavel: 'Carlos' };
+
+/** Trecho da frase logo antes da variável — vira o rótulo do campo. */
+function contextoVar(bodyText, n) {
+  const idx = (bodyText || '').indexOf(`{{${n}}}`);
+  if (idx < 0) return `Campo ${n}`;
+  const antes = (bodyText || '').slice(0, idx).trim().split(/\s+/).slice(-4).join(' ');
+  return antes ? `... ${antes} ___` : `Campo ${n}`;
+}
+
+/**
+ * Prévia AO VIVO da mensagem: dados do contato entram como exemplo real,
+ * texto digitado entra na hora e lacuna vazia fica destacada em âmbar.
+ */
 function PreviewBolha({ tpl, headerImageUrl, vars }) {
   if (!tpl) return null;
-  const corpo = (tpl.bodyText || '').replace(/\{\{\s*(\d+)\s*\}\}/g, (_, n) => {
-    const v = vars?.[Number(n) - 1];
-    if (!v) return `{{${n}}}`;
-    if (v.source === 'fixo') return v.value || `{{${n}}}`;
-    return `[${FONTES_VAR.find((f) => f.value === v.source)?.label || v.source}]`;
-  });
+  const texto = tpl.bodyText || '';
+  const partes = [];
+  const re = /\{\{\s*(\d+)\s*\}\}/g;
+  let last = 0;
+  let m;
+  let k = 0;
+  while ((m = re.exec(texto))) {
+    if (m.index > last) partes.push(texto.slice(last, m.index));
+    const v = vars?.[Number(m[1]) - 1];
+    if (v && v.source === 'fixo') {
+      partes.push(v.value?.trim()
+        ? <span key={k++} className="wa-fill">{v.value}</span>
+        : <span key={k++} className="wa-gap">escreva aqui</span>);
+    } else if (v && !v.source) {
+      partes.push(<span key={k++} className="wa-gap">escolha abaixo</span>);
+    } else if (v) {
+      partes.push(<span key={k++} className="wa-fill" title={FONTES_VAR.find((f) => f.value === v.source)?.label}>{EXEMPLO_VAR[v.source] || EXEMPLO_VAR.nome}</span>);
+    } else {
+      partes.push(<span key={k++} className="wa-gap">escreva aqui</span>);
+    }
+    last = m.index + m[0].length;
+  }
+  if (last < texto.length) partes.push(texto.slice(last));
   return (
     <div className="wa-preview">
       <div className="wa-bubble">
@@ -58,7 +89,7 @@ function PreviewBolha({ tpl, headerImageUrl, vars }) {
             : <div className="wa-header-ph">Imagem do topo</div>
         )}
         {tpl.headerText && <div className="wa-header-text">{tpl.headerText}</div>}
-        <div className="wa-body">{corpo}</div>
+        <div className="wa-body">{partes}</div>
         {tpl.footerText && <div className="wa-footer">{tpl.footerText}</div>}
         {tpl.buttons?.length > 0 && (
           <div className="wa-buttons">
@@ -254,7 +285,7 @@ export default function Broadcasts() {
   function selecionarTemplate(name) {
     const t = templates.find((x) => x.name === name);
     setForm((s) => ({ ...s, templateName: name || null, templateLang: t?.language || 'pt_BR', headerImageUrl: t?.headerFormat === 'IMAGE' ? (s.headerImageUrl || '') : null }));
-    setVars(Array.from({ length: t?.bodyVarCount || 0 }, (_, i) => ({ source: i === 0 ? 'nome' : 'fixo', value: '' })));
+    setVars(Array.from({ length: t?.bodyVarCount || 0 }, (_, i) => ({ source: i === 0 ? 'nome' : '', value: '' })));
   }
 
   function toggleFiltro(chave, valor) {
@@ -307,6 +338,8 @@ export default function Broadcasts() {
     }
     if (passo === 3) {
       if (!form.templateName) return toast.error('Escolha um modelo aprovado.');
+      if (vars.some((v) => !v.source)) return toast.error('Defina de onde vem cada informação do texto.');
+      if (vars.some((v) => v.source === 'fixo' && !(v.value || '').trim())) return toast.error('Preencha os campos marcados como "igual para todos".');
       // Cria a campanha (rascunho/agendada) + grava o público.
       setSalvando(true);
       try {
@@ -771,17 +804,17 @@ export default function Broadcasts() {
             );
           })()}
 
-          {/* Passo 3 — mensagem (somente template aprovado: exigência da API Oficial p/ campanha) */}
+          {/* Passo 3 — mensagem (somente template aprovado; variáveis MAPEADAS para dados do contato) */}
           {passo === 3 && (
             <>
               <p className="cell-muted" style={{ marginBottom: 10, fontSize: 13 }}>
                 Qual mensagem vai ser enviada? Campanhas usam somente modelos aprovados pela Meta.
               </p>
-              <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div className="grid" style={{ gridTemplateColumns: '1fr 1.1fr', gap: 16 }}>
                 <div>
                   <div className="field">
                     <label>Modelos aprovados <span className="req">*</span></label>
-                    <div style={{ maxHeight: 280, overflow: 'auto', border: '1px solid var(--border, #e2e5ea)', borderRadius: 8 }}>
+                    <div style={{ maxHeight: 380, overflow: 'auto', border: '1px solid var(--border, #e2e5ea)', borderRadius: 8 }}>
                       {templates.map((t) => (
                         <button
                           key={t.name} type="button"
@@ -793,35 +826,57 @@ export default function Broadcasts() {
                           onClick={() => selecionarTemplate(t.name)}
                         >
                           <div className="cell-strong" style={{ fontSize: 13 }}>{form.templateName === t.name ? '✓ ' : ''}{t.name}</div>
-                          <div className="cell-muted" style={{ fontSize: 11 }}>{t.category} · {t.language}{t.headerFormat ? ` · topo ${t.headerFormat}` : ''}{t.bodyVarCount ? ` · ${t.bodyVarCount} variável(is)` : ''}</div>
+                          <div className="cell-muted" style={{ fontSize: 11 }}>{t.category} · {t.language}{t.headerFormat ? ` · topo ${t.headerFormat}` : ''}{t.bodyVarCount ? ` · ${t.bodyVarCount} ${t.bodyVarCount > 1 ? 'campos' : 'campo'}` : ''}</div>
                         </button>
                       ))}
                       {templates.length === 0 && <div className="cell-muted" style={{ padding: 12 }}>Nenhum modelo aprovado na conta ainda. Os modelos em análise na Meta aparecem aqui quando aprovarem.</div>}
                     </div>
                   </div>
-                  {tplSel?.headerFormat === 'IMAGE' && (
-                    <Field field={{ name: 'headerImageUrl', label: 'Imagem do topo (URL pública)', hint: 'Ex.: arte da campanha hospedada no site.' }} value={form.headerImageUrl} onChange={setCampo} />
-                  )}
-                  {tplSel?.bodyVarCount > 0 && (
-                    <div className="field">
-                      <label>Variáveis do texto</label>
-                      {vars.map((v, i) => (
-                        <div key={i} className="flex gap-8" style={{ marginBottom: 6, alignItems: 'center' }}>
-                          <span className="cell-muted" style={{ width: 42 }}>{'{{' + (i + 1) + '}}'}</span>
-                          <select className="select" style={{ flex: 1 }} value={v.source} onChange={(e) => setVars((arr) => arr.map((x, j) => (j === i ? { ...x, source: e.target.value } : x)))}>
-                            {FONTES_VAR.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
-                          </select>
-                          {v.source === 'fixo' && (
-                            <input className="input" style={{ flex: 1 }} placeholder="Texto fixo" value={v.value || ''} onChange={(e) => setVars((arr) => arr.map((x, j) => (j === i ? { ...x, value: e.target.value } : x)))} />
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
                 <div>
                   <div className="field"><label>Como vai chegar no WhatsApp</label></div>
-                  {tplSel ? <PreviewBolha tpl={tplSel} headerImageUrl={form.headerImageUrl} vars={vars} /> : <div className="cell-muted">Escolha um modelo à esquerda para ver a mensagem.</div>}
+                  {tplSel ? (
+                    <>
+                      <PreviewBolha tpl={tplSel} headerImageUrl={form.headerImageUrl} vars={vars} />
+                      {tplSel.headerFormat === 'IMAGE' && (
+                        <Field field={{ name: 'headerImageUrl', label: 'Imagem do topo (URL pública)', hint: 'Ex.: arte da campanha hospedada no site.' }} value={form.headerImageUrl} onChange={setCampo} />
+                      )}
+                      {tplSel.bodyVarCount > 0 && (
+                        <div className="field" style={{ marginTop: 12 }}>
+                          <label>De onde vem cada informação?</label>
+                          <span className="field-hint" style={{ display: 'block', marginBottom: 8 }}>
+                            No envio em massa, cada campo é preenchido com o dado de cada pessoa — por isso você MAPEIA, não digita. "Escrever texto" é só para o que é igual para todos (nome do evento, data...).
+                          </span>
+                          {vars.map((v, i) => (
+                            <div key={i} className="map-var">
+                              <div className="map-ctx">{contextoVar(tplSel.bodyText, i + 1)}</div>
+                              <div className="flex gap-8" style={{ alignItems: 'center' }}>
+                                <select
+                                  className={`select ${!v.source ? 'map-pend' : ''}`} style={{ flex: 1 }}
+                                  value={v.source}
+                                  onChange={(e) => setVars((arr) => arr.map((x, j) => (j === i ? { ...x, source: e.target.value } : x)))}
+                                >
+                                  <option value="">Escolher...</option>
+                                  <optgroup label="Dados do contato (muda por pessoa)">
+                                    <option value="nome">Nome do contato</option>
+                                    <option value="cidade">Cidade do contato</option>
+                                    <option value="bairro">Bairro do contato</option>
+                                    <option value="responsavel">Responsável pelo contato</option>
+                                  </optgroup>
+                                  <optgroup label="Igual para todos">
+                                    <option value="fixo">Escrever texto</option>
+                                  </optgroup>
+                                </select>
+                                {v.source === 'fixo' && (
+                                  <input className="input" style={{ flex: 1.3 }} placeholder="Ex.: lançamento da campanha" value={v.value || ''} onChange={(e) => setVars((arr) => arr.map((x, j) => (j === i ? { ...x, value: e.target.value } : x)))} />
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  ) : <div className="cell-muted">Escolha um modelo à esquerda para ver a mensagem.</div>}
                 </div>
               </div>
             </>

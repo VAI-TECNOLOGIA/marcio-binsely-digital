@@ -214,7 +214,8 @@ export function montarComponentesTemplate(tpl, campaign, contact) {
       if (src === 'cidade') return contact.cityName;
       if (src === 'bairro') return contact.neighborhood;
       if (src === 'responsavel') return contact.responsible;
-      if (src === 'fixo') return valorFixo;
+      // Texto fixo NUNCA cai no nome do contato — vazio vira travessão.
+      if (src === 'fixo') return (valorFixo || '').trim() || '—';
       return contact.name; // 'nome' (padrão)
     };
     const vars = Array.isArray(campaign.varsJson) ? campaign.varsJson : null;
