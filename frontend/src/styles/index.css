@@ -1497,3 +1497,43 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
   background: var(--card, #fff);
 }
 .pool-card.pool-off { opacity: .55; }
+
+/* ==== Passo Público — redesenho UX (caminho simples primeiro) ==== */
+.rc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.rc-card {
+  border: 1.5px solid var(--border, #dde2e9); border-radius: 12px; background: var(--card, #fff);
+  padding: 14px 16px; text-align: left; cursor: pointer; transition: all .15s ease; color: var(--text, #26313f);
+}
+.rc-card b { display: block; font-size: 14px; margin-bottom: 3px; color: inherit; }
+.rc-card span { font-size: 12px; color: var(--muted, #7b8494); line-height: 1.35; display: block; }
+.rc-card:hover { border-color: var(--navy, #043868); }
+.rc-card.rc-on {
+  border-color: var(--navy, #043868); background: var(--soft-primary, #e7eff7);
+  box-shadow: inset 0 0 0 1px var(--navy, #043868);
+}
+.seg-area { border-left: 3px solid var(--soft-primary, #e7eff7); padding-left: 14px; margin: 6px 0 10px; }
+.sel-line { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
+.sel-label { font-size: 12px; color: var(--muted, #7b8494); font-weight: 600; }
+.sec-det { border: 1px solid var(--border, #e6e9ee); border-radius: 10px; padding: 0; margin-top: 10px; background: var(--card, #fff); }
+.sec-det > summary {
+  cursor: pointer; padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--text, #26313f);
+  list-style: none; display: flex; align-items: center; gap: 6px;
+}
+.sec-det > summary::before { content: "+"; font-weight: 700; color: var(--navy, #043868); width: 14px; }
+.sec-det[open] > summary::before { content: "–"; }
+.sec-det > summary::-webkit-details-marker { display: none; }
+.sec-det > *:not(summary) { margin: 0 14px 12px; }
+.publico-resumo {
+  position: sticky; bottom: -1px; margin-top: 14px; padding: 12px 16px;
+  background: var(--navy, #043868); color: #fff; border-radius: 12px;
+  display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+  box-shadow: 0 -4px 16px rgba(0,0,0,.10);
+}
+.pr-num { font-size: 22px; font-weight: 800; line-height: 1; }
+.pr-num span { font-size: 13px; font-weight: 500; opacity: .85; margin-left: 4px; }
+.pr-num.pr-calc { font-size: 14px; font-weight: 600; opacity: .85; }
+.pr-det { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; opacity: .9; }
+.pr-det .pr-block { color: #FCA95A; font-weight: 600; }
+/* Contraste no dark: número do rodízio legível */
+.pool-card { color: var(--text, #26313f); }
+.pool-card b { color: inherit; }

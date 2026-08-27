@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Plus, Send, Megaphone, X, Search, Users, ShieldCheck, Clock, Copy, Trash2,
-  Download, Pause, Play, ChevronLeft, ChevronRight, Zap, ClipboardList, RefreshCw,
+  Plus, Send, Megaphone, X, Search, ShieldCheck, Clock, Copy, Trash2,
+  Download, Pause, Play, ChevronLeft, ChevronRight, Zap, ClipboardList,
   ScrollText,
 } from 'lucide-react';
 import Layout from '../components/layout/Layout.jsx';
@@ -108,6 +108,10 @@ export default function Broadcasts() {
   const [tags, setTags] = useState([]);
   const [previewPublico, setPreviewPublico] = useState(null);
   const [calculando, setCalculando] = useState(false);
+  // Público — modo simples primeiro (divulgação progressiva)
+  const [modoPublico, setModoPublico] = useState('todos'); // todos | voluntarios | segmentar
+  const [buscaGrupo, setBuscaGrupo] = useState('');
+  const [verTodosGrupos, setVerTodosGrupos] = useState(false);
   const [modo, setModo] = useState('template');
   const [vars, setVars] = useState([]);
   const [salvando, setSalvando] = useState(false);
@@ -232,6 +236,9 @@ export default function Broadcasts() {
   function abrirWizard() {
     setForm({ templateLang: 'pt_BR' });
     setFiltros({ usarBase: true });
+    setModoPublico('todos');
+    setBuscaGrupo('');
+    setVerTodosGrupos(false);
     setColados('');
     setPreviewPublico(null);
     setModo('template');
@@ -261,6 +268,23 @@ export default function Broadcasts() {
     setPreviewPublico(null);
   }
 
+  function trocarModoPublico(m) {
+    setModoPublico(m);
+    if (m === 'todos') setFiltros({ usarBase: true });
+    else if (m === 'voluntarios') setFiltros({ usarBase: true, apenasVoluntarios: true });
+    else setFiltros((f) => ({ usarBase: true, apenasVoluntarios: false, tags: f.tags || [], cities: f.cities || [], neighborhoods: f.neighborhoods || [], statuses: f.statuses || [] }));
+    setPreviewPublico(null);
+  }
+
+  // O público calcula SOZINHO: qualquer mudança de filtro/números atualiza a
+  // contagem depois de 600ms — feedback contínuo, sem botão "Calcular".
+  useEffect(() => {
+    if (!wizardOpen || passo !== 2) return;
+    const t = setTimeout(() => { calcularPublico(); }, 600);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wizardOpen, passo, filtros, colados]);
+
   async function calcularPublico() {
     setCalculando(true);
     try {
@@ -279,8 +303,8 @@ export default function Broadcasts() {
       return setPasso(2);
     }
     if (passo === 2) {
-      if (!previewPublico) return toast.error('Clique em "Calcular público" para conferir os números.');
-      if (!previewPublico.total) return toast.error('O público está vazio — ajuste os filtros ou cole números.');
+      if (calculando || !previewPublico) return toast.error('Um instante — ainda calculando o público.');
+      if (!previewPublico.total) return toast.error('O público está vazio — ajuste a seleção ou cole números.');
       return setPasso(3);
     }
     if (passo === 3) {
@@ -618,90 +642,136 @@ export default function Broadcasts() {
             </>
           )}
 
-          {/* Passo 2 — público */}
-          {passo === 2 && (
+          {/* Passo 2 — público (simples primeiro; avançado só quando pedido) */}
+          {passo === 2 && (() => {
+            const selTags = filtros.tags || [];
+            const selCidades = filtros.cities || [];
+            const selBairros = filtros.neighborhoods || [];
+            const selStatus = filtros.statuses || [];
+            const listaTags = (tags || []).map((t) => ({ nome: t.tag || t.value || t, qtd: t.count ?? t.total ?? null }));
+            const filtradas = buscaGrupo.trim()
+              ? listaTags.filter((t) => t.nome.toLowerCase().includes(buscaGrupo.trim().toLowerCase()))
+              : listaTags;
+            const visiveis = verTodosGrupos || buscaGrupo.trim() ? filtradas : filtradas.slice(0, 14);
+            const linhasColadas = colados.split(/\n+/).map((x) => x.trim()).filter(Boolean).length;
+            return (
             <>
-              <div className="field">
-                <label><Users size={14} style={{ verticalAlign: -2 }} /> Bases importadas</label>
-                <div className="flex gap-8" style={{ flexWrap: 'wrap' }}>
-                  <button type="button" className={`btn btn-sm ${filtros.usarBase !== false ? 'btn-primary' : ''}`} onClick={() => { setFiltros((f) => ({ ...f, usarBase: f.usarBase === false })); setPreviewPublico(null); }}>
-                    Usar a base de apoiadores
-                  </button>
-                  <button type="button" className={`btn btn-sm ${filtros.apenasVoluntarios ? 'btn-primary' : ''}`} onClick={() => { setFiltros((f) => ({ ...f, apenasVoluntarios: !f.apenasVoluntarios })); setPreviewPublico(null); }}>
-                    Somente voluntários ativos {opcoes ? `(${opcoes.voluntariosAtivos})` : ''}
-                  </button>
-                </div>
-                <span className="field-hint">Sem nenhum filtro abaixo, entra a base inteira com telefone. Cada filtro reduz o público.</span>
+              <p className="cell-muted" style={{ marginBottom: 10, fontSize: 13 }}>Para quem vai esta mensagem?</p>
+
+              {/* Caminhos comuns em 1 clique */}
+              <div className="rc-grid" role="radiogroup" aria-label="Público da campanha">
+                <button type="button" role="radio" aria-checked={modoPublico === 'todos'} className={`rc-card ${modoPublico === 'todos' ? 'rc-on' : ''}`} onClick={() => trocarModoPublico('todos')}>
+                  <b>Toda a base</b>
+                  <span>Todos os apoiadores com telefone</span>
+                </button>
+                <button type="button" role="radio" aria-checked={modoPublico === 'voluntarios'} className={`rc-card ${modoPublico === 'voluntarios' ? 'rc-on' : ''}`} onClick={() => trocarModoPublico('voluntarios')}>
+                  <b>Voluntários ativos</b>
+                  <span>{opcoes ? `${opcoes.voluntariosAtivos.toLocaleString('pt-BR')} pessoas da equipe de rua` : 'Somente quem é voluntário'}</span>
+                </button>
+                <button type="button" role="radio" aria-checked={modoPublico === 'segmentar'} className={`rc-card ${modoPublico === 'segmentar' ? 'rc-on' : ''}`} onClick={() => trocarModoPublico('segmentar')}>
+                  <b>Escolher grupos</b>
+                  <span>Filtrar por grupo, cidade ou bairro</span>
+                </button>
               </div>
 
-              {filtros.usarBase !== false && (
-                <>
-                  <div className="field">
-                    <label>Grupos / etiquetas</label>
-                    <div className="chip-wrap">
-                      {(tags || []).slice(0, 60).map((t) => {
-                        const nome = t.tag || t.value || t;
-                        const qtd = t.count ?? t.total ?? null;
-                        const on = (filtros.tags || []).includes(nome);
-                        return (
-                          <button key={nome} type="button" className={`chip ${on ? 'chip-on' : ''}`} onClick={() => toggleFiltro('tags', nome)}>
-                            {nome}{qtd != null ? ` · ${qtd}` : ''}
-                          </button>
-                        );
+              {/* Segmentação — só aparece quando escolhida */}
+              {modoPublico === 'segmentar' && (
+                <div className="seg-area">
+                  {(selTags.length > 0 || selCidades.length > 0 || selBairros.length > 0 || selStatus.length > 0) && (
+                    <div className="sel-line">
+                      <span className="sel-label">Selecionados:</span>
+                      {selTags.map((t) => <button key={`t-${t}`} type="button" className="chip chip-on" onClick={() => toggleFiltro('tags', t)}>{t} ✕</button>)}
+                      {selCidades.map((c) => <button key={`c-${c}`} type="button" className="chip chip-on" onClick={() => toggleFiltro('cities', c)}>{c} ✕</button>)}
+                      {selBairros.map((b) => <button key={`b-${b}`} type="button" className="chip chip-on" onClick={() => toggleFiltro('neighborhoods', b)}>{b} ✕</button>)}
+                      {selStatus.map((st) => <button key={`s-${st}`} type="button" className="chip chip-on" onClick={() => toggleFiltro('statuses', st)}>{label('SupporterStatus', st) || st} ✕</button>)}
+                    </div>
+                  )}
+                  <span className="field-hint" style={{ display: 'block', marginBottom: 8 }}>Grupos somam pessoas. Cidade, bairro e situação refinam o resultado.</span>
+
+                  <div className="field" style={{ marginBottom: 6 }}>
+                    <div className="search" style={{ maxWidth: 340 }}>
+                      <Search size={14} />
+                      <input className="input" placeholder="Buscar grupo pelo nome..." value={buscaGrupo} onChange={(e) => setBuscaGrupo(e.target.value)} />
+                    </div>
+                  </div>
+                  <div className="chip-wrap">
+                    {visiveis.map((t) => {
+                      const on = selTags.includes(t.nome);
+                      return (
+                        <button key={t.nome} type="button" aria-pressed={on} className={`chip ${on ? 'chip-on' : ''}`} onClick={() => toggleFiltro('tags', t.nome)}>
+                          {on ? '✓ ' : ''}{t.nome}{t.qtd != null ? ` · ${t.qtd.toLocaleString('pt-BR')}` : ''}
+                        </button>
+                      );
+                    })}
+                    {!visiveis.length && <span className="cell-muted">Nenhum grupo com esse nome.</span>}
+                  </div>
+                  {!buscaGrupo.trim() && filtradas.length > 14 && (
+                    <button type="button" className="btn btn-ghost btn-sm" style={{ marginTop: 6 }} onClick={() => setVerTodosGrupos(!verTodosGrupos)}>
+                      {verTodosGrupos ? 'Mostrar menos' : `Mostrar todos os ${filtradas.length} grupos`}
+                    </button>
+                  )}
+
+                  <details className="sec-det">
+                    <summary>Cidades {selCidades.length ? `· ${selCidades.length} selecionada(s)` : ''}</summary>
+                    <div className="chip-wrap" style={{ maxHeight: 150, overflow: 'auto' }}>
+                      {(opcoes?.cidades || []).map((c) => {
+                        const on = selCidades.includes(c.value);
+                        return <button key={c.value} type="button" aria-pressed={on} className={`chip ${on ? 'chip-on' : ''}`} onClick={() => toggleFiltro('cities', c.value)}>{on ? '✓ ' : ''}{c.value} · {c.count}</button>;
                       })}
-                      {(!tags || !tags.length) && <span className="cell-muted">Sem etiquetas na base.</span>}
                     </div>
-                  </div>
-                  <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                    <div className="field">
-                      <label>Cidades</label>
-                      <div className="chip-wrap" style={{ maxHeight: 130, overflow: 'auto' }}>
-                        {(opcoes?.cidades || []).map((c) => (
-                          <button key={c.value} type="button" className={`chip ${(filtros.cities || []).includes(c.value) ? 'chip-on' : ''}`} onClick={() => toggleFiltro('cities', c.value)}>
-                            {c.value} · {c.count}
-                          </button>
-                        ))}
-                      </div>
+                  </details>
+                  <details className="sec-det">
+                    <summary>Bairros {selBairros.length ? `· ${selBairros.length} selecionado(s)` : ''}</summary>
+                    <div className="chip-wrap" style={{ maxHeight: 150, overflow: 'auto' }}>
+                      {(opcoes?.bairros || []).map((b) => {
+                        const on = selBairros.includes(b.value);
+                        return <button key={b.value} type="button" aria-pressed={on} className={`chip ${on ? 'chip-on' : ''}`} onClick={() => toggleFiltro('neighborhoods', b.value)}>{on ? '✓ ' : ''}{b.value} · {b.count}</button>;
+                      })}
                     </div>
-                    <div className="field">
-                      <label>Bairros</label>
-                      <div className="chip-wrap" style={{ maxHeight: 130, overflow: 'auto' }}>
-                        {(opcoes?.bairros || []).map((b) => (
-                          <button key={b.value} type="button" className={`chip ${(filtros.neighborhoods || []).includes(b.value) ? 'chip-on' : ''}`} onClick={() => toggleFiltro('neighborhoods', b.value)}>
-                            {b.value} · {b.count}
-                          </button>
-                        ))}
-                      </div>
+                  </details>
+                  <details className="sec-det">
+                    <summary>Situação do apoiador {selStatus.length ? `· ${selStatus.length}` : ''}</summary>
+                    <div className="chip-wrap">
+                      {(opcoes?.statuses || []).map((st) => {
+                        const on = selStatus.includes(st.value);
+                        return <button key={st.value} type="button" aria-pressed={on} className={`chip ${on ? 'chip-on' : ''}`} onClick={() => toggleFiltro('statuses', st.value)}>{on ? '✓ ' : ''}{label('SupporterStatus', st.value) || st.value} · {st.count}</button>;
+                      })}
                     </div>
-                  </div>
-                </>
+                  </details>
+                </div>
               )}
 
-              <div className="field">
-                <label><ClipboardList size={14} style={{ verticalAlign: -2 }} /> Colar números novos (um por linha)</label>
+              {/* Números avulsos — recolhido; abre só quem precisa */}
+              <details className="sec-det" open={linhasColadas > 0}>
+                <summary><ClipboardList size={13} style={{ verticalAlign: -2 }} /> Adicionar números avulsos {linhasColadas ? `· ${linhasColadas} linha(s)` : '(colar do WhatsApp, planilha...)'}</summary>
                 <textarea
                   className="textarea" rows={4}
                   placeholder={'51999990000 Maria da Silva\n(51) 98888-7777\n5551977776666'}
                   value={colados}
-                  onChange={(e) => { setColados(e.target.value); setPreviewPublico(null); }}
+                  onChange={(e) => setColados(e.target.value)}
                 />
-                <span className="field-hint">Aceita com ou sem DDI 55, com máscara ou só dígitos. O nome depois do número é opcional.</span>
-              </div>
+                <span className="field-hint">Um número por linha, com ou sem DDI 55. O nome depois do número é opcional. Entram junto com a seleção acima.</span>
+              </details>
 
-              <div className="flex gap-8" style={{ alignItems: 'center' }}>
-                <button className="btn btn-primary" disabled={calculando} onClick={calcularPublico}><RefreshCw size={15} /> {calculando ? 'Calculando...' : 'Calcular público'}</button>
-                {previewPublico && (
-                  <div className="media-caption" style={{ flex: 1 }}>
-                    <b>{previewPublico.total.toLocaleString('pt-BR')} destinatários</b>
-                    {' '}· base: {previewPublico.daBase - previewPublico.semTelefone} · colados válidos: {previewPublico.colados - previewPublico.coladosInvalidos}
-                    {previewPublico.blacklist > 0 && <> · <b style={{ color: 'var(--red)' }}>{previewPublico.blacklist} na lista de supressão (fora)</b></>}
-                    {previewPublico.duplicados > 0 && <> · {previewPublico.duplicados} duplicados</>}
-                    {previewPublico.coladosInvalidos > 0 && <> · {previewPublico.coladosInvalidos} inválidos</>}
-                  </div>
+              {/* Contador SEMPRE visível — atualiza sozinho */}
+              <div className="publico-resumo" aria-live="polite">
+                {calculando || !previewPublico ? (
+                  <div className="pr-num pr-calc">Calculando público...</div>
+                ) : (
+                  <>
+                    <div className="pr-num">{previewPublico.total.toLocaleString('pt-BR')} <span>pessoas vão receber</span></div>
+                    <div className="pr-det">
+                      {previewPublico.blacklist > 0 && <span className="pr-block">{previewPublico.blacklist} pediram para não receber (fora)</span>}
+                      {previewPublico.duplicados > 0 && <span>{previewPublico.duplicados} repetidos removidos</span>}
+                      {previewPublico.coladosInvalidos > 0 && <span>{previewPublico.coladosInvalidos} números inválidos</span>}
+                      {previewPublico.semTelefone > 0 && <span>{previewPublico.semTelefone.toLocaleString('pt-BR')} sem telefone</span>}
+                    </div>
+                  </>
                 )}
               </div>
             </>
-          )}
+            );
+          })()}
 
           {/* Passo 3 — mensagem */}
           {passo === 3 && (
