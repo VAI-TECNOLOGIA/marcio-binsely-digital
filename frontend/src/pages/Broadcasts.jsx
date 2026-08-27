@@ -942,70 +942,18 @@ export default function Broadcasts() {
             </>
           )}
 
-          {/* Passo 4 — revisão final: a mensagem, o resumo em linguagem simples e a declaração */}
+          {/* Passo 4 — decisão PRIMEIRO, depois só o que a escolha exige */}
           {passo === 4 && (() => {
             const total = previewPublico?.total || 0;
             const saldo = creditos?.saldo || 0;
             const numerosAtivos = (pool?.numeros || []).filter((n) => n.active);
             const semPacote = !creditos?.total || creditos?.expirado;
+            const precisaDecl = modoEnvio !== 'rascunho';
             return (
             <>
-              <p className="cell-muted" style={{ marginBottom: 10, fontSize: 13 }}>Confira tudo antes de liberar. Nada é enviado sem a declaração.</p>
-
-              <div className="grid" style={{ gridTemplateColumns: '1.1fr 1fr', gap: 16 }}>
-                <div>
-                  <div className="rev-card">
-                    <div className="rev-row"><span className="rev-k">Mensagem</span><span className="rev-v"><b>{form.templateName}</b></span></div>
-                    <div className="rev-row"><span className="rev-k">Vai para</span><span className="rev-v"><b>{total.toLocaleString('pt-BR')} pessoas</b>{previewPublico?.blacklist ? ` · ${previewPublico.blacklist} fora por pedido` : ''}</span></div>
-                    <div className="rev-row"><span className="rev-k">Quando</span><span className="rev-v">{modoEnvio === 'rascunho' ? 'Fica guardada como rascunho' : modoEnvio === 'agendar' ? (form.scheduledAt ? <b>{fmtData(form.scheduledAt)} — o sistema envia sozinho</b> : 'Escolha a data abaixo') : 'Assim que você confirmar'}</span></div>
-                    <div className="rev-row"><span className="rev-k">Sai por</span><span className="rev-v">{numerosAtivos.length} número(s) em rodízio, respeitando o limite diário de cada um</span></div>
-                    <div className="rev-row"><span className="rev-k">Créditos</span><span className="rev-v">{semPacote ? '—' : <>vai consumir até <b>{Math.min(total, saldo).toLocaleString('pt-BR')}</b> dos {saldo.toLocaleString('pt-BR')} disponíveis</>}</span></div>
-                  </div>
-
-                  {semPacote && (
-                    <div className="warning-box" style={{ marginTop: 10 }}>
-                      <span><b>Pacote de créditos não ativado.</b> Você pode salvar ou agendar agora, mas o envio só sai depois de ativar o pacote na tela de Campanhas.</span>
-                    </div>
-                  )}
-                  {!semPacote && saldo < total && (
-                    <div className="warning-box" style={{ marginTop: 10 }}>
-                      <span>O público é maior que o saldo. O envio para sozinho quando os créditos acabarem e os demais ficam pendentes.</span>
-                    </div>
-                  )}
-
-                  <div className="rev-card" style={{ marginTop: 10 }}>
-                    <div className="cell-strong" style={{ fontSize: 13, marginBottom: 6 }}>Teste antes de enviar (recomendado)</div>
-                    <div className="flex gap-8">
-                      <input className="input" style={{ maxWidth: 210 }} placeholder="Seu número com DDD" value={fonesTeste} onChange={(e) => setFoneTeste(e.target.value)} />
-                      <button className="btn" onClick={enviarTesteWizard}><Send size={14} /> Enviar teste</button>
-                    </div>
-                    <span className="field-hint">Chega no seu WhatsApp exatamente como o eleitor vai receber (consome 1 crédito).</span>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="field"><label>Como vai chegar no WhatsApp</label></div>
-                  {tplSel ? <PreviewBolha tpl={tplSel} headerImageUrl={form.headerImageUrl} vars={vars} /> : <div className="cell-muted">Modelo não carregado.</div>}
-                </div>
-              </div>
-
-              <div className="decl-box" style={{ border: '1.5px solid var(--navy, #043868)', borderRadius: 10, padding: '14px 16px', marginTop: 14, background: 'var(--soft-primary, #f4f7fa)' }}>
-                <div className="cell-strong" style={{ fontSize: 13, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <ShieldCheck size={15} /> Declaração de responsabilidade da campanha
-                </div>
-                <div className="flex" style={{ gap: 10, alignItems: 'flex-start' }}>
-                  <input id="decl" type="checkbox" checked={declAceita} onChange={(e) => setDeclAceita(e.target.checked)} style={{ marginTop: 4, width: 16, height: 16 }} />
-                  <label htmlFor="decl" style={{ fontSize: 13, lineHeight: 1.55, cursor: 'pointer' }}>
-                    {declInfo?.texto || 'Carregando o texto da declaração...'}
-                  </label>
-                </div>
-                <div className="cell-muted" style={{ fontSize: 11, marginTop: 8 }}>
-                  O aceite registra usuário, data, hora e IP na auditoria. Mudou o público depois? O sistema exige aceitar de novo.
-                </div>
-              </div>
-
-              <div className="field" style={{ marginTop: 14 }}>
-                <label>O que fazer com esta campanha?</label>
+              {/* 1) A pergunta que manda: o que fazer? */}
+              <div className="field" style={{ marginBottom: 4 }}>
+                <label style={{ fontSize: 14 }}>O que fazer com esta campanha?</label>
                 <div className="rc-grid" role="radiogroup" aria-label="Decisão de envio">
                   <button type="button" role="radio" aria-checked={modoEnvio === 'agora'} className={`rc-card ${modoEnvio === 'agora' ? 'rc-on' : ''}`} onClick={() => setModoEnvio('agora')}>
                     <b>Enviar agora</b>
@@ -1021,14 +969,73 @@ export default function Broadcasts() {
                   </button>
                 </div>
                 {modoEnvio === 'agendar' && (
-                  <div style={{ marginTop: 10, maxWidth: 260 }}>
-                    <Field field={{ name: 'scheduledAt', label: 'Enviar em', type: 'datetime-local', required: true }} value={form.scheduledAt} onChange={setCampo} />
+                  <div style={{ marginTop: 10, maxWidth: 280 }}>
+                    <Field field={{ name: 'scheduledAt', label: 'Data e hora do envio', type: 'datetime-local', required: true }} value={form.scheduledAt} onChange={setCampo} />
                   </div>
                 )}
-                {modoEnvio !== 'rascunho' && !declAceita && (
-                  <span className="field-hint" style={{ display: 'block', marginTop: 6 }}>Marque a declaração acima para liberar o botão.</span>
-                )}
               </div>
+
+              {/* 2) Resumo + prévia */}
+              <div className="grid" style={{ gridTemplateColumns: '1.1fr 1fr', gap: 16, marginTop: 6 }}>
+                <div>
+                  <div className="rev-card">
+                    <div className="rev-row"><span className="rev-k">Mensagem</span><span className="rev-v"><b>{form.templateName}</b></span></div>
+                    <div className="rev-row"><span className="rev-k">Vai para</span><span className="rev-v"><b>{total.toLocaleString('pt-BR')} pessoas</b>{previewPublico?.blacklist ? ` · ${previewPublico.blacklist} fora por pedido` : ''}</span></div>
+                    <div className="rev-row"><span className="rev-k">Quando</span><span className="rev-v">{modoEnvio === 'rascunho' ? 'Fica guardada como rascunho' : modoEnvio === 'agendar' ? (form.scheduledAt ? <b>{fmtData(form.scheduledAt)}</b> : 'Escolha a data acima') : 'Assim que você confirmar'}</span></div>
+                    <div className="rev-row"><span className="rev-k">Sai por</span><span className="rev-v">{numerosAtivos.length} número(s) em rodízio, respeitando o limite diário de cada um</span></div>
+                    <div className="rev-row"><span className="rev-k">Créditos</span><span className="rev-v">{semPacote ? '—' : <>vai consumir até <b>{Math.min(total, saldo).toLocaleString('pt-BR')}</b> dos {saldo.toLocaleString('pt-BR')} disponíveis</>}</span></div>
+                  </div>
+
+                  {precisaDecl && semPacote && (
+                    <div className="warning-box" style={{ marginTop: 10 }}>
+                      <span><b>Pacote de créditos não ativado.</b> {modoEnvio === 'agendar' ? 'Pode agendar agora; o' : 'O'} envio só sai depois de ativar o pacote na tela de Campanhas.</span>
+                    </div>
+                  )}
+                  {precisaDecl && !semPacote && saldo < total && (
+                    <div className="warning-box" style={{ marginTop: 10 }}>
+                      <span>O público é maior que o saldo. O envio para sozinho quando os créditos acabarem e os demais ficam pendentes.</span>
+                    </div>
+                  )}
+
+                  {precisaDecl && (
+                    <div className="rev-card" style={{ marginTop: 10 }}>
+                      <div className="cell-strong" style={{ fontSize: 13, marginBottom: 6 }}>Teste antes de enviar (recomendado)</div>
+                      <div className="flex gap-8">
+                        <input className="input" style={{ maxWidth: 210 }} placeholder="Seu número com DDD" value={fonesTeste} onChange={(e) => setFoneTeste(e.target.value)} />
+                        <button className="btn" onClick={enviarTesteWizard}><Send size={14} /> Enviar teste</button>
+                      </div>
+                      <span className="field-hint">Chega no seu WhatsApp exatamente como o eleitor vai receber (consome 1 crédito).</span>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <div className="field"><label>Como vai chegar no WhatsApp</label></div>
+                  {tplSel ? <PreviewBolha tpl={tplSel} headerImageUrl={form.headerImageUrl} vars={vars} /> : <div className="cell-muted">Modelo não carregado.</div>}
+                </div>
+              </div>
+
+              {/* 3) Declaração — só quando vai enviar ou agendar */}
+              {precisaDecl ? (
+                <div className="decl-box" style={{ border: '1.5px solid var(--navy, #043868)', borderRadius: 10, padding: '14px 16px', marginTop: 14, background: 'var(--soft-primary, #f4f7fa)' }}>
+                  <div className="cell-strong" style={{ fontSize: 13, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <ShieldCheck size={15} /> Declaração de responsabilidade da campanha
+                  </div>
+                  <div className="flex" style={{ gap: 10, alignItems: 'flex-start' }}>
+                    <input id="decl" type="checkbox" checked={declAceita} onChange={(e) => setDeclAceita(e.target.checked)} style={{ marginTop: 4, width: 16, height: 16 }} />
+                    <label htmlFor="decl" style={{ fontSize: 13, lineHeight: 1.55, cursor: 'pointer' }}>
+                      {declInfo?.texto || 'Carregando o texto da declaração...'}
+                    </label>
+                  </div>
+                  <div className="cell-muted" style={{ fontSize: 11, marginTop: 8 }}>
+                    Necessária para {modoEnvio === 'agendar' ? 'agendar' : 'enviar'}. Registra usuário, data, hora e IP na auditoria. Mudou o público depois? O sistema exige aceitar de novo.
+                  </div>
+                </div>
+              ) : (
+                <div className="aviso" style={{ marginTop: 14 }}>
+                  <b>Rascunho.</b> Nada será enviado agora. A campanha fica guardada e você conclui — envia ou agenda — quando quiser, abrindo ela na lista.
+                </div>
+              )}
             </>
             );
           })()}
