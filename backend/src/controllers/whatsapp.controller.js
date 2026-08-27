@@ -50,6 +50,28 @@ async function handleStatus(st) {
   const wamid = st?.id;
   const status = st?.status; // sent | delivered | read | failed
   if (!wamid || !status) return;
+
+  // Registro central de envios: o recebimento atualiza a MESMA linha do envio,
+  // seja campanha, jornada, teste ou conversa.
+  try {
+    const log = await prisma.messageLog.findFirst({ where: { wamid } });
+    if (log) {
+      if (status === 'delivered' && log.status === 'ENVIADO') {
+        await prisma.messageLog.update({ where: { id: log.id }, data: { status: 'ENTREGUE', deliveredAt: new Date() } });
+      } else if (status === 'read' && ['ENVIADO', 'ENTREGUE'].includes(log.status)) {
+        await prisma.messageLog.update({
+          where: { id: log.id },
+          data: { status: 'LIDA', readAt: new Date(), deliveredAt: log.deliveredAt || new Date() },
+        });
+      } else if (status === 'failed' && ['ENVIADO', 'ENTREGUE'].includes(log.status)) {
+        const motivo = st?.errors?.[0]?.title || st?.errors?.[0]?.message || 'Falha reportada pela Meta';
+        await prisma.messageLog.update({ where: { id: log.id }, data: { status: 'FALHA', error: String(motivo).slice(0, 300) } });
+      }
+    }
+  } catch (e) {
+    console.warn('[registro-envios] status não aplicado:', e.message);
+  }
+
   const contato = await prisma.broadcastContact.findFirst({ where: { wamid } });
   if (!contato) return;
 
@@ -112,7 +134,7 @@ async function handleInbound({ phone, name, body, phoneNumberId }) {
       });
     }
     const confirmacao = 'Pronto. Seu número foi removido da lista de comunicações e você não receberá novas mensagens. Se mudar de ideia, é só escrever VOLTAR.';
-    await sendWhatsApp({ to: phone, body: confirmacao, phoneNumberId });
+    await sendWhatsApp({ to: phone, body: confirmacao, phoneNumberId, origem: { tipo: 'CONVERSA', nome: name || null } });
     return { optOut: true };
   }
   // Reversão do opt-out a pedido do próprio titular.
@@ -120,7 +142,7 @@ async function handleInbound({ phone, name, body, phoneNumberId }) {
     const nucleo = nucleoFone(phone);
     const removidos = await prisma.blacklist.deleteMany({ where: { phone: { in: [nucleo, '55' + nucleo, phone] } } });
     if (removidos.count > 0) {
-      await sendWhatsApp({ to: phone, body: 'Seu número voltou a receber as comunicações da campanha. Para sair novamente, escreva SAIR.', phoneNumberId });
+      await sendWhatsApp({ to: phone, body: 'Seu número voltou a receber as comunicações da campanha. Para sair novamente, escreva SAIR.', phoneNumberId, origem: { tipo: 'CONVERSA', nome: name || null } });
       return { optIn: true };
     }
   }
@@ -199,7 +221,8 @@ async function handleInbound({ phone, name, body, phoneNumberId }) {
         ? `Anotado, ${primeiro}! Seu kit de campanha foi registrado e a equipe vai organizar a entrega. Obrigado por caminhar junto!`
         : 'Anotado! Seu kit de campanha foi registrado. Para agilizar a entrega, responda com seu nome completo, bairro e cidade.';
     }
-    const r = await sendWhatsApp({ to: phone, body: texto, phoneNumberId });
+    const quemNome = quem?.name || name || null;
+    const r = await sendWhatsApp({ to: phone, body: texto, phoneNumberId, origem: { tipo: 'CONVERSA', refId: convo.id, nome: quemNome } });
     await prisma.message.create({
       data: { conversationId: convo.id, direction: 'OUTBOUND', body: texto, channel: 'WHATSAPP', externalId: r.id },
     });
@@ -207,7 +230,7 @@ async function handleInbound({ phone, name, body, phoneNumberId }) {
   }
   if (resposta === 'agora não' || resposta === 'agora nao') {
     const texto = 'Tudo bem, obrigado por responder! Se mudar de ideia, é só escrever por aqui.';
-    const r = await sendWhatsApp({ to: phone, body: texto, phoneNumberId });
+    const r = await sendWhatsApp({ to: phone, body: texto, phoneNumberId, origem: { tipo: 'CONVERSA', refId: convo.id, nome: name || null } });
     await prisma.message.create({
       data: { conversationId: convo.id, direction: 'OUTBOUND', body: texto, channel: 'WHATSAPP', externalId: r.id },
     });
@@ -224,7 +247,7 @@ async function handleInbound({ phone, name, body, phoneNumberId }) {
       await prisma.supporter.update({ where: { id: supporter.id }, data: { status: 'CONFIRMADO' } });
       const ask =
         'Que ótimo! Como você prefere ajudar? Responda: (1) Caminhadas (2) Faixa em casa (3) Material digital (4) Eventos';
-      const r = await sendWhatsApp({ to: phone, body: ask, phoneNumberId });
+      const r = await sendWhatsApp({ to: phone, body: ask, phoneNumberId, origem: { tipo: 'CONVERSA', refId: convo.id, nome: supporter?.name || null } });
       await prisma.message.create({
         data: { conversationId: convo.id, direction: 'OUTBOUND', body: ask, channel: 'WHATSAPP', externalId: r.id },
       });

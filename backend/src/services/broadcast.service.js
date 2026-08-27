@@ -119,12 +119,12 @@ const CODES_LIMITE_NUMERO = new Set([130429, 131048, 80007]);
  * devolver limite DO NÚMERO, esgota-o por hoje e tenta UMA vez com o próximo.
  * Devolve { result, numero } ou { poolEsgotado: true }.
  */
-async function enviarPeloPool(montarPayload) {
+async function enviarPeloPool(montarPayload, origem) {
   const usados = [];
   for (let tentativa = 0; tentativa < 2; tentativa++) {
     const numero = await escolherNumero(usados);
     if (!numero) return { poolEsgotado: true };
-    const result = await sendWhatsApp({ ...montarPayload(), phoneNumberId: numero.phoneNumberId || undefined });
+    const result = await sendWhatsApp({ ...montarPayload(), phoneNumberId: numero.phoneNumberId || undefined, origem });
     const code = result?.raw?.error?.code;
     if (result?.success === false && CODES_LIMITE_NUMERO.has(code) && !numero.sintetico) {
       await esgotarNumeroHoje(numero);
@@ -290,7 +290,7 @@ export async function processarLote(campaignId, { batch = 25 } = {}) {
         }
         const body = renderTemplate(campaign.message, { nome: c.name, cidade: c.cityName, bairro: c.neighborhood, responsavel: c.responsible });
         return { to: c.phone, body };
-      });
+      }, { tipo: 'CAMPANHA', refId: campaignId, nome: c.name || null });
       if (envio.poolEsgotado) {
         // Limite diário de todos os números atingido — o contato fica PENDENTE
         // e o cron retoma sozinho na virada do dia.

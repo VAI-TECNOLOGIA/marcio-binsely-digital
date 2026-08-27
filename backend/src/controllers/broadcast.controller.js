@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import prisma from '../config/prisma.js';
+import { Prisma as PrismaNS } from '../generated/prisma/index.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { AppError } from '../utils/AppError.js';
 import { audit } from '../utils/audit.js';
@@ -292,16 +293,16 @@ export const creditosStatus = asyncHandler(async (_req, res) => {
  */
 export const extrato = asyncHandler(async (req, res) => {
   const where = {};
-  if (req.query.campaignId) where.campaignId = String(req.query.campaignId);
+  if (req.query.kind) where.kind = String(req.query.kind);
+  if (req.query.campaignId) where.refId = String(req.query.campaignId);
   if (req.query.status) where.status = String(req.query.status);
-  else where.status = { not: 'PENDENTE' }; // extrato mostra o que já foi processado
   if (req.query.sender) where.senderPhoneId = String(req.query.sender);
   const busca = String(req.query.search || '').trim();
   if (busca) {
     const digitos = busca.replace(/\D/g, '');
     where.OR = [
-      { name: { contains: busca, mode: 'insensitive' } },
-      ...(digitos ? [{ phone: { contains: digitos } }] : []),
+      { toName: { contains: busca, mode: 'insensitive' } },
+      ...(digitos ? [{ to: { contains: digitos } }] : []),
     ];
   }
   if (req.query.de || req.query.ate) {
@@ -310,19 +311,33 @@ export const extrato = asyncHandler(async (req, res) => {
     if (req.query.ate) where.sentAt.lte = new Date(`${req.query.ate}T23:59:59-03:00`);
   }
 
-  const porStatus = await prisma.broadcastContact.groupBy({ by: ['status'], where, _count: { _all: true } });
-  const resumo = Object.fromEntries(porStatus.map((s) => [s.status, s._count._all]));
-  const total = porStatus.reduce((acc, s) => acc + s._count._all, 0);
+  // Totais em destaque (mesmos filtros da listagem).
+  const porStatus = await prisma.messageLog.groupBy({ by: ['status'], where, _count: { _all: true } });
+  const resumo = Object.fromEntries(porStatus.map((x) => [x.status, x._count._all]));
+  const total = porStatus.reduce((acc, x) => acc + x._count._all, 0);
+
+  // Envios e recebimentos POR DIA (fuso de Brasília) — alimenta a visão diária.
+  const conds = [PrismaNS.sql`1=1`];
+  if (req.query.kind) conds.push(PrismaNS.sql`"kind" = ${String(req.query.kind)}`);
+  if (req.query.campaignId) conds.push(PrismaNS.sql`"refId" = ${String(req.query.campaignId)}`);
+  if (req.query.sender) conds.push(PrismaNS.sql`"senderPhoneId" = ${String(req.query.sender)}`);
+  if (req.query.de) conds.push(PrismaNS.sql`"sentAt" >= ${new Date(`${req.query.de}T00:00:00-03:00`)}`);
+  if (req.query.ate) conds.push(PrismaNS.sql`"sentAt" <= ${new Date(`${req.query.ate}T23:59:59-03:00`)}`);
+  const porDia = await prisma.$queryRaw`
+    SELECT to_char("sentAt" AT TIME ZONE 'America/Sao_Paulo', 'YYYY-MM-DD') AS dia,
+      COUNT(*) FILTER (WHERE status IN ('ENVIADO','ENTREGUE','LIDA'))::int AS enviadas,
+      COUNT(*) FILTER (WHERE status IN ('ENTREGUE','LIDA'))::int AS entregues,
+      COUNT(*) FILTER (WHERE status = 'LIDA')::int AS lidas,
+      COUNT(*) FILTER (WHERE status = 'FALHA')::int AS falhas
+    FROM "MessageLog"
+    WHERE ${PrismaNS.join(conds, ' AND ')}
+    GROUP BY 1 ORDER BY 1 DESC LIMIT 31`;
 
   if (req.query.format === 'csv') {
-    const rows = await prisma.broadcastContact.findMany({
-      where,
-      orderBy: [{ sentAt: 'desc' }, { createdAt: 'desc' }],
-      include: { campaign: { select: { name: true } } },
-    });
+    const rows = await prisma.messageLog.findMany({ where, orderBy: { sentAt: 'desc' } });
     const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-    const csv = ['enviado_em,campanha,nome,telefone,numero_remetente,status,entregue_em,lido_em,erro']
-      .concat(rows.map((c) => [c.sentAt?.toISOString(), c.campaign?.name, c.name, c.phone, c.senderPhoneId, c.status, c.deliveredAt?.toISOString(), c.readAt?.toISOString(), c.error].map(esc).join(',')))
+    const csv = ['enviado_em,origem,template_ou_texto,nome,telefone,numero_remetente,status,entregue_em,lido_em,erro']
+      .concat(rows.map((c) => [c.sentAt?.toISOString(), c.kind, c.refType, c.toName, c.to, c.senderPhoneId, c.status, c.deliveredAt?.toISOString(), c.readAt?.toISOString(), c.error].map(esc).join(',')))
       .join('\n');
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader('Content-Disposition', 'attachment; filename="extrato-envios.csv"');
@@ -331,14 +346,8 @@ export const extrato = asyncHandler(async (req, res) => {
 
   const page = Math.max(1, parseInt(req.query.page || '1', 10));
   const take = Math.min(100, Math.max(10, parseInt(req.query.take || '50', 10)));
-  const data = await prisma.broadcastContact.findMany({
-    where,
-    orderBy: [{ sentAt: 'desc' }, { createdAt: 'desc' }],
-    skip: (page - 1) * take,
-    take,
-    include: { campaign: { select: { id: true, name: true } } },
-  });
-  res.json({ total, page, take, resumo, data });
+  const data = await prisma.messageLog.findMany({ where, orderBy: { sentAt: 'desc' }, skip: (page - 1) * take, take });
+  res.json({ total, page, take, resumo, porDia, data });
 });
 
 /** Pool de números do rodízio: envios de hoje, limite e situação de cada um. */
@@ -401,9 +410,10 @@ export const teste = asyncHandler(async (req, res) => {
     result = await sendWhatsApp({
       to: phone,
       template: { name: tpl.name, language: { code: campaign.templateLang || tpl.language || 'pt_BR' }, components: montarComponentesTemplate(tpl, campaign, exemplo) },
+      origem: { tipo: 'TESTE', refId: campaign.id, nome: 'Teste da campanha' },
     });
   } else {
-    result = await sendWhatsApp({ to: phone, body: campaign.message });
+    result = await sendWhatsApp({ to: phone, body: campaign.message, origem: { tipo: 'TESTE', refId: campaign.id, nome: 'Teste da campanha' } });
   }
   if (result?.success === false) throw new AppError(`A Meta recusou o teste: ${result.error}`, 400);
   await prisma.creditPackage.update({ where: { id: pkg.id }, data: { used: { increment: 1 } } });

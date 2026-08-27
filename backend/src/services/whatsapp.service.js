@@ -21,12 +21,38 @@ function normalizarNumeroBR(to) {
   return d;
 }
 
+/**
+ * Registro central de envios (Extrato): UMA linha por mensagem que sai pela
+ * API Oficial. Nunca quebra o envio — falha de log é só avisada no console.
+ */
+async function registrarEnvio({ wamid, to, remetente, origem, template, ok, erro }) {
+  try {
+    await prisma.messageLog.create({
+      data: {
+        wamid: wamid || null,
+        to,
+        toName: origem?.nome || null,
+        kind: origem?.tipo || 'AVULSO',
+        refType: origem?.refType || template?.name || 'texto',
+        refId: origem?.refId || null,
+        senderPhoneId: remetente || null,
+        status: ok ? 'ENVIADO' : 'FALHA',
+        error: ok ? null : String(erro || 'Falha no envio').slice(0, 300),
+      },
+    });
+  } catch (e) {
+    console.warn('[registro-envios] falha ao gravar (ignorada):', e.message);
+  }
+}
+
 // phoneNumberId (opcional) escolhe o número remetente — usado pelo rodízio do
 // pool de disparo e pelas respostas de conversa (sair pelo número que recebeu).
-// Sem ele, usa o número principal do .env.
-export async function sendWhatsApp({ to, body, template, phoneNumberId }) {
+// Sem ele, usa o número principal do .env. origem = {tipo, refId, nome, refType}
+// classifica a linha no registro central (CAMPANHA/JORNADA/TESTE/CONVERSA).
+export async function sendWhatsApp({ to, body, template, phoneNumberId, origem }) {
   if (env.whatsapp.provider === 'meta_cloud' && env.whatsapp.token) {
-    const url = `https://graph.facebook.com/v20.0/${phoneNumberId || env.whatsapp.phoneNumberId}/messages`;
+    const remetente = phoneNumberId || env.whatsapp.phoneNumberId;
+    const url = `https://graph.facebook.com/v20.0/${remetente}/messages`;
     const dest = normalizarNumeroBR(to);
     const payload = template
       ? { messaging_product: 'whatsapp', to: dest, type: 'template', template }
@@ -46,11 +72,16 @@ export async function sendWhatsApp({ to, body, template, phoneNumberId }) {
       // Só é sucesso quando a Meta devolve o id da mensagem. Caso contrário
       // (janela de 24h fechada, número inválido, sem template/pagamento…) é
       // FALHA — não pode ser tratado como enviado.
-      if (resp.ok && id) return { provider: 'meta_cloud', id, success: true, raw: data };
+      if (resp.ok && id) {
+        await registrarEnvio({ wamid: id, to: dest, remetente, origem, template, ok: true });
+        return { provider: 'meta_cloud', id, success: true, raw: data };
+      }
       const err = data?.error;
       const motivo = err?.error_user_msg || err?.message || 'A Meta recusou o envio.';
+      await registrarEnvio({ to: dest, remetente, origem, template, ok: false, erro: motivo });
       return { provider: 'meta_cloud', id: null, success: false, error: motivo, raw: data };
     } catch (e) {
+      await registrarEnvio({ to: dest, remetente, origem, template, ok: false, erro: 'Falha de conexão com a API do WhatsApp.' });
       return { provider: 'meta_cloud', id: null, success: false, error: 'Falha de conexão com a API do WhatsApp.', raw: data };
     }
   }
@@ -113,7 +144,7 @@ export async function enviarAcessoLiberado({ to, nome, email, token }) {
       { type: 'button', sub_type: 'url', index: '0', parameters: [{ type: 'text', text: String(token) }] },
     ],
   };
-  return sendWhatsApp({ to, template });
+  return sendWhatsApp({ to, template, origem: { tipo: 'JORNADA', nome: String(nome || '') || null } });
 }
 
 /**
@@ -135,7 +166,7 @@ export async function dispararJornada(name, to, params = []) {
     const components = params.length
       ? [{ type: 'body', parameters: params.map((p) => ({ type: 'text', text: String(p ?? '—').slice(0, 300) })) }]
       : [];
-    const r = await sendWhatsApp({ to: phone, template: { name, language: { code: 'pt_BR' }, components } });
+    const r = await sendWhatsApp({ to: phone, template: { name, language: { code: 'pt_BR' }, components }, origem: { tipo: 'JORNADA', nome: String(params[0] || '') || null } });
     if (r?.success === false) console.warn(`[jornada:${name}] falhou p/ ${phone}: ${r.error}`);
     return r;
   } catch (e) {
@@ -154,7 +185,7 @@ export async function enviarRecuperarSenha({ to, nome, token }) {
       { type: 'button', sub_type: 'url', index: '0', parameters: [{ type: 'text', text: String(token) }] },
     ],
   };
-  return sendWhatsApp({ to, template });
+  return sendWhatsApp({ to, template, origem: { tipo: 'JORNADA', nome: String(nome || '') || null } });
 }
 
 /** Estrutura de um template pelo nome (para montar o envio). */

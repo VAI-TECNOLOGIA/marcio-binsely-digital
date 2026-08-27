@@ -48,7 +48,7 @@ export const reply = asyncHandler(async (req, res) => {
   if (!convo) throw new AppError('Conversa não encontrada', 404);
 
   // Resposta sai pelo número em que a pessoa escreveu (janela de 24h por número).
-  const result = await sendViaChannel(convo.channel, { to: convo.contactPhone, body, phoneNumberId: convo.phoneNumberId || undefined });
+  const result = await sendViaChannel(convo.channel, { to: convo.contactPhone, body, phoneNumberId: convo.phoneNumberId || undefined, origem: { tipo: 'CONVERSA', refId: convo.id, nome: convo.contactName || null } });
   // Se o canal (WhatsApp) recusou o envio, NÃO salva a mensagem como enviada —
   // devolve o motivo (ex.: fora da janela de 24h) para o atendente ver e reenviar.
   if (result && result.success === false) {

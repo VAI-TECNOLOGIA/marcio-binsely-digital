@@ -851,6 +851,34 @@ model WhatsappNumber {
   createdAt     DateTime  @default(now())
 }
 
+// Registro central de envios — UMA linha por mensagem que sai pela API
+// Oficial, de qualquer origem (campanha, automática/jornada, teste, conversa,
+// avulso). O recebimento (entregue/lida) atualiza a mesma linha via webhook
+// pelo wamid. Alimenta o Extrato de envios.
+model MessageLog {
+  id            String    @id @default(uuid())
+  wamid         String?
+  to            String
+  toName        String?
+  // CAMPANHA | JORNADA | TESTE | CONVERSA | AVULSO
+  kind          String    @default("AVULSO")
+  // Nome do template ou "texto" (mensagem livre).
+  refType       String?
+  // Vínculo com a origem (id da campanha, da conversa etc).
+  refId         String?
+  senderPhoneId String?
+  status        String    @default("ENVIADO") // ENVIADO | ENTREGUE | LIDA | FALHA
+  error         String?
+  sentAt        DateTime  @default(now())
+  deliveredAt   DateTime?
+  readAt        DateTime?
+
+  @@index([wamid])
+  @@index([sentAt])
+  @@index([status])
+  @@index([kind])
+}
+
 // Pacote de créditos de mensagem contratado (ex.: 80.000 · 120 dias).
 // used incrementa a cada envio ACEITO pela API. Saldo = total - used.
 model CreditPackage {

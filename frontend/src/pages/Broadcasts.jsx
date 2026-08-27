@@ -24,6 +24,9 @@ import { label, options } from '../config/enums.js';
 //  marcada), créditos com validade e envio agora ou agendado.
 // ============================================================
 
+const ORIGENS = {
+  CAMPANHA: 'Campanha', JORNADA: 'Automática', TESTE: 'Teste', CONVERSA: 'Conversa', AVULSO: 'Avulso',
+};
 const FONTES_VAR = [
   { value: 'nome', label: 'Nome do contato' },
   { value: 'cidade', label: 'Cidade' },
@@ -115,7 +118,7 @@ export default function Broadcasts() {
   // Extrato de envios (monitoramento cruzando campanhas)
   const [extratoOpen, setExtratoOpen] = useState(false);
   const [extrato, setExtrato] = useState({ data: [], total: 0, page: 1, resumo: {} });
-  const [exFiltro, setExFiltro] = useState({ campaignId: '', status: '', sender: '', search: '', de: '', ate: '', page: 1 });
+  const [exFiltro, setExFiltro] = useState({ campaignId: '', status: '', sender: '', search: '', de: '', ate: '', kind: '', page: 1 });
 
   // Detalhe
   const [detail, setDetail] = useState(null);
@@ -142,7 +145,7 @@ export default function Broadcasts() {
   async function carregarExtrato(filtro = exFiltro) {
     try {
       const params = { page: filtro.page || 1, take: 50 };
-      for (const k of ['campaignId', 'status', 'sender', 'search', 'de', 'ate']) if (filtro[k]) params[k] = filtro[k];
+      for (const k of ['campaignId', 'status', 'sender', 'search', 'de', 'ate', 'kind']) if (filtro[k]) params[k] = filtro[k];
       const { data } = await api.get('/broadcasts/extrato/lista', { params });
       setExtrato(data);
     } catch (e) {
@@ -160,7 +163,7 @@ export default function Broadcasts() {
   async function exportarExtrato() {
     try {
       const params = { format: 'csv' };
-      for (const k of ['campaignId', 'status', 'sender', 'search', 'de', 'ate']) if (exFiltro[k]) params[k] = exFiltro[k];
+      for (const k of ['campaignId', 'status', 'sender', 'search', 'de', 'ate', 'kind']) if (exFiltro[k]) params[k] = exFiltro[k];
       const resp = await api.get('/broadcasts/extrato/lista', { params, responseType: 'blob' });
       const url = URL.createObjectURL(resp.data);
       const a = document.createElement('a');
@@ -557,7 +560,7 @@ export default function Broadcasts() {
           {options('BroadcastStatus').map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
         <div className="spacer" />
-        <button className="btn" onClick={() => { setExFiltro({ campaignId: '', status: '', sender: '', search: '', de: '', ate: '', page: 1 }); setExtratoOpen(true); }}>
+        <button className="btn" onClick={() => { setExFiltro({ campaignId: '', status: '', sender: '', search: '', de: '', ate: '', kind: '', page: 1 }); setExtratoOpen(true); }}>
           <ScrollText size={16} /> Extrato de envios
         </button>
         <button className="btn btn-primary" onClick={abrirWizard}><Plus size={16} /> Nova campanha</button>
@@ -827,6 +830,10 @@ export default function Broadcasts() {
           })()}
 
           <div className="flex gap-8" style={{ flexWrap: 'wrap', marginBottom: 10, alignItems: 'center' }}>
+            <select className="select" style={{ width: 'auto' }} value={exFiltro.kind} onChange={(e) => setExF('kind', e.target.value)}>
+              <option value="">Todas as origens</option>
+              {Object.entries(ORIGENS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+            </select>
             <select className="select" style={{ width: 'auto', maxWidth: 220 }} value={exFiltro.campaignId} onChange={(e) => setExF('campaignId', e.target.value)}>
               <option value="">Todas as campanhas</option>
               {list.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -845,16 +852,39 @@ export default function Broadcasts() {
             <button className="btn btn-ghost btn-sm" onClick={exportarExtrato}><Download size={14} /> CSV</button>
           </div>
 
+          {extrato.porDia?.length > 0 && (
+            <div className="table-wrap" style={{ marginBottom: 12 }}>
+              <table className="table">
+                <thead><tr><th>Dia</th><th>Enviadas</th><th>Entregues</th><th>Lidas</th><th>Falhas</th></tr></thead>
+                <tbody>
+                  {extrato.porDia.map((d) => (
+                    <tr key={d.dia}>
+                      <td className="cell-strong">{d.dia.split('-').reverse().join('/')}</td>
+                      <td>{d.enviadas}</td>
+                      <td style={{ color: 'var(--green-rs, #2DBE60)' }}>{d.entregues}{d.enviadas ? ` (${Math.round((d.entregues / d.enviadas) * 100)}%)` : ''}</td>
+                      <td>{d.lidas}{d.enviadas ? ` (${Math.round((d.lidas / d.enviadas) * 100)}%)` : ''}</td>
+                      <td style={{ color: d.falhas ? 'var(--red, #c53030)' : 'inherit' }}>{d.falhas}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
           <div className="table-wrap">
             <table className="table">
-              <thead><tr><th>Enviado em</th><th>Campanha</th><th>Nome</th><th>Telefone</th><th>Via</th><th>Status</th><th>Recebimento</th></tr></thead>
+              <thead><tr><th>Enviado em</th><th>Origem</th><th>Nome</th><th>Telefone</th><th>Via</th><th>Status</th><th>Recebimento</th></tr></thead>
               <tbody>
                 {extrato.data.map((c) => (
                   <tr key={c.id}>
-                    <td style={{ whiteSpace: 'nowrap' }}>{fmtData(c.sentAt || c.createdAt)}</td>
-                    <td className="cell-muted" style={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.campaign?.name || '—'}</td>
-                    <td>{c.name || '—'}</td>
-                    <td style={{ whiteSpace: 'nowrap' }}>{c.phone}</td>
+                    <td style={{ whiteSpace: 'nowrap' }}>{fmtData(c.sentAt)}</td>
+                    <td className="cell-muted" style={{ maxWidth: 170, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {ORIGENS[c.kind] || c.kind}
+                      {c.kind === 'CAMPANHA' && (list.find((x) => x.id === c.refId)?.name ? ` · ${list.find((x) => x.id === c.refId).name}` : '')}
+                      {c.refType && c.refType !== 'texto' ? ` · ${c.refType}` : ''}
+                    </td>
+                    <td>{c.toName || '—'}</td>
+                    <td style={{ whiteSpace: 'nowrap' }}>{c.to}</td>
                     <td className="cell-muted" style={{ whiteSpace: 'nowrap' }}>{displayNumero(c.senderPhoneId)}</td>
                     <td><StatusBadge group="BroadcastContactStatus" value={c.status} /></td>
                     <td className="cell-muted" style={{ fontSize: 12 }}>

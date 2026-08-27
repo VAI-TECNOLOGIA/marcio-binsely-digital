@@ -6,10 +6,10 @@ import { sendWhatsApp } from './whatsapp.service.js';
 //  WhatsApp / Instagram Direct / Messenger / SMS / Chat interno.
 // ============================================================
 
-export async function sendViaChannel(channel, { to, body, phoneNumberId }) {
+export async function sendViaChannel(channel, { to, body, phoneNumberId, origem }) {
   switch (channel) {
     case 'WHATSAPP':
-      return sendWhatsApp({ to, body, phoneNumberId });
+      return sendWhatsApp({ to, body, phoneNumberId, origem });
     case 'SMS':
       console.log(`[sms:${env.sms.provider}] -> ${to}: ${body}`);
       return { provider: env.sms.provider, id: `sms.${Date.now()}`, simulated: true };
