@@ -284,6 +284,63 @@ export const creditosStatus = asyncHandler(async (_req, res) => {
   });
 });
 
+/**
+ * Extrato de envios — monitoramento linha a linha cruzando as campanhas.
+ * Cada linha: quando saiu, por qual número, e o recebimento (entregue/lida)
+ * confirmado pelo webhook da Meta. Filtros: campanha, status, número, busca
+ * e período. format=csv exporta o extrato filtrado completo.
+ */
+export const extrato = asyncHandler(async (req, res) => {
+  const where = {};
+  if (req.query.campaignId) where.campaignId = String(req.query.campaignId);
+  if (req.query.status) where.status = String(req.query.status);
+  else where.status = { not: 'PENDENTE' }; // extrato mostra o que já foi processado
+  if (req.query.sender) where.senderPhoneId = String(req.query.sender);
+  const busca = String(req.query.search || '').trim();
+  if (busca) {
+    const digitos = busca.replace(/\D/g, '');
+    where.OR = [
+      { name: { contains: busca, mode: 'insensitive' } },
+      ...(digitos ? [{ phone: { contains: digitos } }] : []),
+    ];
+  }
+  if (req.query.de || req.query.ate) {
+    where.sentAt = {};
+    if (req.query.de) where.sentAt.gte = new Date(`${req.query.de}T00:00:00-03:00`);
+    if (req.query.ate) where.sentAt.lte = new Date(`${req.query.ate}T23:59:59-03:00`);
+  }
+
+  const porStatus = await prisma.broadcastContact.groupBy({ by: ['status'], where, _count: { _all: true } });
+  const resumo = Object.fromEntries(porStatus.map((s) => [s.status, s._count._all]));
+  const total = porStatus.reduce((acc, s) => acc + s._count._all, 0);
+
+  if (req.query.format === 'csv') {
+    const rows = await prisma.broadcastContact.findMany({
+      where,
+      orderBy: [{ sentAt: 'desc' }, { createdAt: 'desc' }],
+      include: { campaign: { select: { name: true } } },
+    });
+    const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const csv = ['enviado_em,campanha,nome,telefone,numero_remetente,status,entregue_em,lido_em,erro']
+      .concat(rows.map((c) => [c.sentAt?.toISOString(), c.campaign?.name, c.name, c.phone, c.senderPhoneId, c.status, c.deliveredAt?.toISOString(), c.readAt?.toISOString(), c.error].map(esc).join(',')))
+      .join('\n');
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="extrato-envios.csv"');
+    return res.send('\uFEFF' + csv);
+  }
+
+  const page = Math.max(1, parseInt(req.query.page || '1', 10));
+  const take = Math.min(100, Math.max(10, parseInt(req.query.take || '50', 10)));
+  const data = await prisma.broadcastContact.findMany({
+    where,
+    orderBy: [{ sentAt: 'desc' }, { createdAt: 'desc' }],
+    skip: (page - 1) * take,
+    take,
+    include: { campaign: { select: { id: true, name: true } } },
+  });
+  res.json({ total, page, take, resumo, data });
+});
+
 /** Pool de números do rodízio: envios de hoje, limite e situação de cada um. */
 export const poolStatus = asyncHandler(async (_req, res) => {
   const numeros = await poolNumeros();

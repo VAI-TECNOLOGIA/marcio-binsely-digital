@@ -8,6 +8,7 @@ const r = Router();
 r.get('/', authorize('LIDER', 'MEMBRO'), bc.list);
 r.get('/creditos/status', authorize('LIDER', 'MEMBRO'), bc.creditosStatus);
 r.get('/pool/status', authorize('LIDER', 'MEMBRO'), bc.poolStatus);
+r.get('/extrato/lista', authorize('LIDER', 'MEMBRO'), bc.extrato);
 r.patch('/pool/:numeroId', authorize('LIDER'), bc.poolUpdate);
 r.get('/declaracao/texto', authorize('LIDER', 'MEMBRO'), bc.declaracaoTexto);
 r.get('/audiencia/opcoes', authorize('LIDER', 'MEMBRO'), bc.audienciaOpcoes);

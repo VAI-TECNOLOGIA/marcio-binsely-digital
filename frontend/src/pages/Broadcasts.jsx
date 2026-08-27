@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Plus, Send, Megaphone, X, Search, Users, ShieldCheck, Clock, Copy, Trash2,
   Download, Pause, Play, ChevronLeft, ChevronRight, Zap, ClipboardList, RefreshCw,
+  ScrollText,
 } from 'lucide-react';
 import Layout from '../components/layout/Layout.jsx';
 import { Card } from '../components/ui/Card.jsx';
@@ -111,6 +112,11 @@ export default function Broadcasts() {
   const [declAceita, setDeclAceita] = useState(false);
   const [fonesTeste, setFoneTeste] = useState('');
 
+  // Extrato de envios (monitoramento cruzando campanhas)
+  const [extratoOpen, setExtratoOpen] = useState(false);
+  const [extrato, setExtrato] = useState({ data: [], total: 0, page: 1, resumo: {} });
+  const [exFiltro, setExFiltro] = useState({ campaignId: '', status: '', sender: '', search: '', de: '', ate: '', page: 1 });
+
   // Detalhe
   const [detail, setDetail] = useState(null);
   const [contatos, setContatos] = useState({ data: [], total: 0, page: 1 });
@@ -131,6 +137,43 @@ export default function Broadcasts() {
     api.get('/broadcasts/creditos/status').then(({ data }) => setCreditos(data)).catch(() => {});
     api.get('/broadcasts/pool/status').then(({ data }) => setPool(data)).catch(() => {});
   }
+
+  // ---------- Extrato de envios ----------
+  async function carregarExtrato(filtro = exFiltro) {
+    try {
+      const params = { page: filtro.page || 1, take: 50 };
+      for (const k of ['campaignId', 'status', 'sender', 'search', 'de', 'ate']) if (filtro[k]) params[k] = filtro[k];
+      const { data } = await api.get('/broadcasts/extrato/lista', { params });
+      setExtrato(data);
+    } catch (e) {
+      toast.error(apiError(e));
+    }
+  }
+  useEffect(() => {
+    if (!extratoOpen) return;
+    carregarExtrato();
+    const t = setInterval(() => carregarExtrato(), 8000); // monitor: atualiza sozinho
+    return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [extratoOpen, exFiltro]);
+
+  async function exportarExtrato() {
+    try {
+      const params = { format: 'csv' };
+      for (const k of ['campaignId', 'status', 'sender', 'search', 'de', 'ate']) if (exFiltro[k]) params[k] = exFiltro[k];
+      const resp = await api.get('/broadcasts/extrato/lista', { params, responseType: 'blob' });
+      const url = URL.createObjectURL(resp.data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'extrato-envios.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      toast.error(apiError(e));
+    }
+  }
+  const setExF = (k, v) => setExFiltro((f) => ({ ...f, [k]: v, page: 1 }));
+  const displayNumero = (phoneId) => pool?.numeros?.find((n) => n.phoneNumberId === phoneId)?.display || (phoneId ? `…${String(phoneId).slice(-6)}` : '—');
 
   async function alternarNumero(n) {
     try {
@@ -514,6 +557,9 @@ export default function Broadcasts() {
           {options('BroadcastStatus').map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
         <div className="spacer" />
+        <button className="btn" onClick={() => { setExFiltro({ campaignId: '', status: '', sender: '', search: '', de: '', ate: '', page: 1 }); setExtratoOpen(true); }}>
+          <ScrollText size={16} /> Extrato de envios
+        </button>
         <button className="btn btn-primary" onClick={abrirWizard}><Plus size={16} /> Nova campanha</button>
       </div>
 
@@ -756,6 +802,80 @@ export default function Broadcasts() {
               </div>
             </>
           )}
+        </Modal>
+      )}
+
+      {/* ==================== EXTRATO DE ENVIOS ==================== */}
+      {extratoOpen && (
+        <Modal title="Extrato de envios" wide onClose={() => setExtratoOpen(false)}>
+          {(() => {
+            const r = extrato.resumo || {};
+            const enviadas = (r.ENVIADO || 0) + (r.ENTREGUE || 0) + (r.LIDA || 0);
+            const entregues = (r.ENTREGUE || 0) + (r.LIDA || 0);
+            const lidas = r.LIDA || 0;
+            const falhas = r.FALHA || 0;
+            const txEnt = enviadas ? Math.round((entregues / enviadas) * 100) : 0;
+            const txLida = enviadas ? Math.round((lidas / enviadas) * 100) : 0;
+            return (
+              <div className="grid stats-grid" style={{ marginBottom: 14 }}>
+                <div className="stat-card"><div className="stat-meta"><div className="stat-label">Enviadas</div><div className="stat-value">{enviadas.toLocaleString('pt-BR')}</div></div></div>
+                <div className="stat-card"><div className="stat-meta"><div className="stat-label">Entregues</div><div className="stat-value" style={{ color: 'var(--green-rs, #2DBE60)' }}>{entregues.toLocaleString('pt-BR')} <span className="cell-muted" style={{ fontSize: 12, fontWeight: 400 }}>({txEnt}%)</span></div></div></div>
+                <div className="stat-card"><div className="stat-meta"><div className="stat-label">Lidas</div><div className="stat-value">{lidas.toLocaleString('pt-BR')} <span className="cell-muted" style={{ fontSize: 12, fontWeight: 400 }}>({txLida}%)</span></div></div></div>
+                <div className="stat-card"><div className="stat-meta"><div className="stat-label">Falhas</div><div className="stat-value" style={{ color: 'var(--red, #c53030)' }}>{falhas.toLocaleString('pt-BR')}</div></div></div>
+              </div>
+            );
+          })()}
+
+          <div className="flex gap-8" style={{ flexWrap: 'wrap', marginBottom: 10, alignItems: 'center' }}>
+            <select className="select" style={{ width: 'auto', maxWidth: 220 }} value={exFiltro.campaignId} onChange={(e) => setExF('campaignId', e.target.value)}>
+              <option value="">Todas as campanhas</option>
+              {list.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+            <select className="select" style={{ width: 'auto' }} value={exFiltro.status} onChange={(e) => setExF('status', e.target.value)}>
+              <option value="">Todos os status</option>
+              {options('BroadcastContactStatus').filter((o) => o.value !== 'PENDENTE').map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+            <select className="select" style={{ width: 'auto' }} value={exFiltro.sender} onChange={(e) => setExF('sender', e.target.value)}>
+              <option value="">Todos os números</option>
+              {(pool?.numeros || []).map((n) => <option key={n.phoneNumberId} value={n.phoneNumberId}>{n.display}</option>)}
+            </select>
+            <input className="input" type="date" style={{ width: 'auto' }} value={exFiltro.de} onChange={(e) => setExF('de', e.target.value)} title="De" />
+            <input className="input" type="date" style={{ width: 'auto' }} value={exFiltro.ate} onChange={(e) => setExF('ate', e.target.value)} title="Até" />
+            <input className="input" style={{ flex: 1, minWidth: 150 }} placeholder="Nome ou telefone..." value={exFiltro.search} onChange={(e) => setExF('search', e.target.value)} />
+            <button className="btn btn-ghost btn-sm" onClick={exportarExtrato}><Download size={14} /> CSV</button>
+          </div>
+
+          <div className="table-wrap">
+            <table className="table">
+              <thead><tr><th>Enviado em</th><th>Campanha</th><th>Nome</th><th>Telefone</th><th>Via</th><th>Status</th><th>Recebimento</th></tr></thead>
+              <tbody>
+                {extrato.data.map((c) => (
+                  <tr key={c.id}>
+                    <td style={{ whiteSpace: 'nowrap' }}>{fmtData(c.sentAt || c.createdAt)}</td>
+                    <td className="cell-muted" style={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.campaign?.name || '—'}</td>
+                    <td>{c.name || '—'}</td>
+                    <td style={{ whiteSpace: 'nowrap' }}>{c.phone}</td>
+                    <td className="cell-muted" style={{ whiteSpace: 'nowrap' }}>{displayNumero(c.senderPhoneId)}</td>
+                    <td><StatusBadge group="BroadcastContactStatus" value={c.status} /></td>
+                    <td className="cell-muted" style={{ fontSize: 12 }}>
+                      {c.status === 'FALHA'
+                        ? (c.error || 'Falha')
+                        : [c.deliveredAt && `entregue ${fmtData(c.deliveredAt)}`, c.readAt && `lida ${fmtData(c.readAt)}`].filter(Boolean).join(' · ') || 'aguardando confirmação'}
+                    </td>
+                  </tr>
+                ))}
+                {!extrato.data.length && <tr><td colSpan={7} className="cell-muted">Nenhum envio no período/filtros selecionados.</td></tr>}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex gap-8" style={{ alignItems: 'center', marginTop: 10 }}>
+            <span className="cell-muted" style={{ fontSize: 12 }}>{extrato.total.toLocaleString('pt-BR')} registro(s) · atualiza sozinho a cada 8s</span>
+            <div className="spacer" />
+            <button className="btn btn-ghost btn-sm" disabled={(exFiltro.page || 1) <= 1} onClick={() => setExFiltro((f) => ({ ...f, page: (f.page || 1) - 1 }))}><ChevronLeft size={14} /></button>
+            <span className="cell-muted" style={{ fontSize: 12 }}>pág. {exFiltro.page || 1}</span>
+            <button className="btn btn-ghost btn-sm" disabled={(exFiltro.page || 1) * 50 >= extrato.total} onClick={() => setExFiltro((f) => ({ ...f, page: (f.page || 1) + 1 }))}><ChevronRight size={14} /></button>
+          </div>
         </Modal>
       )}
 
